@@ -388,8 +388,28 @@
 
 <div class="bar">
   <div class="inner">
-    <button class="btn btn-ghost" onclick="goToResult()">📊 ดูผล</button>
-    <button class="btn btn-primary" onclick="shareResult()">↗ แชร์ผล</button>
+    <button class="btn btn-primary" onclick="openResultPage()">📊 ดูผล</button>
+  </div>
+</div>
+
+<!-- ============ RESULT PAGE ============ -->
+<div id="resultPage" style="display:none;position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <!-- header -->
+  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
+    <button onclick="closeResultPage()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">ผลการประเมิน</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">SmartWean Navigator</div>
+    </div>
+  </div>
+  <!-- content -->
+  <div id="resultPageContent" style="max-width:760px;margin:0 auto;padding:16px 14px 110px;"></div>
+  <!-- bottom bar -->
+  <div class="bar" style="z-index:61;">
+    <div class="inner">
+      <button class="btn btn-ghost" onclick="confirmReset()">🔄 ประเมินผลใหม่</button>
+      <button class="btn btn-primary" onclick="shareResult()">↗ แชร์</button>
+    </div>
   </div>
 </div>
 
@@ -914,10 +934,76 @@ function switchModule(m){
   });
   window.scrollTo({top:0,behavior:"smooth"});
 }
-function goToResult(){
-  const active=document.querySelector(".tab.active").dataset.m;
-  const res=document.getElementById("res"+active);
-  res.scrollIntoView({behavior:"smooth",block:"center"});
+
+/* ---------------- result page ---------------- */
+const modLabels=["Module 1 · Smart Readiness Assessment","Module 2 · SBT Guardian","Module 3 · PERRS Score"];
+const modIcons=["🟢","🟡","🔴"];
+function openResultPage(){
+  const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
+  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนดูผล");return;}
+  buildResultPageContent();
+  document.getElementById("resultPage").style.display="block";
+  document.getElementById("resultPage").scrollTop=0;
+}
+function closeResultPage(){
+  document.getElementById("resultPage").style.display="none";
+}
+function buildResultPageContent(){
+  const hn=document.getElementById("hn").value||"—";
+  const pname=document.getElementById("pname").value||"—";
+  const adate=document.getElementById("adate").value||"—";
+  const atime=document.getElementById("atime").value||"—";
+  const nurse=document.getElementById("nurse").value||"—";
+  let html=`<div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
+    <div class="rp-grid two" style="margin-top:10px">
+      <div class="rp-row"><span class="lk">HN</span><span class="lv">${hn}</span></div>
+      <div class="rp-row"><span class="lk">ชื่อ-นามสกุล</span><span class="lv">${pname}</span></div>
+      <div class="rp-row"><span class="lk">วันที่</span><span class="lv">${adate}</span></div>
+      <div class="rp-row"><span class="lk">เวลา</span><span class="lv">${atime}</span></div>
+    </div>
+    <div class="rp-row" style="margin-top:8px"><span class="lk">ผู้ประเมิน</span><span class="lv">${nurse}</span></div>
+  </div>`;
+  [1,2,3].forEach(i=>{
+    const src=document.getElementById("res"+i);
+    if(src.classList.contains("idle"))return;
+    const cls=["green","amber","red"].find(c=>src.classList.contains(c))||"amber";
+    const colorMap={green:"var(--green)",amber:"var(--amber)",red:"var(--red)"};
+    const bgMap={green:"var(--green-soft)",amber:"var(--amber-soft)",red:"var(--red-soft)"};
+    const borderColor=colorMap[cls];
+    const bg=bgMap[cls];
+    html+=`<div style="background:${bg};border:1.5px solid ${borderColor};border-radius:var(--radius);padding:18px 16px;margin-bottom:14px;animation:pop .3s ease">
+      <div style="font-size:12px;font-weight:700;color:${borderColor};letter-spacing:.4px;margin-bottom:8px">${modIcons[i-1]} ${modLabels[i-1]}</div>
+      ${src.innerHTML}
+    </div>`;
+  });
+  html+=`<div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">
+    ⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>`;
+  document.getElementById("resultPageContent").innerHTML=html;
+}
+function confirmReset(){
+  if(confirm("เริ่มประเมินผลใหม่? ข้อมูลที่กรอกทั้งหมดจะถูกล้าง")){
+    document.querySelectorAll("input[type=text],input[type=number],input[type=date],input[type=time],textarea")
+      .forEach(el=>{
+        if(el.id==="adate"||el.id==="atime")return;
+        el.value="";
+      });
+    document.querySelectorAll("input[type=radio],input[type=checkbox]").forEach(el=>{
+      el.checked=false;
+      el.closest(".opt")?.classList.remove("sel","good","warnbad");
+    });
+    [1,2,3].forEach(i=>{
+      const res=document.getElementById("res"+i);
+      const idle=i===1?"ผลการประเมิน Module 1":i===2?"ผลการประเมิน SBT รอบนี้":"PERRS Risk Assessment";
+      const sub=i===1?"กรอกข้อมูลด้านบนเพื่อดูผลแบบเรียลไทม์":i===2?"กรอก Vital Signs และ Red Flag เพื่อดูผล":"เลือกพารามิเตอร์ทั้ง 6 ข้อเพื่อคำนวณคะแนนและระดับความเสี่ยง";
+      res.className="result idle";
+      res.innerHTML=`<div class="light"><span class="dot a"></span>${idle}</div><div class="desc">${sub}</div>`;
+    });
+    document.getElementById("rsbiBox").innerHTML="RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ";
+    document.getElementById("roxBox").innerHTML="ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ";
+    closeResultPage();
+    switchModule(1);
+  }
 }
 // default date/time = now
 (function(){
