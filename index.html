@@ -159,7 +159,7 @@
     font-weight:700;font-size:15px;cursor:pointer;transition:.15s}
   .btn-primary{background:var(--teal);color:#fff}
   .btn-primary:active{background:var(--teal-deep)}
-  .btn-ghost{flex:none;width:52px;background:#fff;border:1.5px solid var(--line);color:var(--muted);font-size:18px}
+  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--teal-deep)}
   .module{display:none}
   .module.show{display:block;animation:fade .25s ease}
   @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -388,8 +388,8 @@
 
 <div class="bar">
   <div class="inner">
-    <button class="btn btn-ghost" onclick="goToResult()" title="ดูผล">📊</button>
-    <button class="btn btn-primary" onclick="exportPDF()">📄 บันทึก / Export PDF</button>
+    <button class="btn btn-ghost" onclick="goToResult()">📊 ดูผล</button>
+    <button class="btn btn-primary" onclick="shareResult()">↗ แชร์ผล</button>
   </div>
 </div>
 
@@ -868,6 +868,42 @@ function exportPDF(){
   }
   buildReport();
   setTimeout(()=>window.print(),60);
+}
+function shareResult(){
+  const allIdle=document.getElementById("res1").classList.contains("idle")
+    &&document.getElementById("res2").classList.contains("idle")
+    &&document.getElementById("res3").classList.contains("idle");
+  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนแชร์");return;}
+  // build text summary
+  const hn=document.getElementById("hn").value||"—";
+  const pname=document.getElementById("pname").value||"—";
+  const adate=document.getElementById("adate").value||"—";
+  const atime=document.getElementById("atime").value||"—";
+  const nurse=document.getElementById("nurse").value||"—";
+  const lines=[];
+  lines.push("📋 SmartWean Navigator — สรุปผลการประเมิน");
+  lines.push(`HN: ${hn}  ผู้ป่วย: ${pname}`);
+  lines.push(`วันที่: ${adate}  เวลา: ${atime}  ผู้ประเมิน: ${nurse}`);
+  lines.push("─".repeat(30));
+  [1,2,3].forEach(i=>{
+    const r=document.getElementById("res"+i);
+    if(!r.classList.contains("idle")){
+      const title=r.querySelector(".light")?.textContent.trim()||"";
+      const desc=r.querySelector(".desc")?.textContent.trim()||"";
+      const big=r.querySelector(".big")?.textContent.trim();
+      lines.push(`[Module ${i}] ${title}${big?" · "+big:""}`);
+      if(desc)lines.push(desc);
+    }
+  });
+  lines.push("─".repeat(30));
+  lines.push("⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น");
+  const text=lines.join("\n");
+  if(navigator.share){
+    navigator.share({title:"SmartWean Navigator",text}).catch(()=>{});
+  }else{
+    navigator.clipboard?.writeText(text).then(()=>alert("คัดลอกข้อความสรุปแล้ว — สามารถวางใน LINE/แชทได้เลย"))
+      .catch(()=>{exportPDF();});
+  }
 }
 
 /* ---------------- nav ---------------- */
