@@ -160,6 +160,21 @@
   .btn-primary{background:var(--teal);color:#fff}
   .btn-primary:active{background:var(--teal-deep)}
   .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--teal-deep)}
+  /* share preview sheet */
+  .sheet-backdrop{position:fixed;inset:0;background:rgba(15,20,30,.5);z-index:80;
+    display:flex;align-items:flex-end;animation:fadein .2s ease}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-height:82vh;
+    display:flex;flex-direction:column;animation:slideup .25s cubic-bezier(.32,1,.4,1)}
+  @keyframes slideup{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+  .sheet-handle{width:36px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 0}
+  .sheet-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+  .sheet-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--teal-deep)}
+  .sheet-body{overflow-y:auto;padding:16px 18px;flex:1;-webkit-overflow-scrolling:touch}
+  .sheet-foot{padding:12px 16px 28px;border-top:1px solid var(--line);display:flex;gap:10px}
+  .preview-box{background:var(--teal-soft);border:1px solid var(--line);border-radius:12px;
+    padding:14px;font-size:13px;line-height:1.75;color:var(--ink);white-space:pre-wrap;
+    font-family:'IBM Plex Sans Thai',monospace}
   .module{display:none}
   .module.show{display:block;animation:fade .25s ease}
   @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -889,40 +904,79 @@ function exportPDF(){
   buildReport();
   setTimeout(()=>window.print(),60);
 }
-function shareResult(){
-  const allIdle=document.getElementById("res1").classList.contains("idle")
-    &&document.getElementById("res2").classList.contains("idle")
-    &&document.getElementById("res3").classList.contains("idle");
-  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนแชร์");return;}
-  // build text summary
+function buildShareText(){
   const hn=document.getElementById("hn").value||"—";
   const pname=document.getElementById("pname").value||"—";
   const adate=document.getElementById("adate").value||"—";
   const atime=document.getElementById("atime").value||"—";
   const nurse=document.getElementById("nurse").value||"—";
+  const sep="─".repeat(28);
   const lines=[];
-  lines.push("📋 SmartWean Navigator — สรุปผลการประเมิน");
-  lines.push(`HN: ${hn}  ผู้ป่วย: ${pname}`);
-  lines.push(`วันที่: ${adate}  เวลา: ${atime}  ผู้ประเมิน: ${nurse}`);
-  lines.push("─".repeat(30));
+  lines.push("📋 SmartWean Navigator");
+  lines.push("สรุปผลการประเมินการหย่าเครื่องช่วยหายใจ");
+  lines.push(sep);
+  lines.push(`HN       : ${hn}`);
+  lines.push(`ผู้ป่วย  : ${pname}`);
+  lines.push(`วันที่   : ${adate}  เวลา ${atime}`);
+  lines.push(`ผู้ประเมิน: ${nurse}`);
+  lines.push(sep);
+  const mNames=["ความพร้อม SBT","ระหว่าง SBT","PERRS หลังถอดท่อ"];
   [1,2,3].forEach(i=>{
     const r=document.getElementById("res"+i);
-    if(!r.classList.contains("idle")){
-      const title=r.querySelector(".light")?.textContent.trim()||"";
-      const desc=r.querySelector(".desc")?.textContent.trim()||"";
-      const big=r.querySelector(".big")?.textContent.trim();
-      lines.push(`[Module ${i}] ${title}${big?" · "+big:""}`);
-      if(desc)lines.push(desc);
-    }
+    if(r.classList.contains("idle"))return;
+    const title=r.querySelector(".light")?.textContent.trim()||"";
+    const desc=r.querySelector(".desc")?.textContent.trim()||"";
+    const big=r.querySelector(".big")?.textContent.trim();
+    const rec=r.querySelector(".rec")?.textContent.trim();
+    const uls=[...r.querySelectorAll("ul li")].map(li=>"  • "+li.textContent.trim());
+    lines.push(`▌ Module ${i} · ${mNames[i-1]}`);
+    lines.push(`  ${title}${big?" ("+big+")":""}`);
+    if(desc)lines.push(`  ${desc}`);
+    uls.forEach(u=>lines.push(u));
+    if(rec)lines.push(`  💡 ${rec}`);
+    lines.push("");
   });
-  lines.push("─".repeat(30));
+  lines.push(sep);
   lines.push("⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น");
-  const text=lines.join("\n");
+  lines.push("ไม่ทดแทนการประเมินของแพทย์");
+  return lines.join("\n");
+}
+function shareResult(){
+  const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
+  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนแชร์");return;}
+  const text=buildShareText();
+  // show preview sheet
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="shareSheet";
+  backdrop.innerHTML=`
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">📤 พรีวิวก่อนแชร์</span>
+        <button onclick="document.getElementById('shareSheet').remove()"
+          style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="preview-box">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-ghost" onclick="document.getElementById('shareSheet').remove()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="doShare()">↗ แชร์เลย</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+}
+function doShare(){
+  document.getElementById("shareSheet")?.remove();
+  const text=buildShareText();
   if(navigator.share){
-    navigator.share({title:"SmartWean Navigator",text}).catch(()=>{});
+    navigator.share({title:"SmartWean Navigator — ผลการประเมิน",text}).catch(()=>{});
   }else{
-    navigator.clipboard?.writeText(text).then(()=>alert("คัดลอกข้อความสรุปแล้ว — สามารถวางใน LINE/แชทได้เลย"))
-      .catch(()=>{exportPDF();});
+    navigator.clipboard?.writeText(text)
+      .then(()=>alert("คัดลอกข้อความสรุปแล้ว — สามารถวางใน LINE/แชทได้เลย"))
+      .catch(()=>exportPDF());
   }
 }
 
