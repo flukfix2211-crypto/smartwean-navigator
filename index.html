@@ -944,8 +944,8 @@ function buildShareText(){
 function shareResult(){
   const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
   if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนแชร์");return;}
-  const text=buildShareText();
-  // show preview sheet
+  buildReport();
+  const previewHTML=document.getElementById("report").innerHTML;
   const backdrop=document.createElement("div");
   backdrop.className="sheet-backdrop";
   backdrop.id="shareSheet";
@@ -953,31 +953,30 @@ function shareResult(){
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-head">
-        <span class="sheet-title">📤 พรีวิวก่อนแชร์</span>
+        <span class="sheet-title">📄 พรีวิว PDF ก่อนแชร์</span>
         <button onclick="document.getElementById('shareSheet').remove()"
           style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
       </div>
       <div class="sheet-body">
-        <div class="preview-box">${text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;
+          padding:16px;font-size:11.5px;transform-origin:top left;">
+          ${previewHTML}
+        </div>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">
+          กด แชร์เลย → เปิด Print dialog → แตะ Share / บันทึกเป็น PDF
+        </p>
       </div>
       <div class="sheet-foot">
         <button class="btn btn-ghost" onclick="document.getElementById('shareSheet').remove()">ยกเลิก</button>
-        <button class="btn btn-primary" onclick="doShare()">↗ แชร์เลย</button>
+        <button class="btn btn-primary" onclick="doSharePDF()">📄 แชร์ / บันทึก PDF</button>
       </div>
     </div>`;
   backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
   document.body.appendChild(backdrop);
 }
-function doShare(){
+function doSharePDF(){
   document.getElementById("shareSheet")?.remove();
-  const text=buildShareText();
-  if(navigator.share){
-    navigator.share({title:"SmartWean Navigator — ผลการประเมิน",text}).catch(()=>{});
-  }else{
-    navigator.clipboard?.writeText(text)
-      .then(()=>alert("คัดลอกข้อความสรุปแล้ว — สามารถวางใน LINE/แชทได้เลย"))
-      .catch(()=>exportPDF());
-  }
+  setTimeout(()=>window.print(),80);
 }
 
 /* ---------------- nav ---------------- */
