@@ -186,6 +186,24 @@
   .rox-box b{font-family:'Sora';font-size:17px}
   .footer{text-align:center;font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6}
 
+  /* ---------- History / dashboard page ---------- */
+  .hist-stat{background:var(--card);border-radius:14px;border:1px solid #eef2f4;padding:12px 14px;text-align:center}
+  .hist-stat .n{font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--teal-deep);line-height:1.1}
+  .hist-stat .l{font-size:11px;color:var(--muted);margin-top:3px}
+  .hist-bar-row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:12.5px}
+  .hist-bar-row .lbl{width:88px;flex:none;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist-bar-track{flex:1;background:var(--line);border-radius:6px;height:10px;overflow:hidden}
+  .hist-bar-fill{height:100%;border-radius:6px;background:var(--teal)}
+  .hist-bar-row .cnt{width:26px;flex:none;text-align:right;font-weight:700;color:var(--ink)}
+  .hist-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+  .hist-row:hover{background:var(--teal-soft)}
+  .hist-row:last-child{border-bottom:none}
+  .hist-row .info{flex:1;min-width:0}
+  .hist-row .hn{font-weight:700;font-size:13.5px}
+  .hist-row .meta{font-size:11.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist-row .dots{display:flex;gap:4px;flex:none}
+  .hist-empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:13.5px}
+
   /* ---------- Help page ---------- */
   .help-page{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
   .help-header{background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px}
@@ -264,7 +282,7 @@
   .rp-calc{background:#f6e8ef;border-left:3px solid #d65d86;padding:7px 10px;border-radius:5px;font-size:11.5px;margin:8px 0;line-height:1.6}
   @media print{
     body{background:#fff}
-    header,.wrap,.bar,.tabs,#helpPage,#resultPage,.sheet-backdrop{display:none!important}
+    header,.wrap,.bar,.tabs,#helpPage,#resultPage,#historyPage,.sheet-backdrop{display:none!important}
     #report{display:block;font-size:11pt;max-width:170mm}
     .rp-mod,.rp-footer{break-inside:avoid-page}
     @page{size:A4;margin:13mm}
@@ -287,7 +305,10 @@
     สำหรับการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา<span id="wardHeaderSub"></span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;position:relative;z-index:1">
     <div class="warn" style="flex:1;margin-top:0">⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>
-    <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
+    <div style="display:flex;flex-direction:column;gap:6px;flex:none">
+      <button class="help-btn" onclick="openHistory()">📁 ประวัติ</button>
+      <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
+    </div>
   </div>
 </header>
 
@@ -304,6 +325,21 @@
       <div class="q"><label class="qlabel">เวลาที่ประเมิน <span class="req">*</span></label><input type="time" id="atime"></div>
       <div class="q"><label class="qlabel">ผู้ประเมิน (พยาบาล) <span class="req">*</span></label><input type="text" id="nurse" placeholder="ชื่อพยาบาล"></div>
       <div class="q"><label class="qlabel">หน่วยงาน / หอผู้ป่วย</label><input type="text" id="ward" placeholder="เช่น กจ.2" oninput="saveWard()"></div>
+    </div>
+  </div>
+
+  <!-- Sync settings -->
+  <div class="help-section" id="syncSettingsCard">
+    <div class="help-section-head" onclick="toggleHelp(this)">
+      <span class="hs-icon">⚙️</span>
+      <span class="hs-title">ตั้งค่าการซิงค์ข้อมูล</span>
+      <span class="hs-chev">▼</span>
+    </div>
+    <div class="help-section-body">
+      <div class="q" style="margin-top:12px"><label class="qlabel">Web App URL</label><input type="text" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveSheetSettings()"></div>
+      <div class="q"><label class="qlabel">รหัสลับ</label><input type="text" id="sheetSecret" placeholder="รหัสลับที่ตั้งไว้ใน Apps Script" oninput="saveSheetSettings()"></div>
+      <div id="sheetSettingsStatus" style="font-size:12px;font-weight:600"></div>
+      <div class="help-tip" style="margin-top:10px"><b>💡 หมายเหตุ:</b> รหัสลับนี้เป็นการป้องกันเบื้องต้นเท่านั้น ไม่ใช่ระบบความปลอดภัยระดับสูง ไม่ควรใช้กับข้อมูลที่ต้องการความปลอดภัยสูงมาก</div>
     </div>
   </div>
 
@@ -738,9 +774,22 @@
   <div class="bar" style="z-index:61;">
     <div class="inner">
       <button class="btn btn-ghost" onclick="confirmReset()">🔄 ประเมินผลใหม่</button>
+      <button class="btn btn-primary" id="saveSheetBtn" onclick="saveToSheet()">💾 บันทึกข้อมูล</button>
       <button class="btn btn-primary" onclick="shareResult()">↗ แชร์</button>
     </div>
   </div>
+</div>
+
+<!-- ============ HISTORY / DASHBOARD PAGE ============ -->
+<div id="historyPage" style="display:none;position:fixed;inset:0;z-index:65;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
+    <button onclick="closeHistory()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">ประวัติ &amp; แดชบอร์ด</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">SmartWean Navigator</div>
+    </div>
+  </div>
+  <div id="historyPageContent" style="max-width:900px;margin:0 auto;padding:16px 14px 60px;"></div>
 </div>
 
 <script>
@@ -1224,6 +1273,104 @@ function buildReport(){
 
   document.getElementById("report").innerHTML=html;
 }
+
+/* ---------------- sheet payload (history/dashboard sync) ---------------- */
+function verdictParts(resId){
+  const r=document.getElementById(resId);
+  if(r.classList.contains("idle"))return{status:"idle",text:"",desc:"",fails:""};
+  const status=["green","amber","red"].find(c=>r.classList.contains(c))||"amber";
+  const text=r.querySelector(".light")?.textContent.trim()||"";
+  const desc=r.querySelector(".desc")?.textContent.trim()||"";
+  const fails=[...r.querySelectorAll("ul li")].map(li=>li.textContent.trim()).join("; ");
+  return{status,text,desc,fails};
+}
+function buildSheetPayload(){
+  const v1=verdictParts("res1"),v2=verdictParts("res2"),v3=verdictParts("res3");
+  const tv=parseFloat(document.getElementById("tv").value),wt=parseFloat(document.getElementById("wt").value),
+        rr1=parseFloat(document.getElementById("rr1").value);
+  let rsbi="",tvkg="";
+  if(!isNaN(rr1)&&!isNaN(tv)&&tv>0)rsbi=(rr1/(tv/1000)).toFixed(0);
+  if(!isNaN(tv)&&!isNaN(wt)&&wt>0)tvkg=(tv/wt).toFixed(1);
+
+  const flags=[];
+  rfGroups.forEach(g=>{
+    document.querySelectorAll(`input[name="${g.id}"]:checked`).forEach(c=>{
+      if(c.dataset.normal!=="1")flags.push(c.parentElement.querySelector(".otxt").textContent.trim());
+    });
+  });
+
+  const sp=parseFloat(document.getElementById("roxspo2").value),roxrr=parseFloat(document.getElementById("roxrr").value),
+        roxfio2v=parseFloat(getR("roxfio2"));
+  let rox="";
+  if(!isNaN(sp)&&!isNaN(roxrr)&&roxrr>0&&!isNaN(roxfio2v))rox=((sp/roxfio2v)/roxrr).toFixed(2);
+  let perrsAnswered=0,perrsTotal=0;
+  ["p1","p2","p3","p4","p5","p6"].forEach(p=>{const val=getR(p);if(val!==null){perrsAnswered++;perrsTotal+=parseInt(val);}});
+
+  return{
+    hn:V("hn"),pname:V("pname"),adate:V("adate"),atime:V("atime"),nurse:V("nurse"),ward:V("ward"),
+    m1_status:v1.status,m1_verdict_text:v1.text,m1_verdict_desc:v1.desc,m1_fail_reasons:v1.fails,
+    m1_c1:rTxt("c1")||"",m1_c2:rTxt("c2")||"",m1_c3:rTxt("c3")||"",m1_c4:rTxt("c4")||"",
+    m1_spo2:V("spo2"),m1_pao2:V("pao2"),m1_fio2:rTxt("fio2")||"",m1_peep:rTxt("peep")||"",
+    m1_tv:V("tv"),m1_wt:V("wt"),m1_tvkg:tvkg,m1_mv:V("mv"),m1_rr:V("rr1"),
+    m1_sbp:V("sbp1"),m1_dbp:V("dbp1"),m1_hr:V("hr1"),m1_hct:V("hct"),m1_hb:V("hb"),
+    m1_lyte:rTxt("lyte")||"",m1_rsbi:rsbi,m1_sbtmode:rTxt("sbtmode")||"",
+    m2_status:v2.status,m2_verdict_text:v2.text,m2_verdict_desc:v2.desc,
+    m2_sbtround:rTxt("sbtround")||"",m2_sbttime:V("sbttime"),
+    m2_rr:V("rr2"),m2_tv:V("tv2"),m2_sbp:V("sbp2"),m2_dbp:V("dbp2"),m2_hr:V("hr2"),m2_spo2:V("spo22"),
+    m2_redflags:flags.join("; "),m2_action:rTxt("m2action")||"",
+    m3_status:v3.status,m3_verdict_text:v3.text,m3_verdict_desc:v3.desc,
+    m3_preext:cTxt("preext").join("; "),m3_cuff:rTxt("cuff")||"",m3_perrsround:rTxt("perrsround")||"",
+    m3_p1:getR("p1")||"",m3_p2:getR("p2")||"",m3_p3:getR("p3")||"",m3_p4:getR("p4")||"",m3_p5:getR("p5")||"",m3_p6:getR("p6")||"",
+    m3_perrs_total:perrsAnswered>0?perrsTotal:"",m3_roxspo2:V("roxspo2"),m3_roxrr:V("roxrr"),
+    m3_roxfio2:rTxt("roxfio2")||"",m3_rox_index:rox,
+    m3_action:cTxt("m3action").join("; "),m3_outcome:rTxt("m3outcome")||"",
+    note1:V("note1"),note2:V("note2"),note3:V("note3")
+  };
+}
+async function saveToSheet(){
+  const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
+  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนบันทึกข้อมูล");return;}
+  const url=localStorage.getItem("swn_sheet_url"),secret=localStorage.getItem("swn_sheet_secret");
+  if(!url||!secret){alert("กรุณาตั้งค่า Web App URL และรหัสลับในการ์ด \"⚙️ ตั้งค่าการซิงค์ข้อมูล\" ก่อนบันทึกข้อมูล");return;}
+
+  const btn=document.getElementById("saveSheetBtn");
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ กำลังบันทึก...";
+  try{
+    // NOTE: Content-Type must stay "text/plain" — Apps Script Web Apps can't
+    // handle a CORS preflight, and "application/json" would trigger one.
+    // The server parses the JSON body manually via JSON.parse(e.postData.contents).
+    const resp=await fetch(url,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({secret,data:buildSheetPayload()})
+    });
+    const json=await resp.json();
+    if(json.ok){showSaveFeedback(true,"บันทึกข้อมูลสำเร็จ");}
+    else{showSaveFeedback(false,"บันทึกไม่สำเร็จ: "+(json.error||"unauthorized — เช็ครหัสลับ"));}
+  }catch(err){
+    showSaveFeedback(false,"เชื่อมต่อไม่สำเร็จ — เช็ค Web App URL และการเชื่อมต่ออินเทอร์เน็ต");
+  }finally{
+    btn.disabled=false;btn.textContent=originalLabel;
+  }
+}
+function showSaveFeedback(ok,msg){
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-body" style="text-align:center;padding:26px 20px 30px">
+        <div style="font-size:40px;margin-bottom:10px">${ok?"✅":"⚠️"}</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:${ok?"var(--green)":"var(--red)"}">${msg}</div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary" onclick="this.closest('.sheet-backdrop').remove()">ปิด</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+}
 function exportPDF(){
   if(document.getElementById("res1").classList.contains("idle")
    &&document.getElementById("res2").classList.contains("idle")
@@ -1401,6 +1548,195 @@ function toggleHelp(head){
   body.classList.toggle("open");
 }
 
+/* ---------------- history / dashboard page ---------------- */
+let historyRows=[];
+let historyFilters={q:"",ward:"",from:"",to:""};
+const histStatusColor={green:"var(--green)",amber:"var(--amber)",red:"var(--red)"};
+const histModLabels=["Module 1 · SBT Readiness","Module 2 · SBT Guardian","Module 3 · PERRS Score"];
+
+function openHistory(){
+  document.getElementById("historyPage").style.display="block";
+  document.getElementById("historyPage").scrollTop=0;
+  loadHistory();
+}
+function closeHistory(){
+  document.getElementById("historyPage").style.display="none";
+}
+function goToSyncSettings(){
+  closeHistory();
+  const head=document.querySelector("#syncSettingsCard .help-section-head");
+  head.classList.add("open");
+  head.nextElementSibling.classList.add("open");
+  document.getElementById("syncSettingsCard").scrollIntoView({behavior:"smooth"});
+}
+async function loadHistory(){
+  const url=localStorage.getItem("swn_sheet_url"),secret=localStorage.getItem("swn_sheet_secret");
+  const box=document.getElementById("historyPageContent");
+  if(!url||!secret){
+    box.innerHTML=`<div class="hist-empty">⚙️ ยังไม่ได้ตั้งค่าการซิงค์ข้อมูล<br>
+      <button class="btn btn-primary" style="margin-top:14px;flex:none;padding:10px 20px" onclick="goToSyncSettings()">ไปตั้งค่า</button></div>`;
+    return;
+  }
+  box.innerHTML=`<div class="hist-empty">⏳ กำลังโหลดข้อมูล...</div>`;
+  try{
+    const resp=await fetch(url+"?secret="+encodeURIComponent(secret));
+    const json=await resp.json();
+    if(!json.ok){
+      box.innerHTML=`<div class="hist-empty">⚠️ โหลดข้อมูลไม่สำเร็จ: ${json.error||"unauthorized"}<br>
+        <button class="btn btn-ghost" style="margin-top:14px;flex:none;padding:10px 20px" onclick="loadHistory()">ลองใหม่</button></div>`;
+      return;
+    }
+    historyRows=json.rows||[];
+    historyFilters={q:"",ward:"",from:"",to:""};
+    renderHistoryPage();
+  }catch(err){
+    box.innerHTML=`<div class="hist-empty">⚠️ เชื่อมต่อไม่สำเร็จ — เช็ค Web App URL และการเชื่อมต่ออินเทอร์เน็ต<br>
+      <button class="btn btn-ghost" style="margin-top:14px;flex:none;padding:10px 20px" onclick="loadHistory()">ลองใหม่</button></div>`;
+  }
+}
+function getFilteredHistoryRows(){
+  const q=historyFilters.q.trim().toLowerCase();
+  return historyRows.filter(r=>{
+    if(q&&!((r.hn||"").toLowerCase().includes(q)||(r.pname||"").toLowerCase().includes(q)))return false;
+    if(historyFilters.ward&&r.ward!==historyFilters.ward)return false;
+    if(historyFilters.from&&(r.adate||"")<historyFilters.from)return false;
+    if(historyFilters.to&&(r.adate||"")>historyFilters.to)return false;
+    return true;
+  });
+}
+function updateHistoryFilter(key,val){
+  historyFilters[key]=val;
+  renderHistoryPage();
+}
+function clearHistoryFilters(){
+  historyFilters={q:"",ward:"",from:"",to:""};
+  renderHistoryPage();
+}
+function renderDashboardStats(rows){
+  const wardCounts={};
+  rows.forEach(r=>{const w=r.ward||"(ไม่ระบุ)";wardCounts[w]=(wardCounts[w]||0)+1;});
+  const wardEntries=Object.entries(wardCounts).sort((a,b)=>b[1]-a[1]);
+  const maxWard=wardEntries.length?wardEntries[0][1]:0;
+  const wardHtml=wardEntries.map(([w,c])=>`
+    <div class="hist-bar-row"><span class="lbl">${w}</span>
+      <div class="hist-bar-track"><div class="hist-bar-fill" style="width:${maxWard?Math.round(c/maxWard*100):0}%"></div></div>
+      <span class="cnt">${c}</span></div>`).join("")||`<div style="font-size:12px;color:var(--muted)">— ไม่มีข้อมูล —</div>`;
+
+  const dates=rows.map(r=>r.adate).filter(Boolean).sort();
+  const dateRange=dates.length?`${dates[0]} – ${dates[dates.length-1]}`:"—";
+
+  const modBadges=[1,2,3].map(i=>{
+    const counts={green:0,amber:0,red:0};
+    rows.forEach(r=>{const s=r["m"+i+"_status"];if(s&&counts[s]!==undefined)counts[s]++;});
+    const total=counts.green+counts.amber+counts.red;
+    const chips=["green","amber","red"].filter(c=>counts[c]>0).map(c=>
+      `<span class="help-badge ${c}">${c==="green"?"🟢":c==="amber"?"🟡":"🔴"} ${counts[c]}</span>`).join(" ");
+    return `<div style="margin:8px 0"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">${histModLabels[i-1]} (${total} รายการ)</div>${chips||`<span style="font-size:12px;color:var(--muted)">— ไม่มีข้อมูล —</span>`}</div>`;
+  }).join("");
+
+  return `
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
+    <div class="hist-stat"><div class="n">${rows.length}</div><div class="l">รายการทั้งหมด (ตามตัวกรอง)</div></div>
+    <div class="hist-stat"><div class="n" style="font-size:14px;line-height:1.6">${dateRange}</div><div class="l">ช่วงวันที่ประเมิน</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">🏥</span><h2>แยกตามหน่วยงาน</h2></div>
+    ${wardHtml}
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">📊</span><h2>ผลการประเมินแต่ละ Module</h2></div>
+    ${modBadges}
+  </div>`;
+}
+function renderHistoryTable(rows){
+  const wards=[...new Set(historyRows.map(r=>r.ward).filter(Boolean))].sort();
+  const wardOptions=wards.map(w=>`<option value="${w}" ${historyFilters.ward===w?"selected":""}>${w}</option>`).join("");
+  const dot=s=>s==="green"?'<span class="dot g"></span>':s==="amber"?'<span class="dot a"></span>':s==="red"?'<span class="dot r"></span>':'<span class="dot" style="background:var(--line)"></span>';
+  const rowsHtml=rows.length?rows.slice().reverse().map(r=>`
+    <div class="hist-row" onclick="viewHistoryDetail('${(r.save_id||"").replace(/'/g,"")}')">
+      <div class="info">
+        <div class="hn">${r.hn||"—"} · ${r.pname||"—"}</div>
+        <div class="meta">${r.adate||"—"} ${r.atime||""} · ${r.ward||"—"}</div>
+      </div>
+      <div class="dots">${dot(r.m1_status)}${dot(r.m2_status)}${dot(r.m3_status)}</div>
+    </div>`).join(""):`<div class="hist-empty">ไม่พบข้อมูลที่ตรงกับตัวกรอง</div>`;
+
+  return `
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">🔍</span><h2>ค้นหา / กรองข้อมูล</h2></div>
+    <div class="q"><input type="text" placeholder="ค้นหา HN หรือชื่อผู้ป่วย" value="${historyFilters.q}" oninput="updateHistoryFilter('q',this.value)"></div>
+    <div class="grid2">
+      <div class="q"><select onchange="updateHistoryFilter('ward',this.value)"><option value="">ทุกหน่วยงาน</option>${wardOptions}</select></div>
+      <div class="q" style="display:flex;gap:8px">
+        <input type="date" value="${historyFilters.from}" onchange="updateHistoryFilter('from',this.value)">
+        <input type="date" value="${historyFilters.to}" onchange="updateHistoryFilter('to',this.value)">
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="flex:none;padding:9px 16px;font-size:13px" onclick="clearHistoryFilters()">ล้างตัวกรอง</button>
+  </div>
+  <div class="card" style="padding:6px 0">
+    ${rowsHtml}
+  </div>`;
+}
+function renderHistoryPage(){
+  const filtered=getFilteredHistoryRows();
+  document.getElementById("historyPageContent").innerHTML=
+    renderDashboardStats(filtered)+renderHistoryTable(filtered);
+}
+function histDetailRow(k,v){
+  if(v===undefined||v===null||v==="")v="—";
+  return `<div class="rp-row"><span class="lk">${k}</span><span class="lv">${v}</span></div>`;
+}
+function histVerdictBox(status,text,desc,fails){
+  if(!status||status==="idle")return`<div style="font-size:12.5px;color:var(--muted)">ไม่มีข้อมูล Module นี้</div>`;
+  const color=histStatusColor[status]||"var(--muted)";
+  const failsHtml=fails?`<ul class="rp-list">${fails.split("; ").map(f=>`<li>${f}</li>`).join("")}</ul>`:"";
+  return `<div class="rp-verdict ${status}" style="border-color:${color}">
+    <div class="vt" style="color:${color}">${text||""}</div>
+    ${desc?`<div class="vd">${desc}</div>`:""}
+    ${failsHtml}
+  </div>`;
+}
+function viewHistoryDetail(saveId){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  const html=`
+  <button class="btn btn-ghost" style="flex:none;padding:8px 16px;font-size:13px;margin-bottom:14px" onclick="renderHistoryPage()">← กลับไปประวัติ</button>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
+    <div class="rp-grid two" style="margin-top:10px">
+      ${histDetailRow("HN",r.hn)}${histDetailRow("ชื่อ-นามสกุล",r.pname)}
+      ${histDetailRow("วันที่",r.adate)}${histDetailRow("เวลา",r.atime)}
+    </div>
+    <div class="rp-row" style="margin-top:8px">${histDetailRow("ผู้ประเมิน",r.nurse)}</div>
+    <div class="rp-row">${histDetailRow("หน่วยงาน",r.ward)}</div>
+  </div>
+  <div class="card" style="margin-bottom:14px;border-left:4px solid ${histStatusColor[r.m1_status]||"var(--line)"}">
+    <div class="sec-head"><span class="ic">🟢</span><h2>Module 1 · SBT Readiness</h2></div>
+    ${histVerdictBox(r.m1_status,r.m1_verdict_text,r.m1_verdict_desc,r.m1_fail_reasons)}
+    <div class="rp-grid" style="margin-top:10px">
+      ${histDetailRow("SpO₂",r.m1_spo2)}${histDetailRow("PaO₂",r.m1_pao2)}${histDetailRow("RSBI",r.m1_rsbi)}
+      ${histDetailRow("TV/kg",r.m1_tvkg)}${histDetailRow("MV",r.m1_mv)}${histDetailRow("RR",r.m1_rr)}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;border-left:4px solid ${histStatusColor[r.m2_status]||"var(--line)"}">
+    <div class="sec-head"><span class="ic">🟡</span><h2>Module 2 · SBT Guardian</h2></div>
+    ${histVerdictBox(r.m2_status,r.m2_verdict_text,r.m2_verdict_desc,r.m2_redflags)}
+    <div class="rp-grid" style="margin-top:10px">
+      ${histDetailRow("รอบประเมิน",r.m2_sbtround)}${histDetailRow("RR",r.m2_rr)}${histDetailRow("SpO₂",r.m2_spo2)}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;border-left:4px solid ${histStatusColor[r.m3_status]||"var(--line)"}">
+    <div class="sec-head"><span class="ic">🔴</span><h2>Module 3 · PERRS Score</h2></div>
+    ${histVerdictBox(r.m3_status,r.m3_verdict_text,r.m3_verdict_desc,"")}
+    <div class="rp-grid" style="margin-top:10px">
+      ${histDetailRow("PERRS รวม",r.m3_perrs_total)}${histDetailRow("ROX Index",r.m3_rox_index)}${histDetailRow("ผลลัพธ์สุดท้าย",r.m3_outcome)}
+    </div>
+  </div>`;
+  document.getElementById("historyPageContent").innerHTML=html;
+  document.getElementById("historyPage").scrollTop=0;
+}
+
 /* ---------------- ward / department name ---------------- */
 function renderWard(){
   const ward=document.getElementById("ward").value.trim();
@@ -1413,6 +1749,20 @@ function saveWard(){
   renderWard();
 }
 
+/* ---------------- sheet sync settings ---------------- */
+function renderSheetSettingsStatus(){
+  const url=document.getElementById("sheetUrl").value.trim();
+  const secret=document.getElementById("sheetSecret").value.trim();
+  const el=document.getElementById("sheetSettingsStatus");
+  if(url&&secret){el.textContent="✓ ตั้งค่าแล้ว";el.style.color="var(--green)";}
+  else{el.textContent="ยังไม่ได้ตั้งค่า — บันทึกข้อมูลและดูประวัติจะยังใช้งานไม่ได้";el.style.color="var(--muted)";}
+}
+function saveSheetSettings(){
+  localStorage.setItem("swn_sheet_url",document.getElementById("sheetUrl").value.trim());
+  localStorage.setItem("swn_sheet_secret",document.getElementById("sheetSecret").value.trim());
+  renderSheetSettingsStatus();
+}
+
 // default date/time = now
 (function(){
   const n=new Date(),p=x=>String(x).padStart(2,"0");
@@ -1420,6 +1770,9 @@ function saveWard(){
   document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
   document.getElementById("ward").value=localStorage.getItem("swn_ward")||"";
   renderWard();
+  document.getElementById("sheetUrl").value=localStorage.getItem("swn_sheet_url")||"";
+  document.getElementById("sheetSecret").value=localStorage.getItem("swn_sheet_secret")||"";
+  renderSheetSettingsStatus();
 })();
 </script>
 </body>
