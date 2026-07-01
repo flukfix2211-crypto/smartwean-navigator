@@ -13,6 +13,48 @@ html,body{margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:#fdf4f7;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#3b2f33}
 
+:root{
+  --ink:#3d2530;--ink-soft:#6b5860;--muted:#9a7b87;--line:#f1d9e0;--bg:#fdf4f7;--card:#ffffff;
+  --teal:#d65d86;--teal-deep:#b03e66;--teal-soft:#fce6ee;
+  --green:#16a34a;--green-soft:#e6f7ec;--amber:#c9870a;--amber-soft:#fbf0d8;--red:#dc2626;--red-soft:#fbe6e6;
+  --radius:16px;--shadow:0 1px 2px rgba(15,28,36,.04),0 8px 24px rgba(15,28,36,.06);
+}
+
+/* ---------- Help guide ---------- */
+.help-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #f1d5df;color:#9b3460;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;padding:8px 14px;border-radius:999px;box-shadow:0 2px 8px -3px rgba(180,90,120,.25);cursor:pointer;transition:.15s;white-space:nowrap;flex:none}
+.help-btn:hover{background:#fdf0f4}
+.help-page{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.help-header{background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px}
+.help-back{background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.help-body{max-width:760px;margin:0 auto;padding:18px 14px 60px}
+.help-section{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #eef2f4;margin-bottom:14px;overflow:hidden}
+.help-section-head{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.help-section-head .hs-icon{font-size:20px;flex:none}
+.help-section-head .hs-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14.5px;color:var(--teal-deep);flex:1}
+.help-section-head .hs-chev{color:var(--muted);transition:.2s;font-size:14px}
+.help-section-head.open .hs-chev{transform:rotate(180deg)}
+.help-section-body{display:none;padding:0 16px 16px;border-top:1px solid var(--line)}
+.help-section-body.open{display:block}
+.help-step{display:flex;gap:12px;margin:12px 0}
+.help-step-num{width:26px;height:26px;background:var(--teal);color:#fff;border-radius:50%;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+.help-step-body{flex:1;font-size:13.5px;line-height:1.65;color:var(--ink-soft)}
+.help-step-body b{color:var(--ink)}
+.help-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+.help-table th{background:var(--teal-soft);color:var(--teal-deep);font-weight:700;padding:6px 10px;text-align:left;border:1px solid var(--line)}
+.help-table td{padding:6px 10px;border:1px solid var(--line);vertical-align:top;line-height:1.5}
+.help-table tr:nth-child(even) td{background:#fdf8fa}
+.help-tip{background:#fff8e6;border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12.5px;color:var(--ink-soft);margin:10px 0;line-height:1.6}
+.help-tip b{color:var(--amber)}
+.help-warn{background:var(--red-soft);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12.5px;color:var(--ink-soft);margin:10px 0;line-height:1.6}
+.help-note{background:var(--teal-soft);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12.5px;color:var(--ink-soft);margin:10px 0;line-height:1.6}
+.help-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin:2px 2px 2px 0}
+.help-badge.green{background:var(--green-soft);color:var(--green)}
+.help-badge.amber{background:var(--amber-soft);color:var(--amber)}
+.help-badge.red{background:var(--red-soft);color:var(--red)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:7px;margin:18px 0 10px}
+.eyebrow::before{content:"";width:18px;height:2px;background:var(--teal);border-radius:2px}
+.eyebrow:first-child{margin-top:2px}
+
 @keyframes swn-ring{0%{box-shadow:0 0 0 0 rgba(22,163,74,.4)}70%{box-shadow:0 0 0 7px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
 @keyframes swn-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
 @keyframes swn-glow{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.18);transform:scale(1.12)}}
@@ -115,6 +157,7 @@ body{background:#fdf4f7;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;-w
       </div>
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.2px;color:#7d2d4e">SmartWean</div>
     </div>
+    <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
   </div>
 
   <div style="flex:1;display:flex;align-items:center;width:100%">
@@ -381,9 +424,298 @@ body{background:#fdf4f7;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;-w
   </div>
 </section>
 
+<!-- ============ HELP PAGE ============ -->
+<div id="helpPage" class="help-page">
+  <div class="help-header">
+    <button class="help-back" onclick="closeHelp()">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px">วิธีใช้งาน SmartWean Navigator</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px">คู่มือฉบับละเอียด</div>
+    </div>
+  </div>
+  <div class="help-body">
+
+    <!-- Overview -->
+    <div class="help-section">
+      <div class="help-section-head open" onclick="toggleHelp(this)">
+        <span class="hs-icon">🗺️</span>
+        <span class="hs-title">ภาพรวมการทำงานของระบบ</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body open">
+        <div class="help-note"><b>SmartWean Navigator</b> ช่วยพยาบาลประเมินผู้ป่วยที่ใช้เครื่องช่วยหายใจแบบครบวงจร ตั้งแต่ประเมินความพร้อมก่อนถอดท่อ ไปจนถึงติดตามหลังถอดท่อ</div>
+        <div class="help-step">
+          <div class="help-step-num">1</div>
+          <div class="help-step-body"><b>กรอกข้อมูลผู้ป่วย</b> — HN, ชื่อ, วันที่/เวลา, ชื่อพยาบาล</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">2</div>
+          <div class="help-step-body"><b>Module 1</b> ประเมินความพร้อมก่อนทำ SBT (Spontaneous Breathing Trial) — ต้องผ่านทุกเกณฑ์จึงเริ่มได้</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">3</div>
+          <div class="help-step-body"><b>Module 2</b> บันทึก Vital Signs ระหว่าง SBT ทุก 5–15 นาที และเช็ค Red Flag</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">4</div>
+          <div class="help-step-body"><b>Module 3</b> ประเมิน PERRS Score หลังถอดท่อ เพื่อประเมินความเสี่ยง Respiratory Failure</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">5</div>
+          <div class="help-step-body"><b>ดูผล / Export PDF</b> — กด "ดูผล" เพื่อดูสรุปทุก Module หรือ Export เป็น PDF A4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient info -->
+    <div class="help-section">
+      <div class="help-section-head" onclick="toggleHelp(this)">
+        <span class="hs-icon">📋</span>
+        <span class="hs-title">ส่วนที่ 1 · กรอกข้อมูลผู้ป่วย</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body">
+        <div class="help-step">
+          <div class="help-step-num">1</div>
+          <div class="help-step-body"><b>HN</b> — หมายเลขผู้ป่วยจากระบบของโรงพยาบาล</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">2</div>
+          <div class="help-step-body"><b>ชื่อ-นามสกุล</b> — ชื่อผู้ป่วยที่จะปรากฎในรายงาน PDF</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">3</div>
+          <div class="help-step-body"><b>วันที่/เวลา</b> — ระบบกำหนดค่าเริ่มต้นเป็นวันที่และเวลาปัจจุบัน แก้ไขได้ตามต้องการ</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">4</div>
+          <div class="help-step-body"><b>ผู้ประเมิน</b> — ชื่อพยาบาลที่ทำการประเมิน จะปรากฎในรายงานและลายเซ็น</div>
+        </div>
+        <div class="help-tip"><b>💡 เคล็ดลับ:</b> กรอกข้อมูลผู้ป่วยให้ครบก่อนเริ่มประเมิน เพื่อให้รายงาน PDF สมบูรณ์</div>
+      </div>
+    </div>
+
+    <!-- Module 1 -->
+    <div class="help-section">
+      <div class="help-section-head" onclick="toggleHelp(this)">
+        <span class="hs-icon">🟢</span>
+        <span class="hs-title">Module 1 · Smart Readiness Assessment</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body">
+        <p style="font-size:13px;color:var(--ink-soft);margin:10px 0 14px">ประเมินว่าผู้ป่วยพร้อมเริ่มทำ Spontaneous Breathing Trial (SBT) หรือไม่ ต้องผ่าน <b>ทุกเกณฑ์</b></p>
+
+        <div class="eyebrow" style="margin-top:0">เกณฑ์ทางคลินิก (Clinical Criteria)</div>
+        <table class="help-table">
+          <tr><th>เกณฑ์</th><th>รายละเอียด</th></tr>
+          <tr><td>Underlying cause ดีขึ้น</td><td>สาเหตุที่ทำให้ต้องใส่ท่อช่วยหายใจแก้ไขได้บ้างแล้ว</td></tr>
+          <tr><td>ไม่มี ACS/CHF/Arrhythmia</td><td>ไม่มีอาการหัวใจขาดเลือดเฉียบพลัน หัวใจวาย หรือหัวใจเต้นผิดจังหวะที่รุนแรงในช่วง 24 ชม.ที่ผ่านมา</td></tr>
+          <tr><td>ตื่นดี / sedative ต่ำสุด</td><td>ผู้ป่วยตื่นตัว ตอบสนองต่อคำสั่ง หรือลดยา sedative เหลือน้อยที่สุดแล้ว</td></tr>
+          <tr><td>Inotropic ต่ำ/ไม่ใช้</td><td>ไม่ใช้ยาเพิ่มความดันเลือด หรือใช้ในขนาดต่ำและ Hemodynamics คงที่</td></tr>
+        </table>
+
+        <div class="eyebrow">Gas Exchange</div>
+        <table class="help-table">
+          <tr><th>ค่า</th><th>เกณฑ์</th><th>วิธีอ่านค่า</th></tr>
+          <tr><td>SpO₂ (%)</td><td>> 90%</td><td>อ่านจาก Pulse Oximeter</td></tr>
+          <tr><td>PaO₂ (mmHg)</td><td>> 60 mmHg</td><td>จาก ABG — ถ้าไม่ได้เจาะ ใส่ 0 ระบบจะข้ามเกณฑ์นี้</td></tr>
+          <tr><td>FiO₂</td><td>≤ 0.40 (40%)</td><td>อ่านจากหน้าจอ Ventilator</td></tr>
+          <tr><td>PEEP (cmH₂O)</td><td>≤ 8</td><td>อ่านจากหน้าจอ Ventilator</td></tr>
+        </table>
+
+        <div class="eyebrow">Respiratory Mechanics</div>
+        <table class="help-table">
+          <tr><th>ค่า</th><th>เกณฑ์</th><th>วิธีอ่านค่า</th></tr>
+          <tr><td>Tidal Volume — TV (cc)</td><td>> 5 cc/kg IBW</td><td>อ่านจาก Ventilator (measured TV)</td></tr>
+          <tr><td>น้ำหนัก (kg)</td><td>ใช้คำนวณ TV/kg</td><td>ใช้ Ideal Body Weight (IBW) ถ้าไม่ทราบใช้น้ำหนักจริง</td></tr>
+          <tr><td>Minute Ventilation (L/min)</td><td>5–12 LPM</td><td>อ่านจาก Ventilator (Total MV)</td></tr>
+          <tr><td>Respiratory Rate (/min)</td><td>< 30/min</td><td>อ่านจาก Ventilator หรือนับเอง</td></tr>
+        </table>
+        <div class="help-note"><b>RSBI (Rapid Shallow Breathing Index)</b> = RR ÷ (TV เป็นลิตร)<br>ค่า < 105 = มีแนวโน้มสำเร็จ | ค่า ≥ 105 = มีความเสี่ยง<br>ระบบคำนวณอัตโนมัติเมื่อกรอก RR และ TV</div>
+
+        <div class="eyebrow">Hemodynamics</div>
+        <table class="help-table">
+          <tr><th>ค่า</th><th>เกณฑ์</th></tr>
+          <tr><td>SBP (mmHg)</td><td>90–180 mmHg</td></tr>
+          <tr><td>DBP (mmHg)</td><td>> 60 mmHg</td></tr>
+          <tr><td>Heart Rate (/min)</td><td>50–120 /min</td></tr>
+          <tr><td>Hct (%)</td><td>≥ 25%</td></tr>
+          <tr><td>Hb (g/dL)</td><td>≥ 8 g/dL</td></tr>
+          <tr><td>Electrolytes</td><td>อยู่ในเกณฑ์ปกติ (K⁺, Mg²⁺, PO₄)</td></tr>
+        </table>
+
+        <div class="help-tip"><b>💡 ผลการประเมิน Module 1:</b><br>
+          <span class="help-badge green">🟢 ผ่านทุกเกณฑ์</span> — เริ่ม SBT ได้ ไปทำ Module 2<br>
+          <span class="help-badge red">🔴 ไม่ผ่านบางเกณฑ์</span> — ยังไม่ควรทำ SBT แจ้งแพทย์
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 2 -->
+    <div class="help-section">
+      <div class="help-section-head" onclick="toggleHelp(this)">
+        <span class="hs-icon">🟡</span>
+        <span class="hs-title">Module 2 · SBT Guardian (ระหว่าง SBT)</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body">
+        <p style="font-size:13px;color:var(--ink-soft);margin:10px 0 14px">บันทึก Vital Signs ขณะทำ SBT และประเมิน Red Flag ทุก 5–15 นาที ตลอดช่วง 30–120 นาทีของ SBT</p>
+
+        <div class="eyebrow" style="margin-top:0">Vital Signs ระหว่าง SBT</div>
+        <table class="help-table">
+          <tr><th>ค่า</th><th>เกณฑ์ผ่าน (ไม่มี Red Flag)</th></tr>
+          <tr><td>RR (/min)</td><td>< 35/min — ถ้า ≥ 35 ต่อเนื่อง 5 นาที หยุด SBT</td></tr>
+          <tr><td>TV (cc)</td><td>ดูแนวโน้ม — ลดลงเรื่อยๆ เป็นสัญญาณเหนื่อย</td></tr>
+          <tr><td>SBP (mmHg)</td><td>90–180 mmHg</td></tr>
+          <tr><td>DBP (mmHg)</td><td>> 60 mmHg</td></tr>
+          <tr><td>Heart Rate (/min)</td><td>50–120 /min</td></tr>
+          <tr><td>SpO₂ (%)</td><td>≥ 90% (ถ้าต่ำกว่า หยุด SBT ทันที)</td></tr>
+        </table>
+
+        <div class="eyebrow">Red Flag — หยุด SBT ทันทีถ้าพบ</div>
+        <div class="help-warn">เมื่อพบ Red Flag ให้ <b>หยุด SBT ทันที</b> กลับไปใช้เครื่องช่วยหายใจในโหมดเดิม และแจ้งแพทย์</div>
+        <table class="help-table">
+          <tr><th>กลุ่มอาการ</th><th>ตัวอย่าง Red Flag</th></tr>
+          <tr><td>Respiratory</td><td>RR ≥ 35/min, SpO₂ < 90%, หายใจลำบาก, ใช้กล้ามเนื้อช่วยหายใจ</td></tr>
+          <tr><td>Cardiovascular</td><td>SBP > 180 หรือ < 90, HR > 120 หรือ < 50, เจ็บหน้าอก</td></tr>
+          <tr><td>Neurological</td><td>กระสับกระส่าย วิตกกังวลมาก ระดับความรู้สึกตัวลดลง</td></tr>
+          <tr><td>Diaphoresis</td><td>เหงื่อออกมาก ซึ่งเป็นสัญญาณของการทำงานหนักของระบบหายใจ</td></tr>
+        </table>
+
+        <div class="eyebrow">รอบการประเมิน</div>
+        <p style="font-size:13px;color:var(--ink-soft);margin:8px 0">เลือกว่ากำลังบันทึกรอบที่เท่าไหร่ของ SBT (5 นาที, 15 นาที, 30 นาที, 60 นาที, 120 นาที) แล้วกรอก Vital Signs ของรอบนั้น</p>
+
+        <div class="help-tip"><b>💡 ผลการประเมิน Module 2:</b><br>
+          <span class="help-badge green">🟢 ผ่าน SBT</span> — ไม่พบ Red Flag ตลอด 30–120 นาที พิจารณาถอดท่อ<br>
+          <span class="help-badge red">🔴 SBT ไม่สำเร็จ</span> — พบ Red Flag ให้หยุดและพัก 24 ชม.ก่อนลองใหม่
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 3 -->
+    <div class="help-section">
+      <div class="help-section-head" onclick="toggleHelp(this)">
+        <span class="hs-icon">🔴</span>
+        <span class="hs-title">Module 3 · PERRS Score (หลังถอดท่อ)</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body">
+        <p style="font-size:13px;color:var(--ink-soft);margin:10px 0 14px">ประเมิน Post-Extubation Respiratory Risk Score ภายใน 1–2 ชม.หลังถอดท่อ เพื่อประเมินความเสี่ยง Respiratory Failure</p>
+
+        <div class="eyebrow" style="margin-top:0">Cuff Leak Test (ก่อนถอดท่อ)</div>
+        <p style="font-size:13px;color:var(--ink-soft);margin:8px 0">ทดสอบก่อนถอดท่อเพื่อประเมินความเสี่ยง Post-Extubation Stridor<br>
+        วิธี: ปล่อยลมออกจาก Cuff แล้วดูว่ามีลมรั่วผ่านได้ไหม (ได้ยินเสียง หรือ TV ลดลง ≥ 110 cc)</p>
+
+        <div class="eyebrow">PERRS Parameters (6 ข้อ)</div>
+        <table class="help-table">
+          <tr><th>พารามิเตอร์</th><th>คะแนน 0</th><th>คะแนน 1</th><th>คะแนน 2</th></tr>
+          <tr><td><b>1. RR (/min)</b></td><td>< 25</td><td>25–30</td><td>> 30</td></tr>
+          <tr><td><b>2. Work of Breathing</b></td><td>ปกติ ไม่ใช้กล้ามเนื้อช่วย</td><td>ใช้กล้ามเนื้อช่วยบ้าง</td><td>เหนื่อยมาก / ใช้กล้ามเนื้อทุกกลุ่ม</td></tr>
+          <tr><td><b>3. ROX Index</b></td><td>≥ 4.88 (ปลอดภัย)</td><td>3.85–4.87</td><td>< 3.85 (เสี่ยงสูง)</td></tr>
+          <tr><td><b>4. ความรู้สึกตัว</b></td><td>ตื่นตัวดี ตอบสนองได้</td><td>ง่วง แต่ปลุกได้</td><td>สับสน / ไม่รู้สึกตัว</td></tr>
+          <tr><td><b>5. การขับเสมหะ</b></td><td>ไอแรง ขับได้เอง</td><td>ไออ่อน ต้องช่วย suction</td><td>ไม่สามารถขับได้</td></tr>
+          <tr><td><b>6. Hemodynamics</b></td><td>คงที่ (HR/BP ปกติ)</td><td>ผันผวนเล็กน้อย</td><td>ไม่คงที่ ต้องให้ยา</td></tr>
+        </table>
+
+        <div class="help-note"><b>ROX Index</b> = (SpO₂ / FiO₂) ÷ RR<br>ระบบคำนวณอัตโนมัติเมื่อกรอก SpO₂, FiO₂ และ RR หลังถอดท่อ<br>ค่า ≥ 4.88 = ปลอดภัย | 3.85–4.87 = เฝ้าระวัง | < 3.85 = เสี่ยงสูง</div>
+
+        <div class="eyebrow">การแปลผล PERRS</div>
+        <table class="help-table">
+          <tr><th>คะแนนรวม</th><th>ระดับความเสี่ยง</th><th>การจัดการ</th></tr>
+          <tr><td style="color:var(--green);font-weight:700">0–3</td><td><span class="help-badge green">Low Risk</span></td><td>เปลี่ยนเป็น Nasal Cannula / Simple Mask และสังเกตอาการ</td></tr>
+          <tr><td style="color:var(--amber);font-weight:700">4–6</td><td><span class="help-badge amber">Moderate Risk</span></td><td>พิจารณา High Flow O₂ / NIV (HFNC หรือ BiPAP) เฝ้าระวังใกล้ชิด</td></tr>
+          <tr><td style="color:var(--red);font-weight:700">≥ 7</td><td><span class="help-badge red">High Risk</span></td><td>เตรียมพร้อม Reintubation — แจ้งแพทย์ด่วน STAT!</td></tr>
+        </table>
+
+        <div class="help-tip"><b>💡 เลือกรอบประเมิน PERRS:</b> 15 นาที, 30 นาที, 1 ชม. หลังถอดท่อ แล้วกรอกค่าซ้ำแต่ละรอบตามความจำเป็น</div>
+      </div>
+    </div>
+
+    <!-- Results and PDF -->
+    <div class="help-section">
+      <div class="help-section-head" onclick="toggleHelp(this)">
+        <span class="hs-icon">📄</span>
+        <span class="hs-title">ดูผล · แชร์ · Export PDF</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body">
+        <div class="help-step">
+          <div class="help-step-num">1</div>
+          <div class="help-step-body"><b>กด "📊 ดูผล"</b> ที่ด้านล่างหน้าจอ — ระบบจะแสดงสรุปผลทุก Module ที่ประเมินแล้วในหน้าเดียว</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">2</div>
+          <div class="help-step-body"><b>กด "↗ แชร์"</b> — เพื่อแชร์สรุปผลเป็นข้อความไปยัง Line/แอปอื่น หรือ Export เป็น PDF</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">3</div>
+          <div class="help-step-body"><b>Export PDF</b> — ในหน้าแชร์ กด "Export PDF / พิมพ์" ระบบจะสร้างรายงาน A4 ที่มีข้อมูลครบทุก Module รวมถึง RSBI, TV/kg, ROX Index, PERRS รวม</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">4</div>
+          <div class="help-step-body"><b>กด "🔄 ประเมินผลใหม่"</b> — ล้างข้อมูลทั้งหมดเพื่อเริ่มประเมินผู้ป่วยรายใหม่</div>
+        </div>
+        <div class="help-tip"><b>💡 PDF A4:</b> เลือก "Save as PDF" ใน print dialog เพื่อบันทึกเป็นไฟล์ หรือเลือกเครื่องพิมพ์เพื่อพิมพ์ออกกระดาษ A4 ได้เลย</div>
+        <div class="help-warn"><b>⚠️ สำคัญ:</b> รายงานนี้สร้างจากข้อมูลที่กรอกในแอป ข้อมูลจะหายเมื่อปิดหน้าต่างหรือ Refresh — ควร Export PDF ก่อนปิด</div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="help-section">
+      <div class="help-section-head" onclick="toggleHelp(this)">
+        <span class="hs-icon">💡</span>
+        <span class="hs-title">เคล็ดลับการใช้งาน</span>
+        <span class="hs-chev">▼</span>
+      </div>
+      <div class="help-section-body">
+        <div class="help-step">
+          <div class="help-step-num">✓</div>
+          <div class="help-step-body"><b>ทำบน Tablet/iPad:</b> หน้าจอใหญ่ขึ้น กรอกข้อมูลง่ายขึ้น เหมาะสำหรับใช้ที่หัวเตียง</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">✓</div>
+          <div class="help-step-body"><b>บันทึกหน้าเว็บไว้ใน Bookmark:</b> กด Share → "Add to Home Screen" บน iOS/Android เพื่อเปิดแบบ App ได้เลย</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">✓</div>
+          <div class="help-step-body"><b>ผลแสดง Real-time:</b> ระบบคำนวณ RSBI, PERRS Score และ ROX Index อัตโนมัติทันทีที่กรอกค่า ไม่ต้องกดปุ่มยืนยัน</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">✓</div>
+          <div class="help-step-body"><b>สีบอกผล:</b> <span class="help-badge green">🟢 เขียว</span> = ผ่าน/ดี &nbsp;<span class="help-badge amber">🟡 เหลือง</span> = ระวัง &nbsp;<span class="help-badge red">🔴 แดง</span> = ไม่ผ่าน/เสี่ยงสูง</div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">✓</div>
+          <div class="help-step-body"><b>ใช้ได้แบบ Offline:</b> เมื่อเปิดหน้าเว็บสำเร็จแล้วครั้งแรก สามารถใช้ได้แม้ไม่มีอินเทอร์เน็ต (browser caching)</div>
+        </div>
+        <div class="help-warn"><b>⚠️ ข้อควรระวัง:</b> ระบบนี้เป็นเครื่องมือสนับสนุนการตัดสินใจเท่านั้น ไม่ทดแทนการประเมินทางคลินิกของแพทย์และพยาบาลผู้เชี่ยวชาญ</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7">
+      SmartWean Navigator · หอผู้ป่วย กจ.2 · รพ.พหลพลพยุหเสนา<br>
+      Nurse-Driven Ventilator Weaning Protocol
+    </div>
+  </div>
+</div>
+
 </main>
 </div>
 
+<script>
+function openHelp(){
+  document.getElementById("helpPage").style.display="block";
+  document.getElementById("helpPage").scrollTop=0;
+}
+function closeHelp(){
+  document.getElementById("helpPage").style.display="none";
+}
+function toggleHelp(head){
+  head.classList.toggle("open");
+  const body=head.nextElementSibling;
+  body.classList.toggle("open");
+}
+</script>
 <script>
 (function(){
   // Detect scroll-driven animation support
