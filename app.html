@@ -325,31 +325,31 @@
       <div class="hint" style="margin-top:-4px;margin-bottom:12px">บันทึกค่าจาก Ventilator และ Vital Signs ล่าสุด</div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:0 0 8px">Gas Exchange</p>
-      <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">เกณฑ์ &gt; 90%</span><input type="number" inputmode="decimal" id="spo2" oninput="calcM1()" placeholder="เช่น 95"></div>
-      <div class="q"><label class="qlabel">PaO₂ (mmHg)</label><span class="crit">เกณฑ์ &gt; 60</span><div class="hint">ถ้าไม่ได้เจาะ ABG ใส่ 0 (ระบบจะข้ามเกณฑ์นี้)</div><input type="number" inputmode="decimal" id="pao2" oninput="calcM1()" placeholder="เช่น 80 หรือ 0"></div>
+      <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">เกณฑ์ &gt; 90%</span><input type="text" inputmode="decimal" id="spo2" oninput="calcM1()" placeholder="เช่น 95"></div>
+      <div class="q"><label class="qlabel">PaO₂ (mmHg)</label><span class="crit">เกณฑ์ &gt; 60</span><div class="hint">ถ้าไม่ได้เจาะ ABG ใส่ 0 (ระบบจะข้ามเกณฑ์นี้)</div><input type="text" inputmode="decimal" id="pao2" oninput="calcM1()" placeholder="เช่น 80 หรือ 0"></div>
       <div class="q"><label class="qlabel">FiO₂</label><span class="crit">เกณฑ์ ≤ 0.40</span><div class="opts" id="fio2"></div></div>
       <div class="q"><label class="qlabel">PEEP (cmH₂O)</label><span class="crit">เกณฑ์ ≤ 8</span><div class="opts" id="peep"></div></div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Respiratory Mechanics</p>
       <div class="grid2">
-        <div class="q"><label class="qlabel">Tidal Volume — TV (cc)</label><span class="crit">&gt; 5 cc/kg</span><input type="number" inputmode="decimal" id="tv" oninput="calcM1()" placeholder="เช่น 450"></div>
-        <div class="q"><label class="qlabel">น้ำหนัก (kg)</label><span class="crit">ใช้คำนวณ TV/kg</span><input type="number" inputmode="decimal" id="wt" oninput="calcM1()" placeholder="เช่น 60"></div>
-        <div class="q"><label class="qlabel">Minute Ventilation (L/min)</label><span class="crit">5–12 LPM</span><input type="number" inputmode="decimal" id="mv" oninput="calcM1()" placeholder="เช่น 8.5"></div>
-        <div class="q"><label class="qlabel">Respiratory Rate (/min)</label><span class="crit">&lt; 30/min</span><input type="number" inputmode="decimal" id="rr1" oninput="calcM1()" placeholder="เช่น 20"></div>
+        <div class="q"><label class="qlabel">Tidal Volume — TV (cc)</label><span class="crit">&gt; 5 cc/kg</span><input type="text" inputmode="decimal" id="tv" oninput="calcM1()" placeholder="เช่น 450"></div>
+        <div class="q"><label class="qlabel">น้ำหนัก (kg)</label><span class="crit">ใช้คำนวณ TV/kg</span><input type="text" inputmode="decimal" id="wt" oninput="calcM1()" placeholder="เช่น 60"></div>
+        <div class="q"><label class="qlabel">Minute Ventilation (L/min)</label><span class="crit">5–12 LPM</span><input type="text" inputmode="decimal" id="mv" oninput="calcM1()" placeholder="เช่น 8.5"></div>
+        <div class="q"><label class="qlabel">Respiratory Rate (/min)</label><span class="crit">&lt; 30/min</span><input type="text" inputmode="decimal" id="rr1" oninput="calcM1()" placeholder="เช่น 20"></div>
       </div>
       <div class="rox-box" id="rsbiBox">RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ</div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Hemodynamics</p>
       <div class="grid2">
-        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">90–180</span><input type="number" inputmode="decimal" id="sbp1" oninput="calcM1()" placeholder="เช่น 120"></div>
-        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">&gt; 60</span><input type="number" inputmode="decimal" id="dbp1" oninput="calcM1()" placeholder="เช่น 75"></div>
-        <div class="q"><label class="qlabel">Heart Rate (/min)</label><span class="crit">50–120</span><input type="number" inputmode="decimal" id="hr1" oninput="calcM1()" placeholder="เช่น 80"></div>
+        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">90–180</span><input type="text" inputmode="decimal" id="sbp1" oninput="calcM1()" placeholder="เช่น 120"></div>
+        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">&gt; 60</span><input type="text" inputmode="decimal" id="dbp1" oninput="calcM1()" placeholder="เช่น 75"></div>
+        <div class="q"><label class="qlabel">Heart Rate (/min)</label><span class="crit">50–120</span><input type="text" inputmode="decimal" id="hr1" oninput="calcM1()" placeholder="เช่น 80"></div>
       </div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Laboratory</p>
       <div class="grid2">
-        <div class="q"><label class="qlabel">Hematocrit — Hct (%)</label><span class="crit">≥ 30%</span><input type="number" inputmode="decimal" id="hct" oninput="calcM1()" placeholder="เช่น 35"></div>
-        <div class="q"><label class="qlabel">Hemoglobin — Hb (g/dL)</label><span class="crit">&gt; 7</span><input type="number" inputmode="decimal" id="hb" oninput="calcM1()" placeholder="เช่น 10.5"></div>
+        <div class="q"><label class="qlabel">Hematocrit — Hct (%)</label><span class="crit">≥ 30%</span><input type="text" inputmode="decimal" id="hct" oninput="calcM1()" placeholder="เช่น 35"></div>
+        <div class="q"><label class="qlabel">Hemoglobin — Hb (g/dL)</label><span class="crit">&gt; 7</span><input type="text" inputmode="decimal" id="hb" oninput="calcM1()" placeholder="เช่น 10.5"></div>
       </div>
       <div class="q"><label class="qlabel">Electrolytes (Mg, Ca, P)</label><span class="crit">อยู่ในระดับปกติ</span><div class="opts" id="lyte"></div></div>
 
@@ -375,12 +375,12 @@
 
       <div class="eyebrow">Vital Signs ระหว่าง SBT</div>
       <div class="grid2">
-        <div class="q"><label class="qlabel">RR (/min)</label><span class="crit">หยุด: &gt;30 หรือ &lt;10</span><input type="number" inputmode="decimal" id="rr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">TV (cc)</label><span class="crit">หยุด: &lt;200</span><input type="number" inputmode="decimal" id="tv2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">หยุด: &lt;90 หรือ &gt;180</span><input type="number" inputmode="decimal" id="sbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">หยุด: &lt;60</span><input type="number" inputmode="decimal" id="dbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">HR (/min)</label><span class="crit">หยุด: &gt;120</span><input type="number" inputmode="decimal" id="hr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">หยุด: &lt;90</span><input type="number" inputmode="decimal" id="spo22" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">RR (/min)</label><span class="crit">หยุด: &gt;30 หรือ &lt;10</span><input type="text" inputmode="decimal" id="rr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">TV (cc)</label><span class="crit">หยุด: &lt;200</span><input type="text" inputmode="decimal" id="tv2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">หยุด: &lt;90 หรือ &gt;180</span><input type="text" inputmode="decimal" id="sbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">หยุด: &lt;60</span><input type="text" inputmode="decimal" id="dbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">HR (/min)</label><span class="crit">หยุด: &gt;120</span><input type="text" inputmode="decimal" id="hr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">หยุด: &lt;90</span><input type="text" inputmode="decimal" id="spo22" oninput="calcM2()" placeholder="ตัวเลข"></div>
       </div>
 
       <div class="eyebrow">🚩 Red Flag — อาการที่ต้องหยุด SBT</div>
@@ -412,8 +412,8 @@
 
       <div class="eyebrow">ค่าที่ใช้คำนวณ ROX Index</div>
       <div class="grid2">
-        <div class="q"><label class="qlabel">SpO₂ หลังถอดท่อ (%)</label><input type="number" inputmode="decimal" id="roxspo2" oninput="calcM3()" placeholder="เช่น 96"></div>
-        <div class="q"><label class="qlabel">RR หลังถอดท่อ (/min)</label><input type="number" inputmode="decimal" id="roxrr" oninput="calcM3()" placeholder="เช่น 22"></div>
+        <div class="q"><label class="qlabel">SpO₂ หลังถอดท่อ (%)</label><input type="text" inputmode="decimal" id="roxspo2" oninput="calcM3()" placeholder="เช่น 96"></div>
+        <div class="q"><label class="qlabel">RR หลังถอดท่อ (/min)</label><input type="text" inputmode="decimal" id="roxrr" oninput="calcM3()" placeholder="เช่น 22"></div>
       </div>
       <div class="q"><label class="qlabel">FiO₂ ที่ให้หลังถอดท่อ</label><div class="opts" id="roxfio2"></div></div>
       <div class="rox-box" id="roxBox">ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ</div>
