@@ -413,7 +413,7 @@ body{background:#fdf4f7;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;-w
         </div>
         <div>
           <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7d2d4e">SmartWean Navigator</div>
-          <div style="font-size:11px;color:#a87f8d">หอผู้ป่วย กจ.2 · โรงพยาบาลพหลพลพยุหเสนา จ.กาญจนบุรี</div>
+          <div style="font-size:11px;color:#a87f8d" id="wardFooterIndex">โรงพยาบาลพหลพลพยุหเสนา จ.กาญจนบุรี</div>
         </div>
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start;border-top:1px solid #f5e1e8;padding-top:11px">
@@ -693,7 +693,7 @@ body{background:#fdf4f7;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;-w
     </div>
 
     <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7">
-      SmartWean Navigator · หอผู้ป่วย กจ.2 · รพ.พหลพลพยุหเสนา<br>
+      SmartWean Navigator<span id="wardHelpFooterIndex"></span> · รพ.พหลพลพยุหเสนา<br>
       Nurse-Driven Ventilator Weaning Protocol
     </div>
   </div>
@@ -715,6 +715,13 @@ function toggleHelp(head){
   const body=head.nextElementSibling;
   body.classList.toggle("open");
 }
+(function(){
+  const ward=(localStorage.getItem("swn_ward")||"").trim();
+  if(ward){
+    document.getElementById("wardFooterIndex").textContent="หอผู้ป่วย "+ward+" · โรงพยาบาลพหลพลพยุหเสนา จ.กาญจนบุรี";
+    document.getElementById("wardHelpFooterIndex").textContent=" · หอผู้ป่วย "+ward;
+  }
+})();
 </script>
 <script>
 (function(){

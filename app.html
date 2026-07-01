@@ -254,10 +254,11 @@
   .rp-verdict.amber{background:var(--amber-soft);border-color:var(--amber)}.rp-verdict.amber .vt{color:var(--amber)}
   .rp-verdict.red{background:var(--red-soft);border-color:var(--red)}.rp-verdict.red .vt{color:var(--red)}
   .rp-note{font-size:11px;margin-top:8px;background:#fdf0f5;border-radius:6px;padding:7px 10px;color:var(--ink-soft)}
-  .rp-sign{display:flex;justify-content:space-between;gap:30px;margin-top:30px;break-inside:avoid}
+  .rp-footer{break-inside:avoid;margin-top:20px}
+  .rp-sign{display:flex;justify-content:space-between;gap:30px;break-inside:avoid}
   .rp-sign .s{flex:1;text-align:center;font-size:11px;color:var(--muted)}
-  .rp-sign .line{border-top:1px solid var(--ink-soft);margin:34px 14px 6px}
-  .rp-disc{margin-top:18px;font-size:9.5px;color:var(--muted);text-align:center;line-height:1.5;
+  .rp-sign .line{border-top:1px solid var(--ink-soft);margin:26px 14px 6px}
+  .rp-disc{margin-top:12px;font-size:9.5px;color:var(--muted);text-align:center;line-height:1.5;
     border-top:1px solid var(--line);padding-top:10px}
 
   .rp-calc{background:#f6e8ef;border-left:3px solid #d65d86;padding:7px 10px;border-radius:5px;font-size:11.5px;margin:8px 0;line-height:1.6}
@@ -265,7 +266,7 @@
     body{background:#fff}
     header,.wrap,.bar,.tabs,#helpPage,#resultPage,.sheet-backdrop{display:none!important}
     #report{display:block;font-size:11pt;max-width:170mm}
-    .rp-mod{break-inside:avoid-page}
+    .rp-mod,.rp-footer{break-inside:avoid-page}
     @page{size:A4;margin:13mm}
   }
 </style>
@@ -283,7 +284,7 @@
     <h1>SmartWean Navigator</h1>
   </div>
   <div class="sub">ระบบสนับสนุนการตัดสินใจทางคลินิก (Nurse-Driven Protocol)<br>
-    สำหรับการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา — หอผู้ป่วย กจ.2</div>
+    สำหรับการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา<span id="wardHeaderSub"></span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;position:relative;z-index:1">
     <div class="warn" style="flex:1;margin-top:0">⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>
     <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
@@ -302,6 +303,7 @@
       <div class="q"><label class="qlabel">วันที่ประเมิน <span class="req">*</span></label><input type="date" id="adate"></div>
       <div class="q"><label class="qlabel">เวลาที่ประเมิน <span class="req">*</span></label><input type="time" id="atime"></div>
       <div class="q"><label class="qlabel">ผู้ประเมิน (พยาบาล) <span class="req">*</span></label><input type="text" id="nurse" placeholder="ชื่อพยาบาล"></div>
+      <div class="q"><label class="qlabel">หน่วยงาน / หอผู้ป่วย</label><input type="text" id="ward" placeholder="เช่น กจ.2" oninput="saveWard()"></div>
     </div>
   </div>
 
@@ -431,7 +433,7 @@
   </div>
 
   <div class="footer">
-    SmartWean Navigator · v1.0 · พัฒนาสำหรับหอผู้ป่วย กจ.2<br>
+    SmartWean Navigator · v1.0<span id="wardFooter"></span><br>
     เครื่องมือนี้ช่วยคำนวณตามเกณฑ์ที่ตั้งไว้ ผลที่ได้ต้องผ่านการพิจารณาของพยาบาลและแพทย์เสมอ
   </div>
 </div>
@@ -708,7 +710,7 @@
     </div>
 
     <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7">
-      SmartWean Navigator · หอผู้ป่วย กจ.2 · รพ.พหลพลพยุหเสนา<br>
+      SmartWean Navigator<span id="wardHelpFooter"></span> · รพ.พหลพลพยุหเสนา<br>
       Nurse-Driven Ventilator Weaning Protocol
     </div>
   </div>
@@ -1078,7 +1080,7 @@ function buildReport(){
       <path d="M50 32 C42 30 30 34 28 48 C26 62 30 76 40 78 C46 79 47 72 47 64 L47 40"/>
       <path d="M50 32 C58 30 70 34 72 48 C74 62 70 76 60 78 C54 79 53 72 53 64 L53 40"/></svg>
     <div><h1>SmartWean Navigator</h1>
-      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา — หอผู้ป่วย กจ.2</div></div>
+      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา${document.getElementById("ward").value.trim()?" — หอผู้ป่วย "+document.getElementById("ward").value.trim():""}</div></div>
     <div class="rp-meta">พิมพ์เมื่อ<br>${stamp}</div>
   </div>
   <div class="rp-patient">
@@ -1211,12 +1213,14 @@ function buildReport(){
   }
 
   html+=`
-  <div class="rp-sign">
-    <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${V("nurse")})</div>
-    <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
-  </div>
-  <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
-    ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>`;
+  <div class="rp-footer">
+    <div class="rp-sign">
+      <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${V("nurse")})</div>
+      <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
+    </div>
+    <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
+      ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>
+  </div>`;
 
   document.getElementById("report").innerHTML=html;
 }
@@ -1397,11 +1401,25 @@ function toggleHelp(head){
   body.classList.toggle("open");
 }
 
+/* ---------------- ward / department name ---------------- */
+function renderWard(){
+  const ward=document.getElementById("ward").value.trim();
+  document.getElementById("wardHeaderSub").textContent=ward?" — หอผู้ป่วย "+ward:"";
+  document.getElementById("wardFooter").textContent=ward?" · พัฒนาสำหรับหอผู้ป่วย "+ward:"";
+  document.getElementById("wardHelpFooter").textContent=ward?" · หอผู้ป่วย "+ward:"";
+}
+function saveWard(){
+  localStorage.setItem("swn_ward",document.getElementById("ward").value.trim());
+  renderWard();
+}
+
 // default date/time = now
 (function(){
   const n=new Date(),p=x=>String(x).padStart(2,"0");
   document.getElementById("adate").value=`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`;
   document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
+  document.getElementById("ward").value=localStorage.getItem("swn_ward")||"";
+  renderWard();
 })();
 </script>
 </body>
