@@ -1,1068 +1,420 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SmartWean Navigator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#3d2530;
-    --ink-soft:#6b4a57;
-    --muted:#9a7f89;
-    --line:#f1dde4;
-    --bg:#fdf4f7;
-    --card:#ffffff;
-    --teal:#d65d86;
-    --teal-deep:#b03e66;
-    --teal-soft:#fce6ee;
-    --green:#1f9d57;
-    --green-soft:#e4f5ea;
-    --amber:#c9870a;
-    --amber-soft:#fbf0d8;
-    --red:#d23b3b;
-    --red-soft:#fbe6e6;
-    --radius:16px;
-    --shadow:0 1px 2px rgba(15,28,36,.04),0 8px 24px rgba(15,28,36,.06);
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0;font-family:'IBM Plex Sans Thai',sans-serif;
-    background:var(--bg);color:var(--ink);line-height:1.5;
-    font-size:15px;-webkit-text-size-adjust:100%;
-  }
-  .wrap{max-width:760px;margin:0 auto;padding:0 14px 120px}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#fdf4f7;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#3b2f33}
 
-  /* ---------- Header ---------- */
-  header{
-    background:linear-gradient(135deg,var(--teal-deep),var(--teal));
-    color:#fff;padding:26px 20px 22px;border-radius:0 0 24px 24px;
-    position:relative;overflow:hidden;
-  }
-  header::after{
-    content:"";position:absolute;right:-40px;top:-40px;width:180px;height:180px;
-    border-radius:50%;background:rgba(255,255,255,.07);
-  }
-  .brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
-  .lung{width:30px;height:30px;flex:none}
-  .lung path{fill:none;stroke:#fff;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
-  .pulse{stroke:#ffd9e6 !important;stroke-dasharray:60;stroke-dashoffset:60;animation:draw 2.4s ease-in-out infinite}
-  @keyframes draw{0%{stroke-dashoffset:60}40%{stroke-dashoffset:0}70%{stroke-dashoffset:0}100%{stroke-dashoffset:-60}}
-  h1{font-family:'Sora',sans-serif;font-weight:700;font-size:22px;margin:0;letter-spacing:-.3px}
-  .sub{font-size:12.5px;opacity:.92;margin-top:8px;position:relative;z-index:1;line-height:1.5}
-  .warn{
-    margin-top:12px;font-size:11.5px;background:rgba(255,255,255,.14);
-    padding:8px 11px;border-radius:10px;position:relative;z-index:1;
-    border:1px solid rgba(255,255,255,.2);
-  }
+@keyframes swn-ring{0%{box-shadow:0 0 0 0 rgba(22,163,74,.4)}70%{box-shadow:0 0 0 7px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+@keyframes swn-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@keyframes swn-glow{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.18);transform:scale(1.12)}}
+@keyframes swn-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes swn-floatb{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+@keyframes swn-in{0%{opacity:0;transform:translateY(90px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes swn-bob{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(7px);opacity:1}}
+@keyframes swn-grow{0%{opacity:0;transform:scale(.42)}100%{opacity:1;transform:scale(1)}}
+@keyframes swn-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes swn-breathe{0%,100%{transform:scale(1)}45%{transform:scale(1.11)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-  /* ---------- Module tabs ---------- */
-  .tabs{display:flex;gap:8px;margin:16px 0 6px;position:sticky;top:0;z-index:30;
-    background:var(--bg);padding:8px 0;}
-  .tab{
-    flex:1;border:1.5px solid var(--line);background:var(--card);
-    border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;
-    font-weight:600;font-size:12px;color:var(--muted);transition:.18s;
-  }
-  .tab .n{display:block;font-family:'Sora';font-size:16px;line-height:1.1}
-  .tab.active{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+.swn-outer{min-height:100vh;width:100%;display:flex;justify-content:center;background:radial-gradient(120% 40% at 50% 0%,#fde8ee 0%,#f7eef1 48%,#f1ebed 100%)}
+.swn-main{width:100%;max-width:468px;background:#fdf4f7;box-shadow:0 0 0 1px rgba(190,120,145,.10),0 24px 70px -28px rgba(150,60,95,.30);position:relative;overflow-x:clip}
 
-  /* ---------- Card / section ---------- */
-  .card{
-    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
-    padding:18px 16px;margin-bottom:14px;border:1px solid #eef2f4;
-  }
-  .sec-head{display:flex;align-items:center;gap:9px;margin-bottom:4px}
-  .sec-head .ic{font-size:18px}
-  .sec-head h2{font-size:15.5px;margin:0;font-weight:700;color:var(--teal-deep)}
-  .sec-desc{font-size:12.5px;color:var(--muted);margin:2px 0 14px}
-  .eyebrow{
-    font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
-    color:var(--teal);display:flex;align-items:center;gap:7px;margin:18px 0 10px;
-  }
-  .eyebrow::before{content:"";width:18px;height:2px;background:var(--teal);border-radius:2px}
-  .eyebrow:first-child{margin-top:2px}
+/* Header */
+.swn-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 0;flex:none}
 
-  /* ---------- Fields ---------- */
-  .q{margin-bottom:16px}
-  .q:last-child{margin-bottom:0}
-  label.qlabel{display:block;font-weight:600;font-size:14px;margin-bottom:3px}
-  .req{color:var(--red);font-weight:700}
-  .hint{font-size:11.5px;color:var(--muted);margin-bottom:7px}
-  .crit{display:inline-block;font-size:11px;font-weight:600;color:var(--teal-deep);
-    background:var(--teal-soft);padding:2px 8px;border-radius:6px;margin-bottom:7px}
-  input[type=text],input[type=number],input[type=date],input[type=time],textarea,select{
-    width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;
-    font-family:inherit;font-size:15px;color:var(--ink);background:#fff;transition:.15s;
-  }
-  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);
-    box-shadow:0 0 0 3px var(--teal-soft)}
-  textarea{resize:vertical;min-height:64px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:480px){.grid2{grid-template-columns:1fr}}
+/* Hero */
+.swn-hero-page{min-height:100vh;display:flex;flex-direction:column;position:relative}
+.swn-hero-wrap{display:flex;flex-direction:column;align-items:center;gap:30px;width:100%;padding:8px 22px 0}
+.swn-hero-left{flex:1 1 auto;max-width:none;width:100%}
+.swn-hero-right{flex:1 1 auto;width:100%;display:flex;justify-content:center;align-items:center;position:relative;min-height:390px}
 
-  /* radio / checkbox option lists */
-  .opts{display:flex;flex-direction:column;gap:7px}
-  .opt{
-    display:flex;align-items:flex-start;gap:10px;border:1.5px solid var(--line);
-    border-radius:10px;padding:10px 12px;cursor:pointer;transition:.14s;font-size:13.5px;
-  }
-  .opt:hover{border-color:#eab4c8}
-  .opt input{margin:2px 0 0;accent-color:var(--teal);width:17px;height:17px;flex:none}
-  .opt.sel{border-color:var(--teal);background:var(--teal-soft)}
-  .opt.sel.good{border-color:var(--green);background:var(--green-soft)}
-  .opt.sel.warnbad{border-color:var(--red);background:var(--red-soft)}
-  .opt .otxt{flex:1}
-  .opt .tag{font-size:10.5px;color:var(--muted)}
-  .pill-pass{color:var(--green);font-weight:600}
-  .pill-fail{color:var(--red);font-weight:600}
+/* Pinned sections */
+.swn-pin-section{position:relative;height:135vh}
+.swn-pin-inner{position:sticky;top:0;min-height:100vh;display:flex;flex-direction:column;justify-content:center;overflow-x:clip}
+.swn-pad{padding:0 22px;width:100%}
 
-  /* ---------- live mini result chips ---------- */
-  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
-    padding:3px 9px;border-radius:20px;margin:3px 4px 0 0}
-  .chip.ok{background:var(--green-soft);color:var(--green)}
-  .chip.bad{background:var(--red-soft);color:var(--red)}
-  .chip.neu{background:#eef2f4;color:var(--muted)}
+/* Grids */
+.swn-grid{display:grid;grid-template-columns:1fr;gap:74px;align-items:start;padding-bottom:20px}
 
-  /* ---------- Result panel ---------- */
-  .result{border-radius:var(--radius);padding:20px 18px;margin-bottom:14px;
-    border:1.5px solid;text-align:left;animation:pop .3s ease}
-  @keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
-  .result.green{background:var(--green-soft);border-color:var(--green)}
-  .result.amber{background:var(--amber-soft);border-color:var(--amber)}
-  .result.red{background:var(--red-soft);border-color:var(--red)}
-  .result.idle{background:#fff;border-color:var(--line);border-style:dashed}
-  .result .light{font-family:'Sora';font-size:20px;font-weight:700;display:flex;
-    align-items:center;gap:10px;margin-bottom:6px}
-  .result.green .light{color:var(--green)}
-  .result.amber .light{color:var(--amber)}
-  .result.red .light{color:var(--red)}
-  .result .big{font-family:'Sora';font-size:42px;font-weight:700;line-height:1}
-  .result .desc{font-size:13.5px;color:var(--ink-soft);margin-top:6px}
-  .result ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--ink-soft)}
-  .result ul li{margin-bottom:3px}
-  .result .rec{margin-top:12px;background:rgba(255,255,255,.6);border-radius:10px;
-    padding:11px 13px;font-size:13px}
-  .result .rec b{color:var(--ink)}
+/* CTA page */
+.swn-cta-page{min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
 
-  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
-  .dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+/* Cloud cards */
+.swn-cloud{background:#fff;border-radius:44px 48px 54px 54px;position:relative;z-index:1;filter:drop-shadow(0 18px 26px rgba(150,60,95,.16))}
+.swn-cloud::before{content:'';position:absolute;left:4px;right:4px;top:-42px;height:60px;background-repeat:no-repeat}
+.swn-cloud::after{content:'';position:absolute;left:14px;right:14px;bottom:-24px;height:44px;background-repeat:no-repeat}
 
-  /* ---------- buttons ---------- */
-  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);
-    backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:11px 14px;z-index:40}
-  .bar .inner{max-width:760px;margin:0 auto;display:flex;gap:10px}
-  .btn{flex:1;border:none;border-radius:12px;padding:14px;font-family:inherit;
-    font-weight:700;font-size:15px;cursor:pointer;transition:.15s}
-  .btn-primary{background:var(--teal);color:#fff}
-  .btn-primary:active{background:var(--teal-deep)}
-  .btn-ghost{background:#fff;border:1.5px solid var(--line);color:var(--teal-deep)}
-  /* share preview sheet */
-  .sheet-backdrop{position:fixed;inset:0;background:rgba(15,20,30,.5);z-index:80;
-    display:flex;align-items:flex-end;animation:fadein .2s ease}
-  @keyframes fadein{from{opacity:0}to{opacity:1}}
-  .sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-height:82vh;
-    display:flex;flex-direction:column;animation:slideup .25s cubic-bezier(.32,1,.4,1)}
-  @keyframes slideup{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
-  .sheet-handle{width:36px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 0}
-  .sheet-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
-  .sheet-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--teal-deep)}
-  .sheet-body{overflow-y:auto;padding:16px 18px;flex:1;-webkit-overflow-scrolling:touch}
-  .sheet-foot{padding:12px 16px 28px;border-top:1px solid var(--line);display:flex;gap:10px}
-  .preview-box{background:var(--teal-soft);border:1px solid var(--line);border-radius:12px;
-    padding:14px;font-size:13px;line-height:1.75;color:var(--ink);white-space:pre-wrap;
-    font-family:'IBM Plex Sans Thai',monospace}
-  .module{display:none}
-  .module.show{display:block;animation:fade .25s ease}
-  @keyframes fade{from{opacity:0}to{opacity:1}}
+.cm1::before{background-image:radial-gradient(circle at 13% 100%,#fff 0 36px,transparent 37px),radial-gradient(circle at 40% 100%,#fff 0 50px,transparent 51px),radial-gradient(circle at 69% 100%,#fff 0 42px,transparent 43px),radial-gradient(circle at 92% 100%,#fff 0 30px,transparent 31px)}
+.cm1::after{background-image:radial-gradient(circle at 19% 0,#fff 0 32px,transparent 33px),radial-gradient(circle at 52% 0,#fff 0 40px,transparent 41px),radial-gradient(circle at 83% 0,#fff 0 30px,transparent 31px)}
+.cm2::before{background-image:radial-gradient(circle at 11% 100%,#fff 0 30px,transparent 31px),radial-gradient(circle at 36% 100%,#fff 0 46px,transparent 47px),radial-gradient(circle at 63% 100%,#fff 0 52px,transparent 53px),radial-gradient(circle at 90% 100%,#fff 0 34px,transparent 35px)}
+.cm2::after{background-image:radial-gradient(circle at 22% 0,#fff 0 36px,transparent 37px),radial-gradient(circle at 56% 0,#fff 0 34px,transparent 35px),radial-gradient(circle at 85% 0,#fff 0 30px,transparent 31px)}
+.cm3::before{background-image:radial-gradient(circle at 12% 100%,#fff 0 40px,transparent 41px),radial-gradient(circle at 42% 100%,#fff 0 34px,transparent 35px),radial-gradient(circle at 70% 100%,#fff 0 48px,transparent 49px),radial-gradient(circle at 92% 100%,#fff 0 28px,transparent 29px)}
+.cm3::after{background-image:radial-gradient(circle at 18% 0,#fff 0 30px,transparent 31px),radial-gradient(circle at 50% 0,#fff 0 42px,transparent 43px),radial-gradient(circle at 82% 0,#fff 0 32px,transparent 33px)}
+.cf1::before{background-image:radial-gradient(circle at 11% 100%,#fff 0 30px,transparent 31px),radial-gradient(circle at 36% 100%,#fff 0 46px,transparent 47px),radial-gradient(circle at 63% 100%,#fff 0 52px,transparent 53px),radial-gradient(circle at 90% 100%,#fff 0 34px,transparent 35px)}
+.cf1::after{background-image:radial-gradient(circle at 19% 0,#fff 0 32px,transparent 33px),radial-gradient(circle at 52% 0,#fff 0 40px,transparent 41px),radial-gradient(circle at 83% 0,#fff 0 30px,transparent 31px)}
+.cf2::before{background-image:radial-gradient(circle at 12% 100%,#fff 0 40px,transparent 41px),radial-gradient(circle at 42% 100%,#fff 0 34px,transparent 35px),radial-gradient(circle at 70% 100%,#fff 0 48px,transparent 49px),radial-gradient(circle at 92% 100%,#fff 0 28px,transparent 29px)}
+.cf2::after{background-image:radial-gradient(circle at 22% 0,#fff 0 36px,transparent 37px),radial-gradient(circle at 56% 0,#fff 0 34px,transparent 35px),radial-gradient(circle at 85% 0,#fff 0 30px,transparent 31px)}
+.cf3::before{background-image:radial-gradient(circle at 13% 100%,#fff 0 36px,transparent 37px),radial-gradient(circle at 40% 100%,#fff 0 50px,transparent 51px),radial-gradient(circle at 69% 100%,#fff 0 42px,transparent 43px),radial-gradient(circle at 92% 100%,#fff 0 30px,transparent 31px)}
+.cf3::after{background-image:radial-gradient(circle at 18% 0,#fff 0 30px,transparent 31px),radial-gradient(circle at 50% 0,#fff 0 42px,transparent 43px),radial-gradient(circle at 82% 0,#fff 0 32px,transparent 33px)}
 
-  .gauge{display:flex;align-items:flex-end;gap:5px;height:46px;margin-top:8px}
-  .gauge .seg{flex:1;border-radius:5px 5px 0 0;background:#e3eaed;position:relative}
-  .rox-box{background:#fdf0f5;border:1px dashed var(--line);border-radius:10px;
-    padding:11px 13px;font-size:13px;margin-top:4px}
-  .rox-box b{font-family:'Sora';font-size:17px}
-  .footer{text-align:center;font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6}
+/* Scroll-driven animations */
+#sec-modules{view-timeline-name:--s2;view-timeline-axis:block}
+#sec-features{view-timeline-name:--s3;view-timeline-axis:block}
 
-  /* ---------- PDF report ---------- */
-  #report{display:none}
-  #report *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .rp-head{display:flex;align-items:center;gap:12px;border-bottom:2.5px solid var(--teal);padding-bottom:12px}
-  .rp-head .lg{width:42px;height:42px;flex:none}
-  .rp-head .lg path{fill:none;stroke:var(--teal);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
-  .rp-head h1{font-family:'Sora';font-size:21px;color:var(--teal-deep);margin:0}
-  .rp-head .org{font-size:11.5px;color:var(--muted);margin-top:2px}
-  .rp-meta{text-align:right;font-size:10.5px;color:var(--muted);margin-left:auto;line-height:1.5}
-  .rp-patient{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:14px 0 4px;
-    border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .rp-patient .cell{padding:8px 11px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .rp-patient .cell:nth-child(4n){border-right:none}
-  .rp-patient .k{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-  .rp-patient .v{font-size:13px;font-weight:600;margin-top:1px}
-  .rp-mod{margin-top:16px;break-inside:avoid}
-  .rp-mod-title{font-family:'Sora';font-size:13px;font-weight:700;color:#fff;
-    padding:6px 12px;border-radius:7px 7px 0 0}
-  .rp-mod-title.t1{background:var(--green)}.rp-mod-title.t2{background:var(--amber)}.rp-mod-title.t3{background:var(--red)}
-  .rp-mod-body{border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;padding:12px}
-  .rp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px 16px;font-size:11.5px;margin-bottom:8px}
-  .rp-grid.two{grid-template-columns:1fr 1fr}
-  .rp-row{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted #f1dde4;padding-bottom:3px}
-  .rp-row .lk{color:var(--muted)}
-  .rp-row .lv{font-weight:600;text-align:right}
-  .rp-row .lv.bad{color:var(--red)}.rp-row .lv.good{color:var(--green)}
-  .rp-sub{font-size:10.5px;font-weight:700;color:var(--ink-soft);margin:8px 0 5px;letter-spacing:.3px}
-  .rp-list{font-size:11px;color:var(--ink-soft);margin:4px 0 0;padding-left:16px}
-  .rp-verdict{margin-top:10px;border:1.5px solid;border-radius:8px;padding:10px 12px}
-  .rp-verdict .vt{font-family:'Sora';font-weight:700;font-size:14px}
-  .rp-verdict .vd{font-size:11px;color:var(--ink-soft);margin-top:2px}
-  .rp-verdict.green{background:var(--green-soft);border-color:var(--green)}.rp-verdict.green .vt{color:var(--green)}
-  .rp-verdict.amber{background:var(--amber-soft);border-color:var(--amber)}.rp-verdict.amber .vt{color:var(--amber)}
-  .rp-verdict.red{background:var(--red-soft);border-color:var(--red)}.rp-verdict.red .vt{color:var(--red)}
-  .rp-note{font-size:11px;margin-top:8px;background:#fdf0f5;border-radius:6px;padding:7px 10px;color:var(--ink-soft)}
-  .rp-sign{display:flex;justify-content:space-between;gap:30px;margin-top:30px;break-inside:avoid}
-  .rp-sign .s{flex:1;text-align:center;font-size:11px;color:var(--muted)}
-  .rp-sign .line{border-top:1px solid var(--ink-soft);margin:34px 14px 6px}
-  .rp-disc{margin-top:18px;font-size:9.5px;color:var(--muted);text-align:center;line-height:1.5;
-    border-top:1px solid var(--line);padding-top:10px}
+.s2h{animation:swn-in both linear;animation-timeline:--s2;animation-range:cover 4% cover 32%}
+.s2c{animation:swn-in both linear;animation-timeline:--s2;animation-range:cover 12% cover 46%}
+.s3h{animation:swn-in both linear;animation-timeline:--s3;animation-range:cover 4% cover 32%}
+.s3c{animation:swn-in both linear;animation-timeline:--s3;animation-range:cover 12% cover 46%}
+.cta-grow{transform-origin:center 42%;animation:swn-grow both cubic-bezier(.2,.7,.3,1);animation-timeline:view();animation-range:entry 8% cover 42%}
 
-  @media print{
-    body{background:#fff}
-    header,.wrap,.bar,.tabs{display:none!important}
-    #report{display:block;font-size:12px}
-    @page{size:A4;margin:13mm}
-  }
+/* JS fallback for scroll animations */
+.swn-reveal{opacity:0;transform:translateY(70px) scale(.93);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.3,1)}
+.swn-reveal.swn-vis{opacity:1;transform:none}
+.swn-grow-fb{opacity:0;transform:scale(.55);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.3,1)}
+.swn-grow-fb.swn-vis{opacity:1;transform:none}
+
+/* Buttons */
+.swn-btn{border:none;cursor:pointer;background:linear-gradient(150deg,#d65d86,#b03e66);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:17px;padding:17px 30px;border-radius:14px;box-shadow:0 14px 30px -10px rgba(194,70,111,.62),inset 0 1px 0 rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s ease,box-shadow .12s ease}
+.swn-btn:hover{transform:translateY(-1px);box-shadow:0 18px 38px -10px rgba(194,70,111,.72),inset 0 1px 0 rgba(255,255,255,.25)}
+.swn-btn:active{transform:translateY(1px)}
+.swn-btn-lg{border:none;cursor:pointer;background:linear-gradient(150deg,#d65d86,#b03e66);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(18px,1.8vw,22px);padding:20px 44px;border-radius:18px;box-shadow:0 22px 44px -14px rgba(194,70,111,.7),inset 0 1px 0 rgba(255,255,255,.25);display:inline-flex;align-items:center;justify-content:center;gap:12px;transition:transform .14s ease,box-shadow .14s ease}
+.swn-btn-lg:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 28px 52px -14px rgba(194,70,111,.78),inset 0 1px 0 rgba(255,255,255,.25)}
+.swn-btn-lg:active{transform:translateY(1px) scale(.99)}
+
+/* Desktop */
+@media(min-width:880px){
+  .swn-main{max-width:100%;box-shadow:none}
+  .swn-header{padding:26px clamp(32px,5vw,80px) 0}
+  .swn-hero-wrap{flex-direction:row;gap:52px;padding:0 clamp(32px,5vw,80px)}
+  .swn-hero-left{flex:1 1 54%;max-width:660px}
+  .swn-hero-right{flex:1 1 46%;min-height:460px}
+  .swn-pad{padding:0 clamp(32px,5vw,80px)}
+  .swn-grid{grid-template-columns:repeat(3,1fr);gap:30px}
+}
 </style>
 </head>
 <body>
+<div class="swn-outer">
+<main class="swn-main">
 
-<header>
-  <div class="brand">
-    <svg class="lung" viewBox="0 0 100 100" aria-hidden="true">
-      <path d="M50 18 V46"/>
-      <path d="M50 32 C42 30 30 34 28 48 C26 62 30 76 40 78 C46 79 47 72 47 64 L47 40"/>
-      <path d="M50 32 C58 30 70 34 72 48 C74 62 70 76 60 78 C54 79 53 72 53 64 L53 40"/>
-      <path class="pulse" d="M14 60 H30 L36 44 L44 74 L52 54 H86"/>
-    </svg>
-    <h1>SmartWean Navigator</h1>
-  </div>
-  <div class="sub">ระบบสนับสนุนการตัดสินใจทางคลินิก (Nurse-Driven Protocol)<br>
-    สำหรับการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา — หอผู้ป่วย กจ.2</div>
-  <div class="warn">⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>
-</header>
-
-<div class="wrap">
-
-  <!-- Patient info -->
-  <div class="card" style="margin-top:16px">
-    <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
-    <div class="sec-desc">กรอกข้อมูลพื้นฐานก่อนเริ่มประเมิน</div>
-    <div class="grid2">
-      <div class="q"><label class="qlabel">HN <span class="req">*</span></label><input type="text" id="hn" placeholder="Hospital Number"></div>
-      <div class="q"><label class="qlabel">ชื่อ-นามสกุลผู้ป่วย <span class="req">*</span></label><input type="text" id="pname" placeholder="ชื่อ-สกุล"></div>
-      <div class="q"><label class="qlabel">วันที่ประเมิน <span class="req">*</span></label><input type="date" id="adate"></div>
-      <div class="q"><label class="qlabel">เวลาที่ประเมิน <span class="req">*</span></label><input type="time" id="atime"></div>
-      <div class="q"><label class="qlabel">ผู้ประเมิน (พยาบาล) <span class="req">*</span></label><input type="text" id="nurse" placeholder="ชื่อพยาบาล"></div>
+<!-- ── PAGE 1 · HERO ── -->
+<section class="swn-hero-page">
+  <div class="swn-header">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,#d65d86,#b03e66);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px -4px rgba(200,77,119,.6)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M2 13h3.2l1.7-5.5 2.9 11 2.6-8 1.8 4 1.6-2H22" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.2px;color:#7d2d4e">SmartWean</div>
     </div>
   </div>
 
-  <!-- Module tabs -->
-  <div class="tabs">
-    <div class="tab active" data-m="1" onclick="switchModule(1)"><span class="n">1</span>ความพร้อม SBT</div>
-    <div class="tab" data-m="2" onclick="switchModule(2)"><span class="n">2</span>ระหว่าง SBT</div>
-    <div class="tab" data-m="3" onclick="switchModule(3)"><span class="n">3</span>PERRS หลังถอดท่อ</div>
-  </div>
-
-  <!-- ============ MODULE 1 ============ -->
-  <div class="module show" id="m1">
-    <div class="card">
-      <div class="sec-head"><span class="ic">🟢</span><h2>Module 1 · Smart Readiness Assessment</h2></div>
-      <div class="sec-desc">ประเมินความพร้อมก่อนทำ Spontaneous Breathing Trial — ต้องผ่าน<b>ทุกเกณฑ์</b>จึงเริ่ม SBT ได้</div>
-
-      <div class="eyebrow">ส่วนที่ 1 · เกณฑ์ทางคลินิก</div>
-      <div id="clinical"></div>
-
-      <div class="eyebrow">ส่วนที่ 2 · เกณฑ์ทางสรีรวิทยา</div>
-      <div class="hint" style="margin-top:-4px;margin-bottom:12px">บันทึกค่าจาก Ventilator และ Vital Signs ล่าสุด</div>
-
-      <p style="font-weight:700;font-size:13px;color:var(--teal);margin:0 0 8px">Gas Exchange</p>
-      <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">เกณฑ์ &gt; 90%</span><input type="number" inputmode="decimal" id="spo2" oninput="calcM1()" placeholder="เช่น 95"></div>
-      <div class="q"><label class="qlabel">PaO₂ (mmHg)</label><span class="crit">เกณฑ์ &gt; 60</span><div class="hint">ถ้าไม่ได้เจาะ ABG ใส่ 0 (ระบบจะข้ามเกณฑ์นี้)</div><input type="number" inputmode="decimal" id="pao2" oninput="calcM1()" placeholder="เช่น 80 หรือ 0"></div>
-      <div class="q"><label class="qlabel">FiO₂</label><span class="crit">เกณฑ์ ≤ 0.40</span><div class="opts" id="fio2"></div></div>
-      <div class="q"><label class="qlabel">PEEP (cmH₂O)</label><span class="crit">เกณฑ์ ≤ 8</span><div class="opts" id="peep"></div></div>
-
-      <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Respiratory Mechanics</p>
-      <div class="grid2">
-        <div class="q"><label class="qlabel">Tidal Volume — TV (cc)</label><span class="crit">&gt; 5 cc/kg</span><input type="number" inputmode="decimal" id="tv" oninput="calcM1()" placeholder="เช่น 450"></div>
-        <div class="q"><label class="qlabel">น้ำหนัก (kg)</label><span class="crit">ใช้คำนวณ TV/kg</span><input type="number" inputmode="decimal" id="wt" oninput="calcM1()" placeholder="เช่น 60"></div>
-        <div class="q"><label class="qlabel">Minute Ventilation (L/min)</label><span class="crit">5–12 LPM</span><input type="number" inputmode="decimal" id="mv" oninput="calcM1()" placeholder="เช่น 8.5"></div>
-        <div class="q"><label class="qlabel">Respiratory Rate (/min)</label><span class="crit">&lt; 30/min</span><input type="number" inputmode="decimal" id="rr1" oninput="calcM1()" placeholder="เช่น 20"></div>
-      </div>
-      <div class="rox-box" id="rsbiBox">RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ</div>
-
-      <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Hemodynamics</p>
-      <div class="grid2">
-        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">90–180</span><input type="number" inputmode="decimal" id="sbp1" oninput="calcM1()" placeholder="เช่น 120"></div>
-        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">&gt; 60</span><input type="number" inputmode="decimal" id="dbp1" oninput="calcM1()" placeholder="เช่น 75"></div>
-        <div class="q"><label class="qlabel">Heart Rate (/min)</label><span class="crit">50–120</span><input type="number" inputmode="decimal" id="hr1" oninput="calcM1()" placeholder="เช่น 80"></div>
+  <div style="flex:1;display:flex;align-items:center;width:100%">
+    <div class="swn-hero-wrap">
+      <div class="swn-hero-left">
+        <div style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #f1d5df;color:#9b3460;font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:999px;box-shadow:0 2px 8px -3px rgba(180,90,120,.25)">
+          <span style="width:6px;height:6px;border-radius:50%;background:#d65d86;display:inline-block"></span>
+          Clinical Decision Support · Ventilator Weaning
+        </div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(42px,5.8vw,76px);line-height:1.01;letter-spacing:-1.2px;margin:18px 0 0;color:#5e1f3c">SmartWean<br><span style="color:#d65d86">Navigator</span></h1>
+        <p style="font-size:clamp(15.5px,1.55vw,19px);line-height:1.6;color:#6b5860;margin:20px 0 0;max-width:44ch">ประเมินความพร้อม<b style="color:#4a3a40;font-weight:600">ก่อนหย่าเครื่องช่วยหายใจอย่างแม่นยำ</b> ด้วยการคำนวณอัตโนมัติและระบบสัญญาณไฟ เพื่อความปลอดภัยของผู้ป่วยในทุกขั้นตอนก่อนถอดท่อช่วยหายใจ</p>
+        <div style="margin-top:26px">
+          <button class="swn-btn" onclick="location.href='./app.html'">
+            เริ่มประเมินผู้ป่วย
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" style="animation:swn-nudge 1.6s ease-in-out infinite"><path d="M5 12h13M13 6l6 6-6 6" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div style="font-size:11.5px;color:#a98d97;margin-top:11px">ใช้เวลาประเมินประมาณ 3–5 นาที ต่อผู้ป่วย 1 ราย</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:26px;max-width:430px">
+          <div style="flex:1;background:#fff;border:1px solid #f3dde4;border-radius:14px;padding:13px 13px 12px">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:21px;color:#5e1f3c;line-height:1">3</div>
+            <div style="font-size:11px;color:#9a7b87;margin-top:4px;line-height:1.3">โมดูล<br>ประเมิน</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #f3dde4;border-radius:14px;padding:13px 13px 12px">
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:21px;color:#5e1f3c;line-height:1">RSBI</div>
+            <div style="font-size:11px;color:#9a7b87;margin-top:4px;line-height:1.3">+ ROX<br>คำนวณอัตโนมัติ</div>
+          </div>
+          <div style="flex:1;background:#fff;border:1px solid #f3dde4;border-radius:14px;padding:13px 13px 12px">
+            <div style="display:flex;gap:4px;align-items:center;height:21px">
+              <span style="width:11px;height:11px;border-radius:50%;background:#16a34a"></span>
+              <span style="width:11px;height:11px;border-radius:50%;background:#f59e0b"></span>
+              <span style="width:11px;height:11px;border-radius:50%;background:#dc2626"></span>
+            </div>
+            <div style="font-size:11px;color:#9a7b87;margin-top:6px;line-height:1.3">สัญญาณไฟ<br>เตือนทันที</div>
+          </div>
+        </div>
       </div>
 
-      <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Laboratory</p>
-      <div class="grid2">
-        <div class="q"><label class="qlabel">Hematocrit — Hct (%)</label><span class="crit">≥ 30%</span><input type="number" inputmode="decimal" id="hct" oninput="calcM1()" placeholder="เช่น 35"></div>
-        <div class="q"><label class="qlabel">Hemoglobin — Hb (g/dL)</label><span class="crit">&gt; 7</span><input type="number" inputmode="decimal" id="hb" oninput="calcM1()" placeholder="เช่น 10.5"></div>
+      <div class="swn-hero-right">
+        <div style="position:absolute;width:330px;height:330px;border-radius:80px;background:radial-gradient(circle at 35% 30%,#fbcfdd,#f3a9c0 70%);transform:rotate(-8deg);filter:blur(2px);opacity:.55"></div>
+        <div style="position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.7),rgba(255,255,255,0) 70%);top:30px;right:30px"></div>
+        <!-- Preview card -->
+        <div style="position:relative;z-index:2;width:300px;max-width:84vw;background:#fffdfe;border:1px solid #f1d9e0;border-radius:24px;padding:18px 18px 16px;box-shadow:0 30px 60px -24px rgba(150,50,90,.45),0 6px 16px -8px rgba(150,50,90,.25)">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(150deg,#d65d86,#b03e66);display:flex;align-items:center;justify-content:center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M2 13h3.2l1.7-5.5 2.9 11 2.6-8 1.8 4 1.6-2H22" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div>
+                <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:#5e1f3c;line-height:1.1">การประเมิน SBT</div>
+                <div style="font-size:9.5px;color:#b08c98">Module 1 · ความพร้อม</div>
+              </div>
+            </div>
+            <div style="font-size:10px;font-weight:600;color:#9b3460;background:#fce6ee;border:1px solid #f1d5df;padding:3px 8px;border-radius:7px">เตียง 7</div>
+          </div>
+          <!-- Lung animation -->
+          <div style="margin-top:13px;background:#fef4f7;border:1px solid #f6dde6;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:12px">
+            <svg width="74" height="54" viewBox="0 0 120 78" fill="none" style="flex:none">
+              <rect x="57" y="8" width="6" height="21" rx="3" fill="#d65d86"/>
+              <path d="M60 27 C 52 31 46 35 42 43 M60 27 C 68 31 74 35 78 43" stroke="#d65d86" stroke-width="2.6" stroke-linecap="round"/>
+              <g style="transform-box:view-box;transform-origin:60px 27px;animation:swn-breathe 3.6s ease-in-out infinite">
+                <ellipse cx="42" cy="52" rx="16" ry="22" transform="rotate(-12 42 52)" fill="#f3a9c0" fill-opacity=".5" stroke="#d65d86" stroke-width="2.4"/>
+                <ellipse cx="78" cy="52" rx="16" ry="22" transform="rotate(12 78 52)" fill="#f3a9c0" fill-opacity=".5" stroke="#d65d86" stroke-width="2.4"/>
+              </g>
+            </svg>
+            <div style="flex:1">
+              <div style="font-size:10px;color:#9a7b87;font-weight:600">อัตราการหายใจ (RR)</div>
+              <div style="display:flex;align-items:baseline;gap:4px">
+                <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:20px;color:#d65d86;line-height:1.1">18</div>
+                <div style="font-size:10px;color:#9a7b87;font-weight:600">ครั้ง/นาที</div>
+              </div>
+              <div style="font-size:9px;color:#15803d;font-weight:600;margin-top:1px">หายใจเองสม่ำเสมอ</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:flex-end;justify-content:space-between">
+            <div>
+              <div style="font-size:10.5px;color:#9a7b87;font-weight:600;letter-spacing:.3px">RSBI</div>
+              <div style="display:flex;align-items:baseline;gap:5px">
+                <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:38px;color:#16a34a;line-height:1">68</div>
+                <div style="font-size:10px;color:#9a7b87">ครั้ง/นาที/ล.</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:10.5px;color:#9a7b87;font-weight:600">TV / kg</div>
+              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:18px;color:#4a2233;line-height:1.2">7.2</div>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="height:8px;border-radius:999px;background:#fde7ee;overflow:hidden">
+              <div style="width:62%;height:100%;border-radius:999px;background:linear-gradient(90deg,#34d27f,#16a34a)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px">
+              <span style="font-size:9.5px;color:#9a7b87">อยู่ในเกณฑ์ปลอดภัย</span>
+              <span style="font-size:9.5px;color:#15803d;font-weight:600">เป้าหมาย &lt; 105</span>
+            </div>
+          </div>
+          <div style="margin-top:13px;display:flex;align-items:center;gap:9px;background:#f0fbf4;border:1px solid #c7ecd4;border-radius:11px;padding:10px 12px">
+            <span style="width:13px;height:13px;border-radius:50%;background:#16a34a;display:inline-block;flex:none;box-shadow:0 0 0 4px rgba(22,163,74,.16);animation:swn-glow 2.4s ease-in-out infinite"></span>
+            <div style="font-size:11.5px;font-weight:600;color:#15803d;line-height:1.3">ผ่านเกณฑ์ · พร้อมเริ่มทดสอบ SBT</div>
+          </div>
+        </div>
+        <!-- Floating chip: ROX -->
+        <div style="position:absolute;z-index:3;top:18px;left:8px;background:#fff;border:1px solid #f1d9e0;border-radius:13px;padding:9px 12px;box-shadow:0 16px 30px -14px rgba(150,50,90,.5);animation:swn-float 4.4s ease-in-out infinite">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:26px;height:26px;border-radius:8px;background:#eef9f1;display:flex;align-items:center;justify-content:center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 17l5-6 4 4 7-8" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 7h4v4" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#9a7b87;font-weight:600;line-height:1">ROX Index</div>
+              <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#15803d;line-height:1.2">12.4</div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating chip: Green -->
+        <div style="position:absolute;z-index:3;bottom:24px;right:6px;background:#fff;border:1px solid #f1d9e0;border-radius:999px;padding:8px 13px 8px 11px;box-shadow:0 16px 30px -14px rgba(150,50,90,.5);display:flex;align-items:center;gap:8px;animation:swn-floatb 5s ease-in-out infinite">
+          <span style="width:11px;height:11px;border-radius:50%;background:#16a34a;display:inline-block;box-shadow:0 0 0 3px rgba(22,163,74,.18);animation:swn-ring 2.2s ease-out infinite"></span>
+          <span style="font-size:11.5px;font-weight:600;color:#15803d">Green · ปลอดภัย</span>
+        </div>
       </div>
-      <div class="q"><label class="qlabel">Electrolytes (Mg, Ca, P)</label><span class="crit">อยู่ในระดับปกติ</span><div class="opts" id="lyte"></div></div>
-
-      <div class="q" style="margin-top:18px"><label class="qlabel">Mode ที่เลือกสำหรับ SBT (กรณีผ่านเกณฑ์)</label>
-        <div class="opts" id="sbtmode"></div></div>
-      <div class="q"><label class="qlabel">บันทึกการพยาบาลเพิ่มเติม</label><textarea id="note1" placeholder="สรุปผล / แผนการแก้ไข ก่อนทำ SBT"></textarea></div>
-    </div>
-
-    <div class="result idle" id="res1">
-      <div class="light"><span class="dot a"></span>ผลการประเมิน Module 1</div>
-      <div class="desc">กรอกข้อมูลด้านบนเพื่อดูผลแบบเรียลไทม์</div>
     </div>
   </div>
 
-  <!-- ============ MODULE 2 ============ -->
-  <div class="module" id="m2">
-    <div class="card">
-      <div class="sec-head"><span class="ic">🟡</span><h2>Module 2 · SBT Guardian</h2></div>
-      <div class="sec-desc">เฝ้าระวังระหว่าง SBT — บันทึก Vital Signs: 15 น.×4, 30 น.×2, ทุก 1 ชม. จนครบ 120 นาที</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:22px;color:#c07d97">
+    <span style="font-size:10.5px;letter-spacing:.5px">เลื่อนลงเพื่อดูรายละเอียด</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="animation:swn-bob 1.8s ease-in-out infinite"><path d="M6 9l6 6 6-6" stroke="#d65d86" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</section>
 
-      <div class="q"><label class="qlabel">รอบการประเมิน SBT</label><div class="opts" id="sbtround"></div></div>
-      <div class="q"><label class="qlabel">เวลาที่บันทึก</label><input type="time" id="sbttime"></div>
-
-      <div class="eyebrow">Vital Signs ระหว่าง SBT</div>
-      <div class="grid2">
-        <div class="q"><label class="qlabel">RR (/min)</label><span class="crit">หยุด: &gt;30 หรือ &lt;10</span><input type="number" inputmode="decimal" id="rr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">TV (cc)</label><span class="crit">หยุด: &lt;200</span><input type="number" inputmode="decimal" id="tv2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">หยุด: &lt;90 หรือ &gt;180</span><input type="number" inputmode="decimal" id="sbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">หยุด: &lt;60</span><input type="number" inputmode="decimal" id="dbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">HR (/min)</label><span class="crit">หยุด: &gt;120</span><input type="number" inputmode="decimal" id="hr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">หยุด: &lt;90</span><input type="number" inputmode="decimal" id="spo22" oninput="calcM2()" placeholder="ตัวเลข"></div>
+<!-- ── PAGE 2 · MODULES (pinned) ── -->
+<section id="sec-modules" class="swn-pin-section">
+  <div class="swn-pin-inner">
+    <div class="swn-pad">
+      <div class="s2h swn-reveal">
+        <div style="font-family:'Sora',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:1px;color:#d65d86;margin-bottom:8px">ขั้นตอนการประเมิน</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:8px">
+          <h2 style="font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(28px,3.6vw,46px);color:#5e1f3c;margin:0;letter-spacing:-.5px">3 โมดูลการประเมิน</h2>
+          <span style="font-size:13px;color:#b08c98">ตามลำดับขั้นทางคลินิก</span>
+        </div>
       </div>
-
-      <div class="eyebrow">🚩 Red Flag — อาการที่ต้องหยุด SBT</div>
-      <div id="redflags"></div>
-
-      <div class="q" style="margin-top:8px"><label class="qlabel">Action ที่ดำเนินการ (กรณีพบ Red Flag)</label><div class="opts" id="m2action"></div></div>
-      <div class="q"><label class="qlabel">บันทึกการพยาบาลเพิ่มเติม</label><textarea id="note2" placeholder="บันทึกเพิ่มเติม Module 2"></textarea></div>
-    </div>
-
-    <div class="result idle" id="res2">
-      <div class="light"><span class="dot a"></span>ผลการประเมิน SBT รอบนี้</div>
-      <div class="desc">กรอก Vital Signs และ Red Flag เพื่อดูผล</div>
-    </div>
-  </div>
-
-  <!-- ============ MODULE 3 ============ -->
-  <div class="module" id="m3">
-    <div class="card">
-      <div class="sec-head"><span class="ic">🔴</span><h2>Module 3 · PERRS Score</h2></div>
-      <div class="sec-desc">Post-Extubation Reintubation Risk Score · ประเมินที่ 5/15/30/60 นาที และทุก 2–4 ชม. หลังถอดท่อ</div>
-
-      <div class="eyebrow">3.1 · Pre-Extubation Checklist</div>
-      <div class="q"><label class="qlabel">รายการที่ดำเนินการแล้ว</label><div class="opts" id="preext"></div></div>
-      <div class="q"><label class="qlabel">ผล Cuff Leak Test</label><div class="opts" id="cuff"></div></div>
-      <div class="q"><label class="qlabel">รอบการประเมิน PERRS</label><div class="opts" id="perrsround"></div></div>
-
-      <div class="eyebrow">3.2 · PERRS Score <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">(0–2 ต่อข้อ · รวมสูงสุด 12)</span></div>
-      <div id="perrs"></div>
-
-      <div class="eyebrow">ค่าที่ใช้คำนวณ ROX Index</div>
-      <div class="grid2">
-        <div class="q"><label class="qlabel">SpO₂ หลังถอดท่อ (%)</label><input type="number" inputmode="decimal" id="roxspo2" oninput="calcM3()" placeholder="เช่น 96"></div>
-        <div class="q"><label class="qlabel">RR หลังถอดท่อ (/min)</label><input type="number" inputmode="decimal" id="roxrr" oninput="calcM3()" placeholder="เช่น 22"></div>
+      <div class="s2c swn-reveal" style="margin-top:48px">
+        <div class="swn-grid">
+          <!-- Module 01 -->
+          <div class="swn-cloud cm1" style="padding:42px 30px 36px;animation:swn-bounce 3.8s ease-in-out infinite">
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#f0a8bf;line-height:1;margin-bottom:12px">01</div>
+            <div style="font-weight:700;font-size:17px;color:#4a2233">ประเมินความพร้อม SBT</div>
+            <div style="font-size:12.5px;color:#b08c98;margin:2px 0 11px">Spontaneous Breathing Trial</div>
+            <p style="font-size:14px;line-height:1.6;color:#6b5860;margin:0">บันทึกค่าทางคลินิกแล้วระบบ<b style="font-weight:600;color:#4a3a40">คำนวณ RSBI และ TV/kg ให้อัตโนมัติ</b> เพื่อยืนยันความพร้อมก่อนเริ่มทดสอบ</p>
+            <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap">
+              <span style="font-family:'Sora',sans-serif;font-size:11.5px;font-weight:600;color:#9b3460;background:#fce6ee;border:1px solid #f1d5df;padding:5px 10px;border-radius:8px">RSBI auto</span>
+              <span style="font-family:'Sora',sans-serif;font-size:11.5px;font-weight:600;color:#9b3460;background:#fce6ee;border:1px solid #f1d5df;padding:5px 10px;border-radius:8px">TV / kg</span>
+            </div>
+          </div>
+          <!-- Module 02 -->
+          <div class="swn-cloud cm2" style="padding:42px 30px 36px;animation:swn-bounce 4.4s ease-in-out infinite .55s">
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#f0a8bf;line-height:1;margin-bottom:12px">02</div>
+            <div style="font-weight:700;font-size:17px;color:#4a2233">เฝ้าระวังระหว่าง SBT</div>
+            <div style="font-size:12.5px;color:#b08c98;margin:2px 0 11px">Red Flag Monitoring · 5 หมวด</div>
+            <p style="font-size:14px;line-height:1.6;color:#6b5860;margin:0">ตรวจจับ <b style="font-weight:600;color:#4a3a40">Red Flag 5 หมวด</b> แบบเรียลไทม์ พร้อมแสดงผลด้วยระบบสัญญาณไฟ</p>
+            <div style="display:flex;gap:8px;margin-top:15px">
+              <div style="flex:1;text-align:center;background:#f0fbf4;border:1px solid #c7ecd4;border-radius:11px;padding:11px 4px">
+                <span style="width:14px;height:14px;border-radius:50%;background:#16a34a;display:inline-block;box-shadow:0 0 0 4px rgba(22,163,74,.16);animation:swn-glow 2.4s ease-in-out infinite"></span>
+                <div style="font-size:11px;font-weight:600;color:#15803d;margin-top:7px">Green · ผ่าน</div>
+              </div>
+              <div style="flex:1;text-align:center;background:#fffaf0;border:1px solid #f5e1b8;border-radius:11px;padding:11px 4px">
+                <span style="width:14px;height:14px;border-radius:50%;background:#f59e0b;display:inline-block;box-shadow:0 0 0 4px rgba(245,158,11,.18);animation:swn-glow 2.4s ease-in-out infinite .8s"></span>
+                <div style="font-size:11px;font-weight:600;color:#b45309;margin-top:7px">Amber · เฝ้าระวัง</div>
+              </div>
+              <div style="flex:1;text-align:center;background:#fef2f2;border:1px solid #f6cccc;border-radius:11px;padding:11px 4px">
+                <span style="width:14px;height:14px;border-radius:50%;background:#dc2626;display:inline-block;box-shadow:0 0 0 4px rgba(220,38,38,.18);animation:swn-glow 2.4s ease-in-out infinite 1.6s"></span>
+                <div style="font-size:11px;font-weight:600;color:#b91c1c;margin-top:7px">Red · หยุด</div>
+              </div>
+            </div>
+          </div>
+          <!-- Module 03 -->
+          <div class="swn-cloud cm3" style="padding:42px 30px 36px;animation:swn-bounce 4.0s ease-in-out infinite .95s">
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#f0a8bf;line-height:1;margin-bottom:12px">03</div>
+            <div style="font-weight:700;font-size:17px;color:#4a2233">PERRS Score หลังถอดท่อ</div>
+            <div style="font-size:12.5px;color:#b08c98;margin:2px 0 11px">Post-Extubation · 6 พารามิเตอร์</div>
+            <p style="font-size:14px;line-height:1.6;color:#6b5860;margin:0">ประเมิน <b style="font-weight:600;color:#4a3a40">6 พารามิเตอร์</b> หลังถอดท่อ พร้อม<b style="font-weight:600;color:#4a3a40">คำนวณ ROX Index อัตโนมัติ</b> เพื่อเฝ้าระวังภาวะหายใจล้มเหลวซ้ำ</p>
+            <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap">
+              <span style="font-family:'Sora',sans-serif;font-size:11.5px;font-weight:600;color:#9b3460;background:#fce6ee;border:1px solid #f1d5df;padding:5px 10px;border-radius:8px">PERRS · 6 ค่า</span>
+              <span style="font-family:'Sora',sans-serif;font-size:11.5px;font-weight:600;color:#9b3460;background:#fce6ee;border:1px solid #f1d5df;padding:5px 10px;border-radius:8px">ROX Index auto</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="q"><label class="qlabel">FiO₂ ที่ให้หลังถอดท่อ</label><div class="opts" id="roxfio2"></div></div>
-      <div class="rox-box" id="roxBox">ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ</div>
-
-      <div class="eyebrow">3.3 · Action หลังประเมิน</div>
-      <div class="q"><label class="qlabel">Action ที่ดำเนินการ</label><div class="opts" id="m3action"></div></div>
-      <div class="q"><label class="qlabel">ผลลัพธ์สุดท้าย</label><div class="opts" id="m3outcome"></div></div>
-      <div class="q"><label class="qlabel">บันทึกการพยาบาลเพิ่มเติม</label><textarea id="note3" placeholder="บันทึกเพิ่มเติม Module 3"></textarea></div>
-    </div>
-
-    <div class="result idle" id="res3">
-      <div class="light"><span class="dot a"></span>PERRS Risk Assessment</div>
-      <div class="desc">เลือกพารามิเตอร์ทั้ง 6 ข้อเพื่อคำนวณคะแนนและระดับความเสี่ยง</div>
     </div>
   </div>
+</section>
 
-  <div class="footer">
-    SmartWean Navigator · v1.0 · พัฒนาสำหรับหอผู้ป่วย กจ.2<br>
-    เครื่องมือนี้ช่วยคำนวณตามเกณฑ์ที่ตั้งไว้ ผลที่ได้ต้องผ่านการพิจารณาของพยาบาลและแพทย์เสมอ
-  </div>
-</div>
-
-<!-- printable clinical report (hidden on screen) -->
-<div id="report"></div>
-
-<div class="bar">
-  <div class="inner">
-    <button class="btn btn-primary" onclick="openResultPage()">📊 ดูผล</button>
-  </div>
-</div>
-
-<!-- ============ RESULT PAGE ============ -->
-<div id="resultPage" style="display:none;position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">
-  <!-- header -->
-  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
-    <button onclick="closeResultPage()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
-    <div>
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">ผลการประเมิน</div>
-      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">SmartWean Navigator</div>
+<!-- ── PAGE 3 · FEATURES (pinned) ── -->
+<section id="sec-features" class="swn-pin-section">
+  <div class="swn-pin-inner">
+    <div class="swn-pad">
+      <div class="s3h swn-reveal">
+        <div style="font-family:'Sora',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:1px;color:#d65d86;margin-bottom:8px">ทำไมต้อง SmartWean</div>
+        <h2 style="font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(28px,3.6vw,46px);color:#5e1f3c;margin:0 0 26px;letter-spacing:-.5px">จุดเด่นของระบบ</h2>
+      </div>
+      <div class="s3c swn-reveal" style="margin-top:42px">
+        <div class="swn-grid">
+          <!-- Feature 1 -->
+          <div class="swn-cloud cf1" style="padding:42px 28px 36px;animation:swn-bounce 4.2s ease-in-out infinite .3s">
+            <div style="width:48px;height:48px;border-radius:14px;background:#fce6ee;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2.5" stroke="#d65d86" stroke-width="1.9"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#d65d86" stroke-width="1.9" stroke-linecap="round"/></svg>
+            </div>
+            <div style="font-weight:700;font-size:16px;color:#4a2233">คำนวณอัตโนมัติแม่นยำ</div>
+            <p style="font-size:13.5px;line-height:1.6;color:#6b5860;margin:6px 0 0">RSBI, TV/kg และ ROX Index คำนวณจากค่าที่บันทึกทันที ลดความผิดพลาดจากการคิดเลขด้วยมือ</p>
+          </div>
+          <!-- Feature 2 -->
+          <div class="swn-cloud cf2" style="padding:42px 28px 36px;animation:swn-bounce 3.6s ease-in-out infinite .7s">
+            <div style="width:48px;height:48px;border-radius:14px;background:#fce6ee;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v5c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V7l8-4z" stroke="#d65d86" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#d65d86" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-weight:700;font-size:16px;color:#4a2233">ระบบสัญญาณไฟบอกผลทันที</div>
+            <p style="font-size:13.5px;line-height:1.6;color:#6b5860;margin:6px 0 0">Green / Amber / Red แปลผลทางคลินิกให้เข้าใจง่าย ตัดสินใจได้รวดเร็วข้างเตียงผู้ป่วย</p>
+          </div>
+          <!-- Feature 3 -->
+          <div class="swn-cloud cf3" style="padding:42px 28px 36px;animation:swn-bounce 4.6s ease-in-out infinite 1s">
+            <div style="width:48px;height:48px;border-radius:14px;background:#fce6ee;display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 3v5h5" stroke="#d65d86" stroke-width="1.9" stroke-linejoin="round"/><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V8l-6-5z" stroke="#d65d86" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 17l2-2 1.5 1.5L15 13" stroke="#d65d86" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-weight:700;font-size:16px;color:#4a2233">ส่งออกรายงาน PDF</div>
+            <p style="font-size:13.5px;line-height:1.6;color:#6b5860;margin:6px 0 0">สรุปผลการประเมินเป็นไฟล์ PDF พร้อมช่องลงลายเซ็นแพทย์และพยาบาล สำหรับเก็บในเวชระเบียน</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <!-- content -->
-  <div id="resultPageContent" style="max-width:760px;margin:0 auto;padding:16px 14px 110px;"></div>
-  <!-- bottom bar -->
-  <div class="bar" style="z-index:61;">
-    <div class="inner">
-      <button class="btn btn-ghost" onclick="confirmReset()">🔄 ประเมินผลใหม่</button>
-      <button class="btn btn-primary" onclick="shareResult()">↗ แชร์</button>
+</section>
+
+<!-- ── PAGE 4 · CLOSING CTA ── -->
+<section class="swn-cta-page">
+  <div style="position:absolute;top:50%;left:50%;width:min(620px,86vw);height:min(620px,86vw);transform:translate(-50%,-58%);border-radius:50%;background:radial-gradient(circle,rgba(248,180,202,.55),rgba(248,180,202,0) 70%);pointer-events:none"></div>
+
+  <div class="cta-grow swn-grow-fb" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;z-index:2;padding:0 clamp(24px,5vw,80px)">
+    <div style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #f1d5df;color:#9b3460;font-size:12px;font-weight:600;padding:7px 14px;border-radius:999px;box-shadow:0 2px 8px -3px rgba(180,90,120,.25)">
+      <span style="width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block;animation:swn-ring 2.2s ease-out infinite"></span>
+      พร้อมเริ่มประเมิน
+    </div>
+    <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(32px,4.6vw,60px);line-height:1.06;letter-spacing:-1px;color:#5e1f3c;margin:20px 0 0;max-width:16ch">ดูแลผู้ป่วยอย่างปลอดภัย<br>ในทุกขั้นตอนการหย่าเครื่อง</h2>
+    <p style="font-size:clamp(15px,1.5vw,18px);line-height:1.6;color:#6b5860;margin:18px 0 0;max-width:42ch">เริ่มประเมินผู้ป่วยรายแรกของคุณได้ทันที ใช้เวลาเพียง 3–5 นาทีต่อราย</p>
+    <button class="swn-btn-lg" onclick="location.href='./app.html'" style="margin-top:34px">
+      เริ่มประเมินผู้ป่วย
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div style="position:relative;z-index:2;padding:0 22px 26px">
+    <div style="max-width:780px;margin:0 auto;background:#fff;border:1px solid #f1d9e0;border-radius:16px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+        <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(150deg,#d65d86,#b03e66);display:flex;align-items:center;justify-content:center">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M2 13h3.2l1.7-5.5 2.9 11 2.6-8 1.8 4 1.6-2H22" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:#7d2d4e">SmartWean Navigator</div>
+          <div style="font-size:11px;color:#a87f8d">หอผู้ป่วย กจ.2 · โรงพยาบาลพหลพลพยุหเสนา จ.กาญจนบุรี</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;border-top:1px solid #f5e1e8;padding-top:11px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9" stroke="#c08699" stroke-width="1.8"/><path d="M12 8v5" stroke="#c08699" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16.3" r="1.1" fill="#c08699"/></svg>
+        <p style="font-size:11.5px;line-height:1.55;color:#8a6e78;margin:0">เครื่องมือนี้เป็น<b style="font-weight:600;color:#6b5860">ระบบสนับสนุนการตัดสินใจทางคลินิก</b> ผลการประเมินใช้เป็นข้อมูลประกอบเท่านั้น <b style="font-weight:600;color:#6b5860">ไม่ทดแทนการประเมินและการวินิจฉัยของแพทย์</b></p>
+      </div>
     </div>
   </div>
+</section>
+
+</main>
 </div>
 
 <script>
-/* ---------------- option builders ---------------- */
-function radio(container,name,items,cb){
-  const box=document.getElementById(container);box.innerHTML="";
-  items.forEach((it,i)=>{
-    const id=name+"_"+i;
-    const lab=document.createElement("label");lab.className="opt";
-    lab.innerHTML=`<input type="radio" name="${name}" value="${it.v}" data-tone="${it.tone||''}"><span class="otxt">${it.t}${it.tag?`<br><span class="tag">${it.tag}</span>`:""}</span>`;
-    lab.querySelector("input").addEventListener("change",e=>{
-      box.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel","good","warnbad"));
-      lab.classList.add("sel");
-      if(it.tone==="good")lab.classList.add("good");
-      if(it.tone==="bad")lab.classList.add("warnbad");
-      cb&&cb();
-    });
-    box.appendChild(lab);
-  });
-}
-function checks(container,name,items,cb){
-  const box=document.getElementById(container);box.innerHTML="";
-  items.forEach((it,i)=>{
-    const lab=document.createElement("label");lab.className="opt";
-    lab.innerHTML=`<input type="checkbox" name="${name}" value="${it.v}" data-normal="${it.normal?1:0}"><span class="otxt">${it.t}</span>`;
-    lab.querySelector("input").addEventListener("change",()=>{
-      lab.classList.toggle("sel",lab.querySelector("input").checked);
-      cb&&cb();
-    });
-    box.appendChild(lab);
-  });
-}
-const getR=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:null;};
-const getRTone=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.dataset.tone:null;};
-const num=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;};
-
-/* ---------------- MODULE 1 build ---------------- */
-const yn=[{v:"Yes",t:"ผ่าน (Yes)",tone:"good"},{v:"No",t:"ไม่ผ่าน (No)",tone:"bad"}];
-const clinicalItems=[
-  {id:"c1",t:"สาเหตุดั้งเดิมที่ทำให้ต้องใส่ท่อ (Underlying cause) ดีขึ้นแล้ว"},
-  {id:"c2",t:"ไม่มีภาวะ ACS, CHF หรือ Arrhythmia ที่คุกคามชีวิต"},
-  {id:"c3",t:"ตื่นดี (No severe brain edema) / ไม่ใช้ Muscle relaxant / Sedative ระดับต่ำสุด"},
-  {id:"c4",t:"ไม่ใช้ Inotropic หรือใช้ขนาดต่ำ (Dopamine/Dobutamine < 5 µg/kg/min)"}
-];
 (function(){
-  const wrap=document.getElementById("clinical");
-  clinicalItems.forEach(c=>{
-    const d=document.createElement("div");d.className="q";
-    d.innerHTML=`<label class="qlabel">${c.t}</label><div class="opts" id="box_${c.id}"></div>`;
-    wrap.appendChild(d);
-    radio("box_"+c.id,c.id,yn,calcM1);
-  });
-})();
-radio("fio2","fio2",[
-  {v:0.21,t:"0.21"},{v:0.25,t:"0.25"},{v:0.28,t:"0.28"},{v:0.30,t:"0.30"},
-  {v:0.35,t:"0.35"},{v:0.40,t:"0.40"},
-  {v:0.45,t:"0.45",tag:"ไม่ผ่านเกณฑ์"},{v:0.50,t:"0.50",tag:"ไม่ผ่านเกณฑ์"},{v:0.6,t:">0.50",tag:"ไม่ผ่านเกณฑ์"}
-],calcM1);
-radio("peep","peep",[
-  {v:5,t:"≤ 5 cmH₂O",tag:"ผ่าน"},{v:6,t:"6 cmH₂O",tag:"ผ่าน"},{v:7,t:"7 cmH₂O",tag:"ผ่าน"},{v:8,t:"8 cmH₂O",tag:"ผ่าน"},
-  {v:9,t:"9 cmH₂O",tag:"ไม่ผ่าน"},{v:10,t:"10 cmH₂O",tag:"ไม่ผ่าน"},{v:11,t:"> 10 cmH₂O",tag:"ไม่ผ่าน"}
-],calcM1);
-radio("lyte","lyte",[
-  {v:"normal",t:"ปกติทุกค่า (Mg, Ca, P ปกติ)",tone:"good"},
-  {v:"mg",t:"Magnesium ต่ำ",tone:"bad"},{v:"ca",t:"Calcium ต่ำ",tone:"bad"},
-  {v:"p",t:"Phosphate ต่ำ",tone:"bad"},{v:"multi",t:"ต่ำมากกว่า 1 ค่า",tone:"bad"}
-],calcM1);
-radio("sbtmode","sbtmode",[
-  {v:"tpiece",t:"T-piece"},{v:"ps",t:"Pressure Support (PS)"},{v:"none",t:"ยังไม่ทำ SBT (รอแก้ไข)"}
-]);
+  // Detect scroll-driven animation support
+  var hasScrollTimeline = CSS.supports('animation-timeline','scroll()');
 
-function calcM1(){
-  const fails=[];
-  // clinical
-  const cl=[["c1","Underlying cause ยังไม่ดีขึ้น"],["c2","มี ACS/CHF/Arrhythmia คุกคามชีวิต"],
-            ["c3","ระดับความรู้สึกตัว/ยา sedative ยังไม่พร้อม"],["c4","ยังใช้ Inotropic ขนาดสูง"]];
-  let clinicalAnswered=0;
-  cl.forEach(([id,msg])=>{const v=getR(id);if(v){clinicalAnswered++;if(v==="No")fails.push(msg);}});
-  // params
-  const spo2=num("spo2"),pao2=num("pao2"),tv=num("tv"),wt=num("wt"),mv=num("mv"),
-        rr=num("rr1"),sbp=num("sbp1"),dbp=num("dbp1"),hr=num("hr1"),hct=num("hct"),hb=num("hb"),
-        fio2=parseFloat(getR("fio2")),peep=parseFloat(getR("peep")),lyte=getR("lyte");
-  if(spo2!==null&&spo2<=90)fails.push("SpO₂ ≤ 90% ("+spo2+")");
-  if(pao2!==null&&pao2>0&&pao2<=60)fails.push("PaO₂ ≤ 60 ("+pao2+")");
-  if(!isNaN(fio2)&&fio2>0.40)fails.push("FiO₂ > 0.40");
-  if(!isNaN(peep)&&peep>8)fails.push("PEEP > 8 cmH₂O");
-  // RSBI + TV/kg
-  let rsbi=null,tvkg=null;
-  if(tv!==null&&wt!==null&&wt>0){tvkg=tv/wt;if(tvkg<=5)fails.push("TV/kg ≤ 5 ("+tvkg.toFixed(1)+")");}
-  if(rr!==null&&tv!==null&&tv>0){rsbi=rr/(tv/1000);}
-  const rb=document.getElementById("rsbiBox");
-  if(rsbi!==null){
-    const ok=rsbi<105;
-    rb.innerHTML=`RSBI = <b>${rsbi.toFixed(0)}</b> ครั้ง/นาที/ลิตร · ${ok?'<span class="pill-pass">&lt; 105 ผ่านเกณฑ์</span>':'<span class="pill-fail">≥ 105 เสี่ยงหย่าไม่สำเร็จ</span>'}${tvkg!==null?` &nbsp;|&nbsp; TV/kg = <b>${tvkg.toFixed(1)}</b>`:""}`;
-    if(!ok)fails.push("RSBI ≥ 105 ("+rsbi.toFixed(0)+")");
-  }else{rb.innerHTML="RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ";}
-  if(mv!==null&&(mv<5||mv>12))fails.push("MV นอกช่วง 5–12 ("+mv+")");
-  if(rr!==null&&rr>=30)fails.push("RR ≥ 30 ("+rr+")");
-  if(sbp!==null&&(sbp<90||sbp>180))fails.push("SBP นอกช่วง 90–180 ("+sbp+")");
-  if(dbp!==null&&dbp<=60)fails.push("DBP ≤ 60 ("+dbp+")");
-  if(hr!==null&&(hr<50||hr>120))fails.push("HR นอกช่วง 50–120 ("+hr+")");
-  if(hct!==null&&hct<30)fails.push("Hct < 30% ("+hct+")");
-  if(hb!==null&&hb<=7)fails.push("Hb ≤ 7 ("+hb+")");
-  if(lyte&&lyte!=="normal")fails.push("Electrolytes ผิดปกติ");
-
-  const anyInput=clinicalAnswered>0||spo2!==null||!isNaN(fio2)||tv!==null;
-  const res=document.getElementById("res1");
-  if(!anyInput){res.className="result idle";
-    res.innerHTML='<div class="light"><span class="dot a"></span>ผลการประเมิน Module 1</div><div class="desc">กรอกข้อมูลด้านบนเพื่อดูผลแบบเรียลไทม์</div>';return;}
-  if(fails.length===0){
-    res.className="result green";
-    res.innerHTML=`<div class="light">🟢 Green Light — พร้อมทำ SBT</div>
-      <div class="desc">ผ่านทุกเกณฑ์ที่กรอก ผู้ป่วยพร้อมเข้าสู่ Spontaneous Breathing Trial</div>
-      <div class="rec"><b>แนวทาง:</b> เริ่ม SBT ตาม Mode ที่เลือก แล้วไปต่อที่ <b>Module 2</b> เพื่อเฝ้าระวังทุกรอบ</div>`;
-  }else{
-    res.className="result red";
-    res.innerHTML=`<div class="light">🔴 Red Light — ยังไม่พร้อม</div>
-      <div class="desc">พบ ${fails.length} เกณฑ์ที่ยังไม่ผ่าน ต้องแก้ไขก่อนทำ SBT</div>
-      <ul>${fails.map(f=>`<li>${f}</li>`).join("")}</ul>
-      <div class="rec"><b>แนวทาง:</b> แก้ไขปัจจัยข้างต้น ประเมินซ้ำ และคง Setting เครื่องช่วยหายใจเดิมไว้ก่อน</div>`;
-  }
-}
-
-/* ---------------- MODULE 2 build ---------------- */
-radio("sbtround","sbtround",[
-  {v:1,t:"รอบที่ 1 (15 นาที)"},{v:2,t:"รอบที่ 2 (30 นาที)"},{v:3,t:"รอบที่ 3 (45 นาที)"},
-  {v:4,t:"รอบที่ 4 (60 นาที)"},{v:5,t:"รอบที่ 5 (90 นาที)"},
-  {v:6,t:"รอบที่ 6 (120 นาที — สิ้นสุด SBT)"},{v:"x",t:"รอบพิเศษ (พบอาการผิดปกติ)"}
-],calcM2);
-const rfGroups=[
-  {id:"rf1",title:"1. Respiratory Muscle Fatigue / Distress",items:[
-    {v:"n",t:"ไม่พบ (Normal)",normal:true},{v:"a",t:"RR > 30/min"},{v:"b",t:"TV < 200 cc"},
-    {v:"c",t:"ใช้ Accessory muscle"},{v:"d",t:"เหงื่อแตก / ตัวเย็น"},{v:"e",t:"Paradoxical breathing"}]},
-  {id:"rf2",title:"2. Hemodynamic Instability",items:[
-    {v:"n",t:"ไม่พบ (Normal)",normal:true},{v:"a",t:"SBP < 90 mmHg"},{v:"b",t:"SBP > 180 mmHg"},
-    {v:"c",t:"DBP < 60 mmHg"},{v:"d",t:"HR > 120/min"},{v:"e",t:"HR เพิ่มขึ้น > 20% จากค่าเดิม"}]},
-  {id:"rf3",title:"3. Life-threatening Arrhythmia",items:[
-    {v:"n",t:"ไม่พบ (Normal)",normal:true},{v:"a",t:"PVC > 6 bpm"},{v:"b",t:"New onset AF"},
-    {v:"c",t:"SVT"},{v:"d",t:"VT"},{v:"e",t:"Arrhythmia อื่นที่คุกคามชีวิต"}]},
-  {id:"rf4",title:"4. Hypoxemia / Gas Exchange Failure",items:[
-    {v:"n",t:"ไม่พบ (Normal)",normal:true},{v:"a",t:"SpO₂ < 90%"},{v:"b",t:"PaO₂ < 60 mmHg"},{v:"c",t:"Cyanosis (เขียว)"}]},
-  {id:"rf5",title:"5. Altered Mental Status",items:[
-    {v:"n",t:"ไม่พบ (Normal)",normal:true},{v:"a",t:"Agitation (กระสับกระส่าย)"},
-    {v:"b",t:"Drowsiness (ซึมลง)"},{v:"c",t:"GCS ลดลงจากเดิม"}]}
-];
-(function(){
-  const wrap=document.getElementById("redflags");
-  rfGroups.forEach(g=>{
-    const d=document.createElement("div");d.className="q";
-    d.innerHTML=`<label class="qlabel" style="font-size:13.5px">${g.title}</label><div class="opts" id="${g.id}"></div>`;
-    wrap.appendChild(d);
-    checks(g.id,g.id,g.items,calcM2);
-  });
-})();
-radio("m2action","m2action",[
-  {v:1,t:"หยุด SBT / กลับ Setting เดิม"},{v:2,t:"แจ้งแพทย์"},{v:3,t:"ทำ ECG 12 leads"},
-  {v:4,t:"ดูดเสมหะ"},{v:5,t:"เจาะ ABG/VBG"},{v:6,t:"จัดท่าศีรษะสูง 30–45°"},
-  {v:7,t:"ไม่ต้องดำเนินการเพิ่ม"},{v:8,t:"อื่นๆ"}
-]);
-
-function calcM2(){
-  const round=getR("sbtround");
-  const vitalFails=[];
-  const rr=num("rr2"),tv=num("tv2"),sbp=num("sbp2"),dbp=num("dbp2"),hr=num("hr2"),spo2=num("spo22");
-  if(rr!==null&&(rr>30||rr<10))vitalFails.push("RR ผิดเกณฑ์ ("+rr+")");
-  if(tv!==null&&tv<200)vitalFails.push("TV < 200 ("+tv+")");
-  if(sbp!==null&&(sbp<90||sbp>180))vitalFails.push("SBP ผิดเกณฑ์ ("+sbp+")");
-  if(dbp!==null&&dbp<60)vitalFails.push("DBP < 60 ("+dbp+")");
-  if(hr!==null&&hr>120)vitalFails.push("HR > 120 ("+hr+")");
-  if(spo2!==null&&spo2<90)vitalFails.push("SpO₂ < 90 ("+spo2+")");
-  // red flags
-  const flags=[];
-  rfGroups.forEach(g=>{
-    document.querySelectorAll(`input[name="${g.id}"]:checked`).forEach(c=>{
-      if(c.dataset.normal!=="1")flags.push(c.parentElement.querySelector(".otxt").textContent);
+  if(hasScrollTimeline){
+    // Remove JS fallback classes — CSS handles everything
+    document.querySelectorAll('.swn-reveal,.swn-grow-fb').forEach(function(el){
+      el.classList.remove('swn-reveal','swn-grow-fb');
     });
-  });
-  const anyInput=rr!==null||tv!==null||sbp!==null||hr!==null||spo2!==null||flags.length>0||
-    document.querySelectorAll('#redflags input:checked').length>0;
-  const res=document.getElementById("res2");
-  if(!anyInput){res.className="result idle";
-    res.innerHTML='<div class="light"><span class="dot a"></span>ผลการประเมิน SBT รอบนี้</div><div class="desc">กรอก Vital Signs และ Red Flag เพื่อดูผล</div>';return;}
-  const allFails=[...vitalFails,...flags];
-  if(allFails.length>0){
-    res.className="result red";
-    res.innerHTML=`<div class="light">🔴 พบ Red Flag — หยุด SBT ทันที</div>
-      <div class="desc">หยุด SBT แล้วกลับ Setting เครื่องช่วยหายใจเดิม พบสัญญาณ ${allFails.length} รายการ</div>
-      <ul>${allFails.map(f=>`<li>${f}</li>`).join("")}</ul>
-      <div class="rec"><b>แนวทาง:</b> กลับ Setting เดิม · แจ้งแพทย์ · พิจารณา ECG / ABG / ดูดเสมหะ ตามอาการ</div>`;
-  }else if(round==="6"){
-    res.className="result green";
-    res.innerHTML=`<div class="light">✅ ผ่าน SBT ครบ 120 นาที</div>
-      <div class="desc">ไม่พบ Red Flag ตลอด 120 นาที ผู้ป่วยทน SBT ได้</div>
-      <div class="rec"><b>แนวทาง:</b> พิจารณาถอดท่อ → ทำ <b>Module 3</b> (Pre-Extubation Checklist + PERRS)</div>`;
-  }else{
-    res.className="result green";
-    res.innerHTML=`<div class="light">✅ ไม่พบ Red Flag — ดำเนินต่อได้</div>
-      <div class="desc">รอบนี้ผ่านเกณฑ์ ดำเนิน SBT ต่อ และประเมินซ้ำในรอบถัดไป</div>
-      <div class="rec"><b>แนวทาง:</b> เฝ้าระวังต่อจนครบ 120 นาที</div>`;
-  }
-}
-
-/* ---------------- MODULE 3 build ---------------- */
-checks("preext","preext",[
-  {v:1,t:"NPO อย่างน้อย 4 ชั่วโมง"},{v:2,t:"ดูดเสมหะใน ETT และช่องปากเรียบร้อย"},
-  {v:3,t:"พ่นยาขยายหลอดลม 15 นาทีก่อนถอดท่อ"},{v:4,t:"เตรียม O₂ mask with nebulizer พร้อมใช้"},
-  {v:5,t:"Cuff Leak Test ผ่าน (Positive)"}
-]);
-radio("cuff","cuff",[
-  {v:"pos",t:"Positive (มี leak > 110 ml) — พร้อมถอดท่อ",tone:"good"},
-  {v:"neg",t:"Negative (leak < 110 ml / ไม่มี) — เสี่ยง พิจารณา Steroid",tone:"bad"},
-  {v:"none",t:"ไม่ได้ทำ Cuff Leak Test"}
-]);
-radio("perrsround","perrsround",[
-  {v:5,t:"5 นาทีหลังถอดท่อ"},{v:15,t:"15 นาทีหลังถอดท่อ"},{v:30,t:"30 นาทีหลังถอดท่อ"},
-  {v:60,t:"60 นาทีหลังถอดท่อ"},{v:120,t:"2 ชั่วโมงหลังถอดท่อ"},{v:"x",t:"ประเมินพิเศษ (พบอาการผิดปกติ)"}
-]);
-const perrsParams=[
-  {id:"p1",title:"พารามิเตอร์ 1 · อัตราการหายใจ (RR)",o:[
-    {s:0,t:"12–24 ครั้ง/นาที (ปกติ)"},{s:1,t:"25–30 ครั้ง/นาที (เฝ้าระวัง)"},{s:2,t:"> 30 หรือ < 10 (วิกฤต)"}]},
-  {id:"p2",title:"พารามิเตอร์ 2 · Work of Breathing",o:[
-    {s:0,t:"ไม่ใช้กล้ามเนื้อช่วย (ปกติ)"},{s:1,t:"ใช้เล็กน้อย Intercostal (เฝ้าระวัง)"},{s:2,t:"ใช้ Accessory / Paradoxical (วิกฤต)"}]},
-  {id:"p3",title:"พารามิเตอร์ 3 · ROX Index",o:[
-    {s:0,t:"ROX > 4.88 (ดี)"},{s:1,t:"ROX 3.85–4.88 (น่ากังวล)"},{s:2,t:"ROX < 3.85 (แย่)"}]},
-  {id:"p4",title:"พารามิเตอร์ 4 · ระดับความรู้สึกตัว",o:[
-    {s:0,t:"สดชื่น พูดคุยรู้เรื่อง (ปกติ)"},{s:1,t:"สับสน / กระสับกระส่าย (เฝ้าระวัง)"},{s:2,t:"ซึมลง / เรียกไม่ตื่น (วิกฤต)"}]},
-  {id:"p5",title:"พารามิเตอร์ 5 · การขับเสมหะ / เสียงหายใจ",o:[
-    {s:0,t:"ไอแรง ไม่มี Stridor (ปกติ)"},{s:1,t:"ไอเบาลง Secretion ปานกลาง (เฝ้าระวัง)"},{s:2,t:"ไอไม่ได้ / เสมหะอุดกั้น / Stridor (วิกฤต)"}]},
-  {id:"p6",title:"พารามิเตอร์ 6 · Hemodynamics",o:[
-    {s:0,t:"MAP ≥ 65, HR 60–100 (ปกติ)"},{s:1,t:"MAP 60–65 ไม่ต้องใช้ยา (เฝ้าระวัง)"},{s:2,t:"MAP < 60 หรือ HR > 120 (วิกฤต)"}]}
-];
-(function(){
-  const wrap=document.getElementById("perrs");
-  perrsParams.forEach(p=>{
-    const d=document.createElement("div");d.className="q";
-    d.innerHTML=`<label class="qlabel" style="font-size:13.5px">${p.title}</label><div class="opts" id="${p.id}"></div>`;
-    wrap.appendChild(d);
-    radio(p.id,p.id,p.o.map(x=>({v:x.s,t:`<b style="font-family:Sora">${x.s}</b> &nbsp;${x.t}`})),calcM3);
-  });
-})();
-radio("roxfio2","roxfio2",[
-  {v:0.21,t:"0.21 (Room air)"},{v:0.24,t:"0.24 (NC 1 L/min)"},{v:0.28,t:"0.28 (NC 2 L/min)"},
-  {v:0.32,t:"0.32 (NC 3 L/min)"},{v:0.36,t:"0.36 (NC 4 L/min)"},{v:0.40,t:"0.40 (Simple mask / NC 5 L)"},
-  {v:0.50,t:"0.50 (Simple mask 8–10 L)"},{v:0.60,t:"0.60 (Non-rebreather)"},
-  {v:0.75,t:"0.70–0.80 (HFNC / NIV)"},{v:0.90,t:"> 0.80 (HFNC high flow / BIPAP)"}
-],calcM3);
-checks("m3action","m3action",[
-  {v:1,t:"เปลี่ยนเป็น Nasal Cannula"},{v:2,t:"เปลี่ยนเป็น Simple Mask"},{v:3,t:"เริ่ม HFNC"},
-  {v:4,t:"เริ่ม NIV / BIPAP"},{v:5,t:"แจ้งแพทย์ด่วน"},{v:6,t:"เตรียม Crash Cart"},
-  {v:7,t:"เตรียมอุปกรณ์ Intubation"},{v:8,t:"ดูดเสมหะ"},{v:9,t:"Reintubation"}
-]);
-radio("m3outcome","m3outcome",[
-  {v:1,t:"สังเกตอาการต่อใน ICU"},{v:2,t:"ส่งกลับ Ward ได้"},{v:3,t:"ส่ง Ward พร้อม O₂"},
-  {v:4,t:"Reintubation (ใส่ท่อใหม่)"}
-]);
-
-function calcM3(){
-  // ROX
-  const sp=num("roxspo2"),rr=num("roxrr"),fio2=parseFloat(getR("roxfio2"));
-  const box=document.getElementById("roxBox");
-  let rox=null;
-  if(sp!==null&&rr!==null&&rr>0&&!isNaN(fio2)){
-    rox=(sp/fio2)/rr;
-    let band,cls;
-    if(rox>=4.88){band="≥ 4.88 · ความเสี่ยงต่ำ";cls="pill-pass";}
-    else if(rox>=3.85){band="3.85–4.88 · น่ากังวล";cls="";}
-    else{band="< 3.85 · เสี่ยงสูง";cls="pill-fail";}
-    box.innerHTML=`ROX Index = <b>${rox.toFixed(2)}</b> &nbsp; <span class="${cls}">${band}</span><br>
-      <span style="font-size:11.5px;color:var(--muted)">(SpO₂ ${sp} ÷ FiO₂ ${fio2}) ÷ RR ${rr}</span>`;
-  }else{box.innerHTML="ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ";}
-
-  // PERRS sum
-  let answered=0,total=0;const breakdown=[];
-  perrsParams.forEach(p=>{const v=getR(p.id);if(v!==null){answered++;total+=parseInt(v);}});
-  const res=document.getElementById("res3");
-  if(answered===0){res.className="result idle";
-    res.innerHTML='<div class="light"><span class="dot a"></span>PERRS Risk Assessment</div><div class="desc">เลือกพารามิเตอร์ทั้ง 6 ข้อเพื่อคำนวณคะแนนและระดับความเสี่ยง</div>';return;}
-
-  let cls,level,matrix,light;
-  if(total<=3){cls="green";level="Low Risk (0–3)";light="🟢 Low Risk";
-    matrix="Safe to Observe — เปลี่ยน O₂ เป็น Nasal Cannula / Simple Mask และสังเกตอาการ";}
-  else if(total<=6){cls="amber";level="Moderate Risk (4–6)";light="🟡 Moderate Risk";
-    matrix="High Flow / NIV Support — พิจารณา HFNC หรือ BIPAP และเฝ้าระวังใกล้ชิด";}
-  else{cls="red";level="High Risk (≥ 7)";light="🔴 High Risk";
-    matrix="Impending Respiratory Failure — เตรียมพร้อม Reintubation / แจ้งแพทย์ด่วน STAT!";}
-
-  const incomplete=answered<6?`<div class="desc" style="margin-top:6px;color:var(--amber)">⚠️ ยังเลือกไม่ครบ (${answered}/6 ข้อ) คะแนนอาจเปลี่ยน</div>`:"";
-  res.className="result "+cls;
-  res.innerHTML=`<div class="light">${light}</div>
-    <div class="big">${total}<span style="font-size:18px;color:var(--muted)"> / 12</span></div>
-    <div class="desc">${level} · ตอบแล้ว ${answered}/6 ข้อ${rox!==null?` · ROX ${rox.toFixed(2)}`:""}</div>
-    ${incomplete}
-    <div class="rec"><b>Decision Matrix:</b> ${matrix}</div>`;
-}
-
-/* ---------------- PDF report ---------------- */
-function rTxt(name){
-  const e=document.querySelector(`input[name="${name}"]:checked`);
-  if(!e)return null;
-  const o=e.parentElement.querySelector(".otxt").cloneNode(true);
-  o.querySelectorAll(".tag").forEach(t=>t.remove());
-  return o.textContent.trim();
-}
-function cTxt(name){
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)]
-    .map(e=>e.parentElement.querySelector(".otxt").textContent.trim());
-}
-const V=id=>{const v=document.getElementById(id).value;return v?v.trim():"—";};
-function row(k,val,tone){
-  if(val===null||val===undefined||val==="—"||val==="")val="—";
-  return `<div class="rp-row"><span class="lk">${k}</span><span class="lv ${tone||""}">${val}</span></div>`;
-}
-function verdict(resId){
-  const r=document.getElementById(resId);
-  if(r.classList.contains("idle"))return"";
-  const cls=["green","amber","red"].find(c=>r.classList.contains(c))||"amber";
-  const title=r.querySelector(".light")?.textContent.trim()||"";
-  const desc=r.querySelector(".desc")?.textContent.trim()||"";
-  const big=r.querySelector(".big")?.textContent.trim();
-  const ul=r.querySelector("ul");
-  const rec=r.querySelector(".rec")?.textContent.trim();
-  return `<div class="rp-verdict ${cls}">
-    <div class="vt">${title}${big?` · ${big}`:""}</div>
-    ${desc?`<div class="vd">${desc}</div>`:""}
-    ${ul?`<ul class="rp-list">${ul.innerHTML}</ul>`:""}
-    ${rec?`<div class="vd" style="margin-top:6px">${rec}</div>`:""}
-  </div>`;
-}
-function note(id){const t=V(id);return t==="—"?"":`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${t}</div>`;}
-
-function buildReport(){
-  const now=new Date();
-  const stamp=now.toLocaleString("th-TH",{dateStyle:"long",timeStyle:"short"});
-  let html=`
-  <div class="rp-head">
-    <svg class="lg" viewBox="0 0 100 100"><path d="M50 18 V46"/>
-      <path d="M50 32 C42 30 30 34 28 48 C26 62 30 76 40 78 C46 79 47 72 47 64 L47 40"/>
-      <path d="M50 32 C58 30 70 34 72 48 C74 62 70 76 60 78 C54 79 53 72 53 64 L53 40"/></svg>
-    <div><h1>SmartWean Navigator</h1>
-      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา — หอผู้ป่วย กจ.2</div></div>
-    <div class="rp-meta">พิมพ์เมื่อ<br>${stamp}</div>
-  </div>
-  <div class="rp-patient">
-    <div class="cell"><div class="k">HN</div><div class="v">${V("hn")}</div></div>
-    <div class="cell"><div class="k">ชื่อ-นามสกุล</div><div class="v">${V("pname")}</div></div>
-    <div class="cell"><div class="k">วันที่ประเมิน</div><div class="v">${V("adate")}</div></div>
-    <div class="cell"><div class="k">เวลา</div><div class="v">${V("atime")}</div></div>
-    <div class="cell" style="grid-column:span 4;border-bottom:none"><div class="k">ผู้ประเมิน (พยาบาล)</div><div class="v">${V("nurse")}</div></div>
-  </div>`;
-
-  // ---- Module 1 ----
-  if(!document.getElementById("res1").classList.contains("idle")){
-    const tv=parseFloat(document.getElementById("tv").value),wt=parseFloat(document.getElementById("wt").value),
-          rr=parseFloat(document.getElementById("rr1").value);
-    let rsbi="—",tvkg="—";
-    if(!isNaN(rr)&&!isNaN(tv)&&tv>0)rsbi=(rr/(tv/1000)).toFixed(0);
-    if(!isNaN(tv)&&!isNaN(wt)&&wt>0)tvkg=(tv/wt).toFixed(1);
-    const c=i=>{const x=rTxt("c"+i);return x?(x.includes("ผ่าน")&&!x.includes("ไม่")?"good":"bad"):"";};
-    html+=`<div class="rp-mod"><div class="rp-mod-title t1">🟢 Module 1 · Smart Readiness Assessment (ความพร้อม SBT)</div>
-    <div class="rp-mod-body">
-      <div class="rp-sub">เกณฑ์ทางคลินิก</div>
-      <div class="rp-grid">
-        ${row("Underlying cause ดีขึ้น",rTxt("c1"),c(1))}
-        ${row("ไม่มี ACS/CHF/Arrhythmia",rTxt("c2"),c(2))}
-        ${row("ตื่นดี / sedative ต่ำสุด",rTxt("c3"),c(3))}
-        ${row("Inotropic ต่ำ/ไม่ใช้",rTxt("c4"),c(4))}
-      </div>
-      <div class="rp-sub">เกณฑ์ทางสรีรวิทยา</div>
-      <div class="rp-grid">
-        ${row("SpO₂ (%)",V("spo2"))}
-        ${row("PaO₂ (mmHg)",V("pao2"))}
-        ${row("FiO₂",rTxt("fio2"))}
-        ${row("PEEP (cmH₂O)",rTxt("peep"))}
-        ${row("TV (cc)",V("tv"))}
-        ${row("น้ำหนัก (kg)",V("wt"))}
-        ${row("TV/kg",tvkg)}
-        ${row("RSBI",rsbi)}
-        ${row("MV (L/min)",V("mv"))}
-        ${row("RR (/min)",V("rr1"))}
-        ${row("SBP (mmHg)",V("sbp1"))}
-        ${row("DBP (mmHg)",V("dbp1"))}
-        ${row("HR (/min)",V("hr1"))}
-        ${row("Hct (%)",V("hct"))}
-        ${row("Hb (g/dL)",V("hb"))}
-        ${row("Electrolytes",rTxt("lyte"))}
-        ${row("Mode SBT",rTxt("sbtmode"))}
-      </div>
-      ${verdict("res1")}
-      ${note("note1")}
-    </div></div>`;
-  }
-
-  // ---- Module 2 ----
-  if(!document.getElementById("res2").classList.contains("idle")){
-    const flags=[];
-    rfGroups.forEach(g=>{
-      document.querySelectorAll(`input[name="${g.id}"]:checked`).forEach(c=>{
-        if(c.dataset.normal!=="1")flags.push(c.parentElement.querySelector(".otxt").textContent.trim());
+  } else {
+    // IntersectionObserver fallback
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('swn-vis');
+          io.unobserve(e.target);
+        }
       });
+    },{threshold:0.12});
+
+    document.querySelectorAll('.swn-reveal,.swn-grow-fb').forEach(function(el){
+      io.observe(el);
     });
-    html+=`<div class="rp-mod"><div class="rp-mod-title t2">🟡 Module 2 · SBT Guardian (เฝ้าระวังระหว่าง SBT)</div>
-    <div class="rp-mod-body">
-      <div class="rp-grid">
-        ${row("รอบการประเมิน",rTxt("sbtround"))}
-        ${row("เวลาที่บันทึก",V("sbttime"))}
-        ${row("RR (/min)",V("rr2"))}
-        ${row("TV (cc)",V("tv2"))}
-        ${row("SBP (mmHg)",V("sbp2"))}
-        ${row("DBP (mmHg)",V("dbp2"))}
-        ${row("HR (/min)",V("hr2"))}
-        ${row("SpO₂ (%)",V("spo22"))}
-      </div>
-      <div class="rp-sub">🚩 Red Flag ที่พบ</div>
-      ${flags.length?`<ul class="rp-list">${flags.map(f=>`<li>${f}</li>`).join("")}</ul>`
-        :`<div class="vd" style="font-size:11px;color:var(--green)">ไม่พบ Red Flag</div>`}
-      ${row("Action ที่ดำเนินการ",rTxt("m2action"))?`<div class="rp-grid" style="margin-top:8px">${row("Action ที่ดำเนินการ",rTxt("m2action"))}</div>`:""}
-      ${verdict("res2")}
-      ${note("note2")}
-    </div></div>`;
   }
 
-  // ---- Module 3 ----
-  if(!document.getElementById("res3").classList.contains("idle")){
-    const sp=parseFloat(document.getElementById("roxspo2").value),rr=parseFloat(document.getElementById("roxrr").value),
-          fio2=parseFloat(getR("roxfio2"));
-    let rox="—";
-    if(!isNaN(sp)&&!isNaN(rr)&&rr>0&&!isNaN(fio2))rox=((sp/fio2)/rr).toFixed(2);
-    const pre=cTxt("preext"),act=cTxt("m3action");
-    const pscore=p=>{const v=getR(p);return v!==null?v+" คะแนน":"—";};
-    html+=`<div class="rp-mod"><div class="rp-mod-title t3">🔴 Module 3 · PERRS Score (หลังถอดท่อ)</div>
-    <div class="rp-mod-body">
-      <div class="rp-grid two">
-        ${row("Cuff Leak Test",rTxt("cuff"))}
-        ${row("รอบประเมิน PERRS",rTxt("perrsround"))}
-      </div>
-      <div class="rp-sub">Pre-Extubation Checklist</div>
-      ${pre.length?`<ul class="rp-list">${pre.map(p=>`<li>${p}</li>`).join("")}</ul>`:`<div class="vd" style="font-size:11px">—</div>`}
-      <div class="rp-sub">PERRS Parameters</div>
-      <div class="rp-grid">
-        ${row("1. RR",pscore("p1"))}
-        ${row("2. Work of Breathing",pscore("p2"))}
-        ${row("3. ROX Index",pscore("p3"))}
-        ${row("4. ความรู้สึกตัว",pscore("p4"))}
-        ${row("5. การขับเสมหะ",pscore("p5"))}
-        ${row("6. Hemodynamics",pscore("p6"))}
-      </div>
-      <div class="rp-grid">
-        ${row("SpO₂ หลังถอดท่อ",V("roxspo2"))}
-        ${row("RR หลังถอดท่อ",V("roxrr"))}
-        ${row("FiO₂",rTxt("roxfio2"))}
-        ${row("ROX Index (คำนวณ)",rox)}
-      </div>
-      ${verdict("res3")}
-      ${act.length?`<div class="rp-sub">Action หลังประเมิน</div><ul class="rp-list">${act.map(a=>`<li>${a}</li>`).join("")}</ul>`:""}
-      ${row("ผลลัพธ์สุดท้าย",rTxt("m3outcome"))?`<div class="rp-grid" style="margin-top:8px">${row("ผลลัพธ์สุดท้าย",rTxt("m3outcome"))}</div>`:""}
-      ${note("note3")}
-    </div></div>`;
-  }
-
-  html+=`
-  <div class="rp-sign">
-    <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${V("nurse")})</div>
-    <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
-  </div>
-  <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
-    ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>`;
-
-  document.getElementById("report").innerHTML=html;
-}
-function exportPDF(){
-  if(document.getElementById("res1").classList.contains("idle")
-   &&document.getElementById("res2").classList.contains("idle")
-   &&document.getElementById("res3").classList.contains("idle")){
-    alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อน Export PDF");return;
-  }
-  buildReport();
-  setTimeout(()=>window.print(),60);
-}
-function buildShareText(){
-  const hn=document.getElementById("hn").value||"—";
-  const pname=document.getElementById("pname").value||"—";
-  const adate=document.getElementById("adate").value||"—";
-  const atime=document.getElementById("atime").value||"—";
-  const nurse=document.getElementById("nurse").value||"—";
-  const sep="─".repeat(28);
-  const lines=[];
-  lines.push("📋 SmartWean Navigator");
-  lines.push("สรุปผลการประเมินการหย่าเครื่องช่วยหายใจ");
-  lines.push(sep);
-  lines.push(`HN       : ${hn}`);
-  lines.push(`ผู้ป่วย  : ${pname}`);
-  lines.push(`วันที่   : ${adate}  เวลา ${atime}`);
-  lines.push(`ผู้ประเมิน: ${nurse}`);
-  lines.push(sep);
-  const mNames=["ความพร้อม SBT","ระหว่าง SBT","PERRS หลังถอดท่อ"];
-  [1,2,3].forEach(i=>{
-    const r=document.getElementById("res"+i);
-    if(r.classList.contains("idle"))return;
-    const title=r.querySelector(".light")?.textContent.trim()||"";
-    const desc=r.querySelector(".desc")?.textContent.trim()||"";
-    const big=r.querySelector(".big")?.textContent.trim();
-    const rec=r.querySelector(".rec")?.textContent.trim();
-    const uls=[...r.querySelectorAll("ul li")].map(li=>"  • "+li.textContent.trim());
-    lines.push(`▌ Module ${i} · ${mNames[i-1]}`);
-    lines.push(`  ${title}${big?" ("+big+")":""}`);
-    if(desc)lines.push(`  ${desc}`);
-    uls.forEach(u=>lines.push(u));
-    if(rec)lines.push(`  💡 ${rec}`);
-    lines.push("");
+  // Hook for external app integration
+  window.addEventListener('smartwean:start',function(){
+    // Replace with actual navigation when integrating into the app
+    console.log('[SmartWean] เริ่มประเมิน');
   });
-  lines.push(sep);
-  lines.push("⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น");
-  lines.push("ไม่ทดแทนการประเมินของแพทย์");
-  return lines.join("\n");
-}
-function shareResult(){
-  const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
-  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนแชร์");return;}
-  buildReport();
-  const previewHTML=document.getElementById("report").innerHTML;
-  const backdrop=document.createElement("div");
-  backdrop.className="sheet-backdrop";
-  backdrop.id="shareSheet";
-  backdrop.innerHTML=`
-    <div class="sheet">
-      <div class="sheet-handle"></div>
-      <div class="sheet-head">
-        <span class="sheet-title">📄 พรีวิว PDF ก่อนแชร์</span>
-        <button onclick="document.getElementById('shareSheet').remove()"
-          style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
-      </div>
-      <div class="sheet-body">
-        <div style="background:#fff;border:1px solid var(--line);border-radius:10px;
-          padding:16px;font-size:11.5px;transform-origin:top left;">
-          ${previewHTML}
-        </div>
-        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">
-          กด แชร์เลย → เปิด Print dialog → แตะ Share / บันทึกเป็น PDF
-        </p>
-      </div>
-      <div class="sheet-foot">
-        <button class="btn btn-ghost" onclick="document.getElementById('shareSheet').remove()">ยกเลิก</button>
-        <button class="btn btn-primary" onclick="doSharePDF()">📄 แชร์ / บันทึก PDF</button>
-      </div>
-    </div>`;
-  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
-  document.body.appendChild(backdrop);
-}
-function doSharePDF(){
-  document.getElementById("shareSheet")?.remove();
-  setTimeout(()=>window.print(),80);
-}
-
-/* ---------------- nav ---------------- */
-function switchModule(m){
-  [1,2,3].forEach(i=>{
-    document.getElementById("m"+i).classList.toggle("show",i===m);
-    document.querySelector(`.tab[data-m="${i}"]`).classList.toggle("active",i===m);
-  });
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-/* ---------------- result page ---------------- */
-const modLabels=["Module 1 · Smart Readiness Assessment","Module 2 · SBT Guardian","Module 3 · PERRS Score"];
-const modIcons=["🟢","🟡","🔴"];
-function openResultPage(){
-  const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
-  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนดูผล");return;}
-  buildResultPageContent();
-  document.getElementById("resultPage").style.display="block";
-  document.getElementById("resultPage").scrollTop=0;
-}
-function closeResultPage(){
-  document.getElementById("resultPage").style.display="none";
-}
-function buildResultPageContent(){
-  const hn=document.getElementById("hn").value||"—";
-  const pname=document.getElementById("pname").value||"—";
-  const adate=document.getElementById("adate").value||"—";
-  const atime=document.getElementById("atime").value||"—";
-  const nurse=document.getElementById("nurse").value||"—";
-  let html=`<div class="card" style="margin-bottom:14px">
-    <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
-    <div class="rp-grid two" style="margin-top:10px">
-      <div class="rp-row"><span class="lk">HN</span><span class="lv">${hn}</span></div>
-      <div class="rp-row"><span class="lk">ชื่อ-นามสกุล</span><span class="lv">${pname}</span></div>
-      <div class="rp-row"><span class="lk">วันที่</span><span class="lv">${adate}</span></div>
-      <div class="rp-row"><span class="lk">เวลา</span><span class="lv">${atime}</span></div>
-    </div>
-    <div class="rp-row" style="margin-top:8px"><span class="lk">ผู้ประเมิน</span><span class="lv">${nurse}</span></div>
-  </div>`;
-  [1,2,3].forEach(i=>{
-    const src=document.getElementById("res"+i);
-    if(src.classList.contains("idle"))return;
-    const cls=["green","amber","red"].find(c=>src.classList.contains(c))||"amber";
-    const colorMap={green:"var(--green)",amber:"var(--amber)",red:"var(--red)"};
-    const bgMap={green:"var(--green-soft)",amber:"var(--amber-soft)",red:"var(--red-soft)"};
-    const borderColor=colorMap[cls];
-    const bg=bgMap[cls];
-    html+=`<div style="background:${bg};border:1.5px solid ${borderColor};border-radius:var(--radius);padding:18px 16px;margin-bottom:14px;animation:pop .3s ease">
-      <div style="font-size:12px;font-weight:700;color:${borderColor};letter-spacing:.4px;margin-bottom:8px">${modIcons[i-1]} ${modLabels[i-1]}</div>
-      ${src.innerHTML}
-    </div>`;
-  });
-  html+=`<div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6">
-    ⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>`;
-  document.getElementById("resultPageContent").innerHTML=html;
-}
-function confirmReset(){
-  if(confirm("เริ่มประเมินผลใหม่? ข้อมูลที่กรอกทั้งหมดจะถูกล้าง")){
-    document.querySelectorAll("input[type=text],input[type=number],input[type=date],input[type=time],textarea")
-      .forEach(el=>{
-        if(el.id==="adate"||el.id==="atime")return;
-        el.value="";
-      });
-    document.querySelectorAll("input[type=radio],input[type=checkbox]").forEach(el=>{
-      el.checked=false;
-      el.closest(".opt")?.classList.remove("sel","good","warnbad");
-    });
-    [1,2,3].forEach(i=>{
-      const res=document.getElementById("res"+i);
-      const idle=i===1?"ผลการประเมิน Module 1":i===2?"ผลการประเมิน SBT รอบนี้":"PERRS Risk Assessment";
-      const sub=i===1?"กรอกข้อมูลด้านบนเพื่อดูผลแบบเรียลไทม์":i===2?"กรอก Vital Signs และ Red Flag เพื่อดูผล":"เลือกพารามิเตอร์ทั้ง 6 ข้อเพื่อคำนวณคะแนนและระดับความเสี่ยง";
-      res.className="result idle";
-      res.innerHTML=`<div class="light"><span class="dot a"></span>${idle}</div><div class="desc">${sub}</div>`;
-    });
-    document.getElementById("rsbiBox").innerHTML="RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ";
-    document.getElementById("roxBox").innerHTML="ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ";
-    closeResultPage();
-    switchModule(1);
-  }
-}
-// default date/time = now
-(function(){
-  const n=new Date(),p=x=>String(x).padStart(2,"0");
-  document.getElementById("adate").value=`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`;
-  document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
 })();
 </script>
 </body>
