@@ -1706,9 +1706,34 @@ function viewHistoryDetail(saveId){
     <div class="rp-grid" style="margin-top:10px">
       ${histDetailRow("PERRS รวม",r.m3_perrs_total)}${histDetailRow("ROX Index",r.m3_rox_index)}${histDetailRow("ผลลัพธ์สุดท้าย",r.m3_outcome)}
     </div>
-  </div>`;
+  </div>
+  <button class="btn btn-ghost" id="deleteHistBtn" style="flex:none;padding:10px 20px;font-size:13px;color:var(--red);border-color:var(--red-soft);width:100%" onclick="deleteHistoryRecord('${(r.save_id||"").replace(/'/g,"")}')">🗑️ ลบรายการนี้</button>`;
   document.getElementById("historyPageContent").innerHTML=html;
   document.getElementById("historyPage").scrollTop=0;
+}
+async function deleteHistoryRecord(saveId){
+  if(!confirm("ยืนยันลบรายการนี้? ข้อมูลจะถูกลบออกจาก Google Sheet ถาวร กู้คืนไม่ได้"))return;
+  const btn=document.getElementById("deleteHistBtn");
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ กำลังลบ...";
+  try{
+    const resp=await fetch(SWN_SHEET_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({secret:SWN_SHEET_SECRET,action:"delete",save_id:saveId})
+    });
+    const json=await resp.json();
+    if(json.ok){
+      historyRows=historyRows.filter(r=>r.save_id!==saveId);
+      renderHistoryPage();
+    }else{
+      alert("ลบไม่สำเร็จ: "+(json.error||"unknown error"));
+      btn.disabled=false;btn.textContent=originalLabel;
+    }
+  }catch(err){
+    alert("เชื่อมต่อไม่สำเร็จ — เช็คอินเทอร์เน็ต");
+    btn.disabled=false;btn.textContent=originalLabel;
+  }
 }
 
 /* ---------------- ward / department name ---------------- */
