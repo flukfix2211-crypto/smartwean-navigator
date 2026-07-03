@@ -308,6 +308,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;flex:none">
       <button class="help-btn" onclick="openHistory()">📁 ประวัติ</button>
       <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
+      <button class="help-btn" onclick="goHome()">🏠 หน้าแรก</button>
     </div>
   </div>
 </header>
@@ -1520,6 +1521,11 @@ function confirmReset(){
     closeResultPage();
     switchModule(1);
   }
+}
+function goHome(){
+  const anyFilled=[1,2,3].some(i=>!document.getElementById("res"+i).classList.contains("idle"));
+  if(anyFilled&&!confirm("ข้อมูลที่กรอกยังไม่ได้บันทึก ต้องการออกจากหน้านี้เพื่อกลับหน้าแรกหรือไม่?"))return;
+  location.href="./index.html";
 }
 /* ---------------- help page ---------------- */
 function openHelp(){
