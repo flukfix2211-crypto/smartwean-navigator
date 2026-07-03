@@ -328,21 +328,6 @@
     </div>
   </div>
 
-  <!-- Sync settings -->
-  <div class="help-section" id="syncSettingsCard">
-    <div class="help-section-head" onclick="toggleHelp(this)">
-      <span class="hs-icon">⚙️</span>
-      <span class="hs-title">ตั้งค่าการซิงค์ข้อมูล</span>
-      <span class="hs-chev">▼</span>
-    </div>
-    <div class="help-section-body">
-      <div class="q" style="margin-top:12px"><label class="qlabel">Web App URL</label><input type="text" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveSheetSettings()"></div>
-      <div class="q"><label class="qlabel">รหัสลับ</label><input type="text" id="sheetSecret" placeholder="รหัสลับที่ตั้งไว้ใน Apps Script" oninput="saveSheetSettings()"></div>
-      <div id="sheetSettingsStatus" style="font-size:12px;font-weight:600"></div>
-      <div class="help-tip" style="margin-top:10px"><b>💡 หมายเหตุ:</b> รหัสลับนี้เป็นการป้องกันเบื้องต้นเท่านั้น ไม่ใช่ระบบความปลอดภัยระดับสูง ไม่ควรใช้กับข้อมูลที่ต้องการความปลอดภัยสูงมาก</div>
-    </div>
-  </div>
-
   <!-- Module tabs -->
   <div class="tabs">
     <div class="tab active" data-m="1" onclick="switchModule(1)"><span class="n">1</span>ความพร้อม SBT</div>
@@ -793,6 +778,10 @@
 </div>
 
 <script>
+/* ---------------- sheet sync config ---------------- */
+const SWN_SHEET_URL="https://script.google.com/macros/s/AKfycbxyR4tWjST97LNr6kNYLU2jmT3cdz5U9HHJqcxKQSdsvIpqfuoEBgXrf-OJdAKcB2RY/exec";
+const SWN_SHEET_SECRET="6077";
+
 /* ---------------- option builders ---------------- */
 function radio(container,name,items,cb){
   const box=document.getElementById(container);box.innerHTML="";
@@ -1330,8 +1319,6 @@ function buildSheetPayload(){
 async function saveToSheet(){
   const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
   if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนบันทึกข้อมูล");return;}
-  const url=localStorage.getItem("swn_sheet_url"),secret=localStorage.getItem("swn_sheet_secret");
-  if(!url||!secret){alert("กรุณาตั้งค่า Web App URL และรหัสลับในการ์ด \"⚙️ ตั้งค่าการซิงค์ข้อมูล\" ก่อนบันทึกข้อมูล");return;}
 
   const btn=document.getElementById("saveSheetBtn");
   const originalLabel=btn.textContent;
@@ -1340,10 +1327,10 @@ async function saveToSheet(){
     // NOTE: Content-Type must stay "text/plain" — Apps Script Web Apps can't
     // handle a CORS preflight, and "application/json" would trigger one.
     // The server parses the JSON body manually via JSON.parse(e.postData.contents).
-    const resp=await fetch(url,{
+    const resp=await fetch(SWN_SHEET_URL,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({secret,data:buildSheetPayload()})
+      body:JSON.stringify({secret:SWN_SHEET_SECRET,data:buildSheetPayload()})
     });
     const json=await resp.json();
     if(json.ok){showSaveFeedback(true,"บันทึกข้อมูลสำเร็จ");}
@@ -1562,35 +1549,11 @@ function openHistory(){
 function closeHistory(){
   document.getElementById("historyPage").style.display="none";
 }
-function unlockHistory(){
-  const url=document.getElementById("histUnlockUrl").value.trim();
-  const secret=document.getElementById("histUnlockSecret").value.trim();
-  if(!url||!secret){alert("กรุณากรอก Web App URL และรหัสลับให้ครบ");return;}
-  localStorage.setItem("swn_sheet_url",url);
-  localStorage.setItem("swn_sheet_secret",secret);
-  const su=document.getElementById("sheetUrl"),ss=document.getElementById("sheetSecret");
-  if(su)su.value=url;
-  if(ss)ss.value=secret;
-  renderSheetSettingsStatus();
-  loadHistory();
-}
 async function loadHistory(){
-  const url=localStorage.getItem("swn_sheet_url"),secret=localStorage.getItem("swn_sheet_secret");
   const box=document.getElementById("historyPageContent");
-  if(!url||!secret){
-    box.innerHTML=`
-      <div class="card" style="margin-top:20px">
-        <div class="sec-head"><span class="ic">🔒</span><h2>เข้าดูประวัติ &amp; แดชบอร์ด</h2></div>
-        <div class="sec-desc">กรอกครั้งเดียว ระบบจะจำไว้ในเครื่องนี้ ครั้งต่อไปกดปุ่ม "📁 ประวัติ" เข้าดูได้ทันที</div>
-        <div class="q"><label class="qlabel">Web App URL</label><input type="text" id="histUnlockUrl" placeholder="https://script.google.com/macros/s/.../exec" value="${url||""}"></div>
-        <div class="q"><label class="qlabel">รหัสลับ</label><input type="text" id="histUnlockSecret" placeholder="รหัสลับที่ตั้งไว้ใน Apps Script" value="${secret||""}" onkeydown="if(event.key==='Enter')unlockHistory()"></div>
-        <button class="btn btn-primary" style="flex:none;padding:12px 26px" onclick="unlockHistory()">🔓 เข้าดู</button>
-      </div>`;
-    return;
-  }
   box.innerHTML=`<div class="hist-empty">⏳ กำลังโหลดข้อมูล...</div>`;
   try{
-    const resp=await fetch(url+"?secret="+encodeURIComponent(secret));
+    const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
     const json=await resp.json();
     if(!json.ok){
       box.innerHTML=`<div class="hist-empty">⚠️ โหลดข้อมูลไม่สำเร็จ: ${json.error||"unauthorized"}<br>
@@ -1760,20 +1723,6 @@ function saveWard(){
   renderWard();
 }
 
-/* ---------------- sheet sync settings ---------------- */
-function renderSheetSettingsStatus(){
-  const url=document.getElementById("sheetUrl").value.trim();
-  const secret=document.getElementById("sheetSecret").value.trim();
-  const el=document.getElementById("sheetSettingsStatus");
-  if(url&&secret){el.textContent="✓ ตั้งค่าแล้ว";el.style.color="var(--green)";}
-  else{el.textContent="ยังไม่ได้ตั้งค่า — บันทึกข้อมูลและดูประวัติจะยังใช้งานไม่ได้";el.style.color="var(--muted)";}
-}
-function saveSheetSettings(){
-  localStorage.setItem("swn_sheet_url",document.getElementById("sheetUrl").value.trim());
-  localStorage.setItem("swn_sheet_secret",document.getElementById("sheetSecret").value.trim());
-  renderSheetSettingsStatus();
-}
-
 // default date/time = now
 (function(){
   const n=new Date(),p=x=>String(x).padStart(2,"0");
@@ -1781,9 +1730,6 @@ function saveSheetSettings(){
   document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
   document.getElementById("ward").value=localStorage.getItem("swn_ward")||"";
   renderWard();
-  document.getElementById("sheetUrl").value=localStorage.getItem("swn_sheet_url")||"";
-  document.getElementById("sheetSecret").value=localStorage.getItem("swn_sheet_secret")||"";
-  renderSheetSettingsStatus();
 })();
 </script>
 </body>
