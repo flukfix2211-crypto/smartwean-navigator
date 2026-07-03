@@ -1562,19 +1562,30 @@ function openHistory(){
 function closeHistory(){
   document.getElementById("historyPage").style.display="none";
 }
-function goToSyncSettings(){
-  closeHistory();
-  const head=document.querySelector("#syncSettingsCard .help-section-head");
-  head.classList.add("open");
-  head.nextElementSibling.classList.add("open");
-  document.getElementById("syncSettingsCard").scrollIntoView({behavior:"smooth"});
+function unlockHistory(){
+  const url=document.getElementById("histUnlockUrl").value.trim();
+  const secret=document.getElementById("histUnlockSecret").value.trim();
+  if(!url||!secret){alert("กรุณากรอก Web App URL และรหัสลับให้ครบ");return;}
+  localStorage.setItem("swn_sheet_url",url);
+  localStorage.setItem("swn_sheet_secret",secret);
+  const su=document.getElementById("sheetUrl"),ss=document.getElementById("sheetSecret");
+  if(su)su.value=url;
+  if(ss)ss.value=secret;
+  renderSheetSettingsStatus();
+  loadHistory();
 }
 async function loadHistory(){
   const url=localStorage.getItem("swn_sheet_url"),secret=localStorage.getItem("swn_sheet_secret");
   const box=document.getElementById("historyPageContent");
   if(!url||!secret){
-    box.innerHTML=`<div class="hist-empty">⚙️ ยังไม่ได้ตั้งค่าการซิงค์ข้อมูล<br>
-      <button class="btn btn-primary" style="margin-top:14px;flex:none;padding:10px 20px" onclick="goToSyncSettings()">ไปตั้งค่า</button></div>`;
+    box.innerHTML=`
+      <div class="card" style="margin-top:20px">
+        <div class="sec-head"><span class="ic">🔒</span><h2>เข้าดูประวัติ &amp; แดชบอร์ด</h2></div>
+        <div class="sec-desc">กรอกครั้งเดียว ระบบจะจำไว้ในเครื่องนี้ ครั้งต่อไปกดปุ่ม "📁 ประวัติ" เข้าดูได้ทันที</div>
+        <div class="q"><label class="qlabel">Web App URL</label><input type="text" id="histUnlockUrl" placeholder="https://script.google.com/macros/s/.../exec" value="${url||""}"></div>
+        <div class="q"><label class="qlabel">รหัสลับ</label><input type="text" id="histUnlockSecret" placeholder="รหัสลับที่ตั้งไว้ใน Apps Script" value="${secret||""}" onkeydown="if(event.key==='Enter')unlockHistory()"></div>
+        <button class="btn btn-primary" style="flex:none;padding:12px 26px" onclick="unlockHistory()">🔓 เข้าดู</button>
+      </div>`;
     return;
   }
   box.innerHTML=`<div class="hist-empty">⏳ กำลังโหลดข้อมูล...</div>`;
