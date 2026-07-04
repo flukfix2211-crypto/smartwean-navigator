@@ -319,6 +319,10 @@
   <div class="card" style="margin-top:16px">
     <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
     <div class="sec-desc">กรอกข้อมูลพื้นฐานก่อนเริ่มประเมิน</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn btn-ghost" style="flex:1;padding:10px;font-size:13px" onclick="confirmReset()">🆕 ผู้ป่วยใหม่</button>
+      <button class="btn btn-ghost" style="flex:1;padding:10px;font-size:13px" onclick="openHnSearch()">🔍 ผู้ป่วยเก่า (ค้นหา HN)</button>
+    </div>
     <div class="grid2">
       <div class="q"><label class="qlabel">HN <span class="req">*</span></label><input type="text" inputmode="numeric" id="hn" placeholder="Hospital Number"></div>
       <div class="q"><label class="qlabel">ชื่อ-นามสกุลผู้ป่วย <span class="req">*</span></label><input type="text" id="pname" placeholder="ชื่อ-สกุล"></div>
@@ -1787,6 +1791,49 @@ function continueAssessment(saveId){
   closeHistory();
   switchModule(missingMod);
   alert("โหลดข้อมูลผู้ป่วย "+(r.pname||r.hn)+" แล้ว กรุณาประเมิน Module "+missingMod+" ต่อ");
+}
+function openHnSearch(){
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="hnSearchSheet";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">🔍 ค้นหาผู้ป่วยเก่า</span>
+        <button onclick="document.getElementById('hnSearchSheet').remove()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="q"><label class="qlabel">HN ผู้ป่วย</label><input type="text" inputmode="numeric" id="hnSearchInput" placeholder="กรอก HN" onkeydown="if(event.key==='Enter')doHnSearch()"></div>
+        <div id="hnSearchStatus" style="font-size:12.5px;color:var(--muted);min-height:18px"></div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-ghost" onclick="document.getElementById('hnSearchSheet').remove()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="doHnSearch()">ค้นหา</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+  setTimeout(()=>document.getElementById("hnSearchInput")?.focus(),50);
+}
+async function doHnSearch(){
+  const hn=document.getElementById("hnSearchInput").value.trim();
+  const status=document.getElementById("hnSearchStatus");
+  if(!hn){status.textContent="กรุณากรอก HN";status.style.color="var(--red)";return;}
+  status.textContent="⏳ กำลังค้นหา...";status.style.color="var(--muted)";
+  try{
+    const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
+    const json=await resp.json();
+    if(!json.ok){status.textContent="ค้นหาไม่สำเร็จ: "+(json.error||"unknown error");status.style.color="var(--red)";return;}
+    historyRows=json.rows||[];
+    const matches=historyRows.filter(r=>String(r.hn||"").trim()===hn);
+    if(!matches.length){status.textContent="ไม่พบข้อมูลผู้ป่วย HN "+hn;status.style.color="var(--red)";return;}
+    const latest=matches[matches.length-1];
+    document.getElementById("hnSearchSheet")?.remove();
+    continueAssessment(latest.save_id);
+  }catch(err){
+    status.textContent="เชื่อมต่อไม่สำเร็จ — เช็คอินเทอร์เน็ต";status.style.color="var(--red)";
+  }
 }
 async function deleteHistoryRecord(saveId){
   if(!confirm("ยืนยันลบรายการนี้? ข้อมูลจะถูกลบออกจาก Google Sheet ถาวร กู้คืนไม่ได้"))return;
