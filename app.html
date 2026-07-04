@@ -1321,6 +1321,49 @@ async function saveToSheet(){
   const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
   if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนบันทึกข้อมูล");return;}
 
+  const hn=document.getElementById("hn").value.trim();
+  const btn=document.getElementById("saveSheetBtn");
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ กำลังตรวจสอบ...";
+  let existingMatch=null;
+  try{
+    if(hn){
+      const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
+      const json=await resp.json();
+      if(json.ok){
+        const matches=(json.rows||[]).filter(r=>String(r.hn||"").trim()===hn);
+        if(matches.length)existingMatch=matches[matches.length-1];
+      }
+    }
+  }catch(err){ /* lookup failed — fall through and just save as new */ }
+  btn.disabled=false;btn.textContent=originalLabel;
+
+  if(existingMatch)showSaveChoiceSheet(existingMatch);
+  else await doSaveToSheet(null);
+}
+function showSaveChoiceSheet(existingMatch){
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="saveChoiceSheet";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">พบข้อมูล HN นี้อยู่แล้ว</span>
+        <button onclick="document.getElementById('saveChoiceSheet').remove()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <p style="font-size:13px;color:var(--ink-soft);margin:0">พบรายการล่าสุดของ HN ${existingMatch.hn} (${existingMatch.pname||"—"}) วันที่ ${existingMatch.adate||"—"} — ต้องการทำอย่างไร?</p>
+      </div>
+      <div class="sheet-foot" style="flex-direction:column;gap:8px">
+        <button class="btn btn-primary" style="width:100%" onclick="document.getElementById('saveChoiceSheet').remove();doSaveToSheet('${(existingMatch.save_id||"").replace(/'/g,"")}')">🔄 อัพเดตรายการเดิม (เติม Module ที่เพิ่งทำ)</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="document.getElementById('saveChoiceSheet').remove();doSaveToSheet(null)">➕ บันทึกเป็นรายการใหม่ (คนละครั้งรักษา)</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+}
+async function doSaveToSheet(updateSaveId){
   const btn=document.getElementById("saveSheetBtn");
   const originalLabel=btn.textContent;
   btn.disabled=true;btn.textContent="⏳ กำลังบันทึก...";
@@ -1328,13 +1371,16 @@ async function saveToSheet(){
     // NOTE: Content-Type must stay "text/plain" — Apps Script Web Apps can't
     // handle a CORS preflight, and "application/json" would trigger one.
     // The server parses the JSON body manually via JSON.parse(e.postData.contents).
+    const payload=updateSaveId
+      ?{secret:SWN_SHEET_SECRET,action:"update",save_id:updateSaveId,data:buildSheetPayload()}
+      :{secret:SWN_SHEET_SECRET,data:buildSheetPayload()};
     const resp=await fetch(SWN_SHEET_URL,{
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:JSON.stringify({secret:SWN_SHEET_SECRET,data:buildSheetPayload()})
+      body:JSON.stringify(payload)
     });
     const json=await resp.json();
-    if(json.ok){showSaveFeedback(true,"บันทึกข้อมูลสำเร็จ");}
+    if(json.ok){showSaveFeedback(true,updateSaveId?"อัพเดตข้อมูลสำเร็จ":"บันทึกข้อมูลสำเร็จ");}
     else{showSaveFeedback(false,"บันทึกไม่สำเร็จ: "+(json.error||"unauthorized — เช็ครหัสลับ"));}
   }catch(err){
     showSaveFeedback(false,"เชื่อมต่อไม่สำเร็จ — เช็ค Web App URL และการเชื่อมต่ออินเทอร์เน็ต");
@@ -1717,6 +1763,7 @@ function viewHistoryDetail(saveId){
       ${histDetailRow("PERRS รวม",r.m3_perrs_total)}${histDetailRow("ROX Index",r.m3_rox_index)}${histDetailRow("ผลลัพธ์สุดท้าย",r.m3_outcome)}
     </div>
   </div>
+  <button class="btn btn-ghost" style="flex:none;padding:10px 20px;font-size:13px;width:100%;margin-bottom:10px" onclick="showHistoryPdfChooser('${(r.save_id||"").replace(/'/g,"")}')">📄 Export PDF</button>
   ${continueBtn}
   <button class="btn btn-ghost" id="deleteHistBtn" style="flex:none;padding:10px 20px;font-size:13px;color:var(--red);border-color:var(--red-soft);width:100%" onclick="deleteHistoryRecord('${(r.save_id||"").replace(/'/g,"")}')">🗑️ ลบรายการนี้</button>`;
   document.getElementById("historyPageContent").innerHTML=html;
@@ -1764,6 +1811,148 @@ async function deleteHistoryRecord(saveId){
     alert("เชื่อมต่อไม่สำเร็จ — เช็คอินเทอร์เน็ต");
     btn.disabled=false;btn.textContent=originalLabel;
   }
+}
+
+/* ---------------- history: export PDF ---------------- */
+const histModLabelsFull={1:"Module 1 · SBT Readiness",2:"Module 2 · SBT Guardian",3:"Module 3 · PERRS Score"};
+function showHistoryPdfChooser(saveId){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  const available=[1,2,3].filter(i=>r["m"+i+"_status"]&&r["m"+i+"_status"]!=="idle");
+  if(!available.length){alert("ยังไม่มีข้อมูล Module ใดที่ประเมินแล้วในรายการนี้");return;}
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="pdfChooserSheet";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">📄 เลือก Module สำหรับ Export PDF</span>
+        <button onclick="document.getElementById('pdfChooserSheet').remove()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="opts" id="pdfModCheckboxes">
+          ${available.map(i=>`<label class="opt sel"><input type="checkbox" value="${i}" checked><span class="otxt">${histModLabelsFull[i]}</span></label>`).join("")}
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-ghost" onclick="document.getElementById('pdfChooserSheet').remove()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="confirmHistoryPdfExport('${saveId.replace(/'/g,"")}')">📄 Export PDF</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+  backdrop.querySelectorAll("#pdfModCheckboxes .opt").forEach(lab=>{
+    lab.querySelector("input").addEventListener("change",()=>{
+      lab.classList.toggle("sel",lab.querySelector("input").checked);
+    });
+  });
+}
+function confirmHistoryPdfExport(saveId){
+  const checked=[...document.querySelectorAll("#pdfModCheckboxes input:checked")].map(i=>parseInt(i.value));
+  if(!checked.length){alert("กรุณาเลือกอย่างน้อย 1 Module");return;}
+  document.getElementById("pdfChooserSheet")?.remove();
+  exportHistoryPDF(saveId,checked);
+}
+function exportHistoryPDF(saveId,modules){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  buildReportFromHistory(r,modules);
+  setTimeout(()=>window.print(),60);
+}
+function buildReportFromHistory(r,modules){
+  const stamp=new Date().toLocaleString("th-TH",{dateStyle:"long",timeStyle:"short"});
+  const rr=(k,v)=>{if(v===undefined||v===null||v==="")v="—";return `<div class="rp-row"><span class="lk">${k}</span><span class="lv">${v}</span></div>`;};
+  const ul=s=>String(s||"").split("; ").filter(Boolean).map(x=>`<li>${x}</li>`).join("");
+  const verd=(status,text,desc,fails)=>{
+    if(!status||status==="idle")return"";
+    const cls=["green","amber","red"].includes(status)?status:"amber";
+    return `<div class="rp-verdict ${cls}"><div class="vt">${text||""}</div>${desc?`<div class="vd">${desc}</div>`:""}${fails?`<ul class="rp-list">${ul(fails)}</ul>`:""}</div>`;
+  };
+  let html=`
+  <div class="rp-head">
+    <svg class="lg" viewBox="0 0 100 100"><path d="M50 18 V46"/>
+      <path d="M50 32 C42 30 30 34 28 48 C26 62 30 76 40 78 C46 79 47 72 47 64 L47 40"/>
+      <path d="M50 32 C58 30 70 34 72 48 C74 62 70 76 60 78 C54 79 53 72 53 64 L53 40"/></svg>
+    <div><h1>SmartWean Navigator</h1>
+      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา${r.ward?" — หอผู้ป่วย "+r.ward:""}</div></div>
+    <div class="rp-meta">พิมพ์เมื่อ<br>${stamp}</div>
+  </div>
+  <div class="rp-patient">
+    <div class="cell"><div class="k">HN</div><div class="v">${r.hn||"—"}</div></div>
+    <div class="cell"><div class="k">ชื่อ-นามสกุล</div><div class="v">${r.pname||"—"}</div></div>
+    <div class="cell"><div class="k">วันที่ประเมิน</div><div class="v">${r.adate||"—"}</div></div>
+    <div class="cell"><div class="k">เวลา</div><div class="v">${r.atime||"—"}</div></div>
+    <div class="cell" style="grid-column:span 4;border-bottom:none"><div class="k">ผู้ประเมิน (พยาบาล)</div><div class="v">${r.nurse||"—"}</div></div>
+  </div>`;
+
+  if(modules.includes(1)&&r.m1_status&&r.m1_status!=="idle"){
+    html+=`<div class="rp-mod"><div class="rp-mod-title t1">🟢 Module 1 · Smart Readiness Assessment</div>
+    <div class="rp-mod-body">
+      <div class="rp-grid">
+        ${rr("SpO₂ (%)",r.m1_spo2)}${rr("PaO₂ (mmHg)",r.m1_pao2)}${rr("FiO₂",r.m1_fio2)}
+        ${rr("PEEP",r.m1_peep)}${rr("TV (cc)",r.m1_tv)}${rr("น้ำหนัก (kg)",r.m1_wt)}
+        ${rr("TV/kg",r.m1_tvkg)}${rr("RSBI",r.m1_rsbi)}${rr("MV (L/min)",r.m1_mv)}
+        ${rr("RR (/min)",r.m1_rr)}${rr("SBP",r.m1_sbp)}${rr("DBP",r.m1_dbp)}
+        ${rr("HR",r.m1_hr)}${rr("Hct (%)",r.m1_hct)}${rr("Hb (g/dL)",r.m1_hb)}
+        ${rr("Electrolytes",r.m1_lyte)}${rr("Mode SBT",r.m1_sbtmode)}
+      </div>
+      ${verd(r.m1_status,r.m1_verdict_text,r.m1_verdict_desc,r.m1_fail_reasons)}
+      ${r.note1?`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${r.note1}</div>`:""}
+    </div></div>`;
+  }
+  if(modules.includes(2)&&r.m2_status&&r.m2_status!=="idle"){
+    html+=`<div class="rp-mod"><div class="rp-mod-title t2">🟡 Module 2 · SBT Guardian</div>
+    <div class="rp-mod-body">
+      <div class="rp-grid">
+        ${rr("รอบการประเมิน",r.m2_sbtround)}${rr("เวลาที่บันทึก",r.m2_sbttime)}
+        ${rr("RR",r.m2_rr)}${rr("TV",r.m2_tv)}${rr("SBP",r.m2_sbp)}${rr("DBP",r.m2_dbp)}
+        ${rr("HR",r.m2_hr)}${rr("SpO₂",r.m2_spo2)}
+      </div>
+      <div class="rp-sub">🚩 Red Flag ที่พบ</div>
+      ${r.m2_redflags?`<ul class="rp-list">${ul(r.m2_redflags)}</ul>`:`<div class="vd" style="font-size:11px;color:var(--green)">ไม่พบ Red Flag</div>`}
+      ${r.m2_action?`<div class="rp-grid" style="margin-top:8px">${rr("Action ที่ดำเนินการ",r.m2_action)}</div>`:""}
+      ${verd(r.m2_status,r.m2_verdict_text,r.m2_verdict_desc,r.m2_redflags)}
+      ${r.note2?`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${r.note2}</div>`:""}
+    </div></div>`;
+  }
+  if(modules.includes(3)&&r.m3_status&&r.m3_status!=="idle"){
+    html+=`<div class="rp-mod"><div class="rp-mod-title t3">🔴 Module 3 · PERRS Score</div>
+    <div class="rp-mod-body">
+      <div class="rp-grid two">
+        ${rr("Cuff Leak Test",r.m3_cuff)}${rr("รอบประเมิน PERRS",r.m3_perrsround)}
+      </div>
+      <div class="rp-sub">Pre-Extubation Checklist</div>
+      ${r.m3_preext?`<ul class="rp-list">${ul(r.m3_preext)}</ul>`:`<div class="vd" style="font-size:11px">—</div>`}
+      <div class="rp-sub">PERRS Parameters</div>
+      <div class="rp-grid">
+        ${rr("1. RR",r.m3_p1)}${rr("2. Work of Breathing",r.m3_p2)}${rr("3. ROX Index",r.m3_p3)}
+        ${rr("4. ความรู้สึกตัว",r.m3_p4)}${rr("5. การขับเสมหะ",r.m3_p5)}${rr("6. Hemodynamics",r.m3_p6)}
+      </div>
+      <div class="rp-sub">ROX Index (คำนวณ)</div>
+      <div class="rp-grid two">
+        ${rr("SpO₂ หลังถอดท่อ (%)",r.m3_roxspo2)}${rr("RR หลังถอดท่อ (/min)",r.m3_roxrr)}
+        ${rr("FiO₂",r.m3_roxfio2)}${rr("ROX Index",r.m3_rox_index)}
+      </div>
+      <div class="rp-calc">PERRS รวม = <b>${r.m3_perrs_total||"—"}</b> &nbsp;|&nbsp; ROX Index = <b>${r.m3_rox_index||"—"}</b></div>
+      ${verd(r.m3_status,r.m3_verdict_text,r.m3_verdict_desc,"")}
+      ${r.m3_action?`<div class="rp-sub">Action หลังประเมิน</div><ul class="rp-list">${ul(r.m3_action)}</ul>`:""}
+      ${r.m3_outcome?`<div class="rp-grid" style="margin-top:8px">${rr("ผลลัพธ์สุดท้าย",r.m3_outcome)}</div>`:""}
+      ${r.note3?`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${r.note3}</div>`:""}
+    </div></div>`;
+  }
+
+  html+=`
+  <div class="rp-footer">
+    <div class="rp-sign">
+      <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${r.nurse||"—"})</div>
+      <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
+    </div>
+    <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
+      ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>
+  </div>`;
+
+  document.getElementById("report").innerHTML=html;
 }
 
 /* ---------------- ward / department name ---------------- */
