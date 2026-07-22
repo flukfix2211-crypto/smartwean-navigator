@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SmartWean Navigator</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#b03e66">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
@@ -69,6 +75,8 @@
   }
   .tab .n{display:block;font-family:'Sora';font-size:16px;line-height:1.1}
   .tab.active{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+  .tab-updated{font-size:9px;font-weight:500;color:var(--muted);margin-top:2px;line-height:1.2}
+  .tab.active .tab-updated{color:var(--teal-deep);opacity:.75}
 
   /* ---------- Card / section ---------- */
   .card{
@@ -186,6 +194,24 @@
   .rox-box b{font-family:'Sora';font-size:17px}
   .footer{text-align:center;font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6}
 
+  /* ---------- History / dashboard page ---------- */
+  .hist-stat{background:var(--card);border-radius:14px;border:1px solid #eef2f4;padding:12px 14px;text-align:center}
+  .hist-stat .n{font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--teal-deep);line-height:1.1}
+  .hist-stat .l{font-size:11px;color:var(--muted);margin-top:3px}
+  .hist-bar-row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:12.5px}
+  .hist-bar-row .lbl{width:88px;flex:none;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist-bar-track{flex:1;background:var(--line);border-radius:6px;height:10px;overflow:hidden}
+  .hist-bar-fill{height:100%;border-radius:6px;background:var(--teal)}
+  .hist-bar-row .cnt{width:26px;flex:none;text-align:right;font-weight:700;color:var(--ink)}
+  .hist-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s}
+  .hist-row:hover{background:var(--teal-soft)}
+  .hist-row:last-child{border-bottom:none}
+  .hist-row .info{flex:1;min-width:0}
+  .hist-row .hn{font-weight:700;font-size:13.5px}
+  .hist-row .meta{font-size:11.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hist-row .dots{display:flex;gap:4px;flex:none}
+  .hist-empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:13.5px}
+
   /* ---------- Help page ---------- */
   .help-page{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
   .help-header{background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px}
@@ -216,7 +242,7 @@
   .help-tip b{color:var(--amber)}
   .help-warn{background:var(--red-soft);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12.5px;color:var(--ink-soft);margin:10px 0;line-height:1.6}
   .help-note{background:var(--teal-soft);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:9px 12px;font-size:12.5px;color:var(--ink-soft);margin:10px 0;line-height:1.6}
-  .help-btn{background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;margin-left:auto;font-weight:700;font-family:'Sora',sans-serif;transition:.15s}
+  .help-btn{background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);color:#fff;padding:9px 15px;border-radius:999px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:6px;flex:none;margin-left:auto;font-weight:700;font-family:'Sora',sans-serif;transition:.15s;white-space:nowrap}
   .help-btn:hover{background:rgba(255,255,255,.32)}
 
   /* ---------- PDF report ---------- */
@@ -254,18 +280,19 @@
   .rp-verdict.amber{background:var(--amber-soft);border-color:var(--amber)}.rp-verdict.amber .vt{color:var(--amber)}
   .rp-verdict.red{background:var(--red-soft);border-color:var(--red)}.rp-verdict.red .vt{color:var(--red)}
   .rp-note{font-size:11px;margin-top:8px;background:#fdf0f5;border-radius:6px;padding:7px 10px;color:var(--ink-soft)}
-  .rp-sign{display:flex;justify-content:space-between;gap:30px;margin-top:30px;break-inside:avoid}
+  .rp-footer{break-inside:avoid;margin-top:20px}
+  .rp-sign{display:flex;justify-content:space-between;gap:30px;break-inside:avoid}
   .rp-sign .s{flex:1;text-align:center;font-size:11px;color:var(--muted)}
-  .rp-sign .line{border-top:1px solid var(--ink-soft);margin:34px 14px 6px}
-  .rp-disc{margin-top:18px;font-size:9.5px;color:var(--muted);text-align:center;line-height:1.5;
+  .rp-sign .line{border-top:1px solid var(--ink-soft);margin:26px 14px 6px}
+  .rp-disc{margin-top:12px;font-size:9.5px;color:var(--muted);text-align:center;line-height:1.5;
     border-top:1px solid var(--line);padding-top:10px}
 
   .rp-calc{background:#f6e8ef;border-left:3px solid #d65d86;padding:7px 10px;border-radius:5px;font-size:11.5px;margin:8px 0;line-height:1.6}
   @media print{
     body{background:#fff}
-    header,.wrap,.bar,.tabs,#helpPage{display:none!important}
+    header,.wrap,.bar,.tabs,#helpPage,#resultPage,#historyPage,.sheet-backdrop{display:none!important}
     #report{display:block;font-size:11pt;max-width:170mm}
-    .rp-mod{break-inside:avoid-page}
+    .rp-mod,.rp-footer{break-inside:avoid-page}
     @page{size:A4;margin:13mm}
   }
 </style>
@@ -283,10 +310,14 @@
     <h1>SmartWean Navigator</h1>
   </div>
   <div class="sub">ระบบสนับสนุนการตัดสินใจทางคลินิก (Nurse-Driven Protocol)<br>
-    สำหรับการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา — หอผู้ป่วย กจ.2</div>
+    สำหรับการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา<span id="wardHeaderSub"></span></div>
   <div style="display:flex;align-items:center;gap:10px;margin-top:12px;position:relative;z-index:1">
     <div class="warn" style="flex:1;margin-top:0">⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>
-    <button class="help-btn" onclick="openHelp()" title="วิธีใช้งาน">?</button>
+    <div style="display:flex;flex-direction:column;gap:6px;flex:none">
+      <button class="help-btn" onclick="openHistory()">📁 ประวัติ</button>
+      <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
+      <button class="help-btn" onclick="goHome()">🏠 หน้าแรก</button>
+    </div>
   </div>
 </header>
 
@@ -296,20 +327,25 @@
   <div class="card" style="margin-top:16px">
     <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
     <div class="sec-desc">กรอกข้อมูลพื้นฐานก่อนเริ่มประเมิน</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn btn-ghost" style="flex:1;padding:10px;font-size:13px" onclick="confirmReset()">🆕 ผู้ป่วยใหม่</button>
+      <button class="btn btn-ghost" style="flex:1;padding:10px;font-size:13px" onclick="openHnSearch()">🔍 ผู้ป่วยเก่า (ค้นหา HN)</button>
+    </div>
     <div class="grid2">
-      <div class="q"><label class="qlabel">HN <span class="req">*</span></label><input type="text" id="hn" placeholder="Hospital Number"></div>
+      <div class="q"><label class="qlabel">HN <span class="req">*</span></label><input type="text" inputmode="numeric" id="hn" placeholder="Hospital Number"></div>
       <div class="q"><label class="qlabel">ชื่อ-นามสกุลผู้ป่วย <span class="req">*</span></label><input type="text" id="pname" placeholder="ชื่อ-สกุล"></div>
       <div class="q"><label class="qlabel">วันที่ประเมิน <span class="req">*</span></label><input type="date" id="adate"></div>
       <div class="q"><label class="qlabel">เวลาที่ประเมิน <span class="req">*</span></label><input type="time" id="atime"></div>
       <div class="q"><label class="qlabel">ผู้ประเมิน (พยาบาล) <span class="req">*</span></label><input type="text" id="nurse" placeholder="ชื่อพยาบาล"></div>
+      <div class="q"><label class="qlabel">หน่วยงาน / หอผู้ป่วย</label><input type="text" id="ward" placeholder="เช่น กจ.2" oninput="saveWard()"></div>
     </div>
   </div>
 
   <!-- Module tabs -->
   <div class="tabs">
-    <div class="tab active" data-m="1" onclick="switchModule(1)"><span class="n">1</span>ความพร้อม SBT</div>
-    <div class="tab" data-m="2" onclick="switchModule(2)"><span class="n">2</span>ระหว่าง SBT</div>
-    <div class="tab" data-m="3" onclick="switchModule(3)"><span class="n">3</span>PERRS หลังถอดท่อ</div>
+    <div class="tab active" data-m="1" onclick="switchModule(1)"><span class="n">1</span>ความพร้อม SBT<div class="tab-updated" id="tabUpdated1"></div></div>
+    <div class="tab" data-m="2" onclick="switchModule(2)"><span class="n">2</span>ระหว่าง SBT<div class="tab-updated" id="tabUpdated2"></div></div>
+    <div class="tab" data-m="3" onclick="switchModule(3)"><span class="n">3</span>PERRS หลังถอดท่อ<div class="tab-updated" id="tabUpdated3"></div></div>
   </div>
 
   <!-- ============ MODULE 1 ============ -->
@@ -325,31 +361,31 @@
       <div class="hint" style="margin-top:-4px;margin-bottom:12px">บันทึกค่าจาก Ventilator และ Vital Signs ล่าสุด</div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:0 0 8px">Gas Exchange</p>
-      <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">เกณฑ์ &gt; 90%</span><input type="number" inputmode="decimal" id="spo2" oninput="calcM1()" placeholder="เช่น 95"></div>
-      <div class="q"><label class="qlabel">PaO₂ (mmHg)</label><span class="crit">เกณฑ์ &gt; 60</span><div class="hint">ถ้าไม่ได้เจาะ ABG ใส่ 0 (ระบบจะข้ามเกณฑ์นี้)</div><input type="number" inputmode="decimal" id="pao2" oninput="calcM1()" placeholder="เช่น 80 หรือ 0"></div>
+      <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">เกณฑ์ &gt; 90%</span><input type="text" inputmode="decimal" id="spo2" oninput="calcM1()" placeholder="เช่น 95"></div>
+      <div class="q"><label class="qlabel">PaO₂ (mmHg)</label><span class="crit">เกณฑ์ &gt; 60</span><div class="hint">ถ้าไม่ได้เจาะ ABG ใส่ 0 (ระบบจะข้ามเกณฑ์นี้)</div><input type="text" inputmode="decimal" id="pao2" oninput="calcM1()" placeholder="เช่น 80 หรือ 0"></div>
       <div class="q"><label class="qlabel">FiO₂</label><span class="crit">เกณฑ์ ≤ 0.40</span><div class="opts" id="fio2"></div></div>
       <div class="q"><label class="qlabel">PEEP (cmH₂O)</label><span class="crit">เกณฑ์ ≤ 8</span><div class="opts" id="peep"></div></div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Respiratory Mechanics</p>
       <div class="grid2">
-        <div class="q"><label class="qlabel">Tidal Volume — TV (cc)</label><span class="crit">&gt; 5 cc/kg</span><input type="number" inputmode="decimal" id="tv" oninput="calcM1()" placeholder="เช่น 450"></div>
-        <div class="q"><label class="qlabel">น้ำหนัก (kg)</label><span class="crit">ใช้คำนวณ TV/kg</span><input type="number" inputmode="decimal" id="wt" oninput="calcM1()" placeholder="เช่น 60"></div>
-        <div class="q"><label class="qlabel">Minute Ventilation (L/min)</label><span class="crit">5–12 LPM</span><input type="number" inputmode="decimal" id="mv" oninput="calcM1()" placeholder="เช่น 8.5"></div>
-        <div class="q"><label class="qlabel">Respiratory Rate (/min)</label><span class="crit">&lt; 30/min</span><input type="number" inputmode="decimal" id="rr1" oninput="calcM1()" placeholder="เช่น 20"></div>
+        <div class="q"><label class="qlabel">Tidal Volume — TV (cc)</label><span class="crit">&gt; 5 cc/kg</span><input type="text" inputmode="decimal" id="tv" oninput="calcM1()" placeholder="เช่น 450"></div>
+        <div class="q"><label class="qlabel">น้ำหนัก (kg)</label><span class="crit">ใช้คำนวณ TV/kg</span><input type="text" inputmode="decimal" id="wt" oninput="calcM1()" placeholder="เช่น 60"></div>
+        <div class="q"><label class="qlabel">Minute Ventilation (L/min)</label><span class="crit">5–12 LPM</span><input type="text" inputmode="decimal" id="mv" oninput="calcM1()" placeholder="เช่น 8.5"></div>
+        <div class="q"><label class="qlabel">Respiratory Rate (/min)</label><span class="crit">&lt; 30/min</span><input type="text" inputmode="decimal" id="rr1" oninput="calcM1()" placeholder="เช่น 20"></div>
       </div>
       <div class="rox-box" id="rsbiBox">RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ</div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Hemodynamics</p>
       <div class="grid2">
-        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">90–180</span><input type="number" inputmode="decimal" id="sbp1" oninput="calcM1()" placeholder="เช่น 120"></div>
-        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">&gt; 60</span><input type="number" inputmode="decimal" id="dbp1" oninput="calcM1()" placeholder="เช่น 75"></div>
-        <div class="q"><label class="qlabel">Heart Rate (/min)</label><span class="crit">50–120</span><input type="number" inputmode="decimal" id="hr1" oninput="calcM1()" placeholder="เช่น 80"></div>
+        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">90–180</span><input type="text" inputmode="decimal" id="sbp1" oninput="calcM1()" placeholder="เช่น 120"></div>
+        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">&gt; 60</span><input type="text" inputmode="decimal" id="dbp1" oninput="calcM1()" placeholder="เช่น 75"></div>
+        <div class="q"><label class="qlabel">Heart Rate (/min)</label><span class="crit">50–120</span><input type="text" inputmode="decimal" id="hr1" oninput="calcM1()" placeholder="เช่น 80"></div>
       </div>
 
       <p style="font-weight:700;font-size:13px;color:var(--teal);margin:18px 0 8px">Laboratory</p>
       <div class="grid2">
-        <div class="q"><label class="qlabel">Hematocrit — Hct (%)</label><span class="crit">≥ 30%</span><input type="number" inputmode="decimal" id="hct" oninput="calcM1()" placeholder="เช่น 35"></div>
-        <div class="q"><label class="qlabel">Hemoglobin — Hb (g/dL)</label><span class="crit">&gt; 7</span><input type="number" inputmode="decimal" id="hb" oninput="calcM1()" placeholder="เช่น 10.5"></div>
+        <div class="q"><label class="qlabel">Hematocrit — Hct (%)</label><span class="crit">≥ 30%</span><input type="text" inputmode="decimal" id="hct" oninput="calcM1()" placeholder="เช่น 35"></div>
+        <div class="q"><label class="qlabel">Hemoglobin — Hb (g/dL)</label><span class="crit">&gt; 7</span><input type="text" inputmode="decimal" id="hb" oninput="calcM1()" placeholder="เช่น 10.5"></div>
       </div>
       <div class="q"><label class="qlabel">Electrolytes (Mg, Ca, P)</label><span class="crit">อยู่ในระดับปกติ</span><div class="opts" id="lyte"></div></div>
 
@@ -375,12 +411,12 @@
 
       <div class="eyebrow">Vital Signs ระหว่าง SBT</div>
       <div class="grid2">
-        <div class="q"><label class="qlabel">RR (/min)</label><span class="crit">หยุด: &gt;30 หรือ &lt;10</span><input type="number" inputmode="decimal" id="rr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">TV (cc)</label><span class="crit">หยุด: &lt;200</span><input type="number" inputmode="decimal" id="tv2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">หยุด: &lt;90 หรือ &gt;180</span><input type="number" inputmode="decimal" id="sbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">หยุด: &lt;60</span><input type="number" inputmode="decimal" id="dbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">HR (/min)</label><span class="crit">หยุด: &gt;120</span><input type="number" inputmode="decimal" id="hr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
-        <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">หยุด: &lt;90</span><input type="number" inputmode="decimal" id="spo22" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">RR (/min)</label><span class="crit">หยุด: &gt;30 หรือ &lt;10</span><input type="text" inputmode="decimal" id="rr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">TV (cc)</label><span class="crit">หยุด: &lt;200</span><input type="text" inputmode="decimal" id="tv2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">SBP (mmHg)</label><span class="crit">หยุด: &lt;90 หรือ &gt;180</span><input type="text" inputmode="decimal" id="sbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">DBP (mmHg)</label><span class="crit">หยุด: &lt;60</span><input type="text" inputmode="decimal" id="dbp2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">HR (/min)</label><span class="crit">หยุด: &gt;120</span><input type="text" inputmode="decimal" id="hr2" oninput="calcM2()" placeholder="ตัวเลข"></div>
+        <div class="q"><label class="qlabel">SpO₂ (%)</label><span class="crit">หยุด: &lt;90</span><input type="text" inputmode="decimal" id="spo22" oninput="calcM2()" placeholder="ตัวเลข"></div>
       </div>
 
       <div class="eyebrow">🚩 Red Flag — อาการที่ต้องหยุด SBT</div>
@@ -412,8 +448,8 @@
 
       <div class="eyebrow">ค่าที่ใช้คำนวณ ROX Index</div>
       <div class="grid2">
-        <div class="q"><label class="qlabel">SpO₂ หลังถอดท่อ (%)</label><input type="number" inputmode="decimal" id="roxspo2" oninput="calcM3()" placeholder="เช่น 96"></div>
-        <div class="q"><label class="qlabel">RR หลังถอดท่อ (/min)</label><input type="number" inputmode="decimal" id="roxrr" oninput="calcM3()" placeholder="เช่น 22"></div>
+        <div class="q"><label class="qlabel">SpO₂ หลังถอดท่อ (%)</label><input type="text" inputmode="decimal" id="roxspo2" oninput="calcM3()" placeholder="เช่น 96"></div>
+        <div class="q"><label class="qlabel">RR หลังถอดท่อ (/min)</label><input type="text" inputmode="decimal" id="roxrr" oninput="calcM3()" placeholder="เช่น 22"></div>
       </div>
       <div class="q"><label class="qlabel">FiO₂ ที่ให้หลังถอดท่อ</label><div class="opts" id="roxfio2"></div></div>
       <div class="rox-box" id="roxBox">ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ</div>
@@ -431,7 +467,7 @@
   </div>
 
   <div class="footer">
-    SmartWean Navigator · v1.0 · พัฒนาสำหรับหอผู้ป่วย กจ.2<br>
+    SmartWean Navigator · v1.0<span id="wardFooter"></span><br>
     เครื่องมือนี้ช่วยคำนวณตามเกณฑ์ที่ตั้งไว้ ผลที่ได้ต้องผ่านการพิจารณาของพยาบาลและแพทย์เสมอ
   </div>
 </div>
@@ -671,7 +707,7 @@
           <div class="help-step-body"><b>กด "🔄 ประเมินผลใหม่"</b> — ล้างข้อมูลทั้งหมดเพื่อเริ่มประเมินผู้ป่วยรายใหม่</div>
         </div>
         <div class="help-tip"><b>💡 PDF A4:</b> เลือก "Save as PDF" ใน print dialog เพื่อบันทึกเป็นไฟล์ หรือเลือกเครื่องพิมพ์เพื่อพิมพ์ออกกระดาษ A4 ได้เลย</div>
-        <div class="help-warn"><b>⚠️ สำคัญ:</b> รายงานนี้สร้างจากข้อมูลที่กรอกในแอป ข้อมูลจะหายเมื่อปิดหน้าต่างหรือ Refresh — ควย Export PDF ก่อนปิด</div>
+        <div class="help-warn"><b>⚠️ สำคัญ:</b> รายงานนี้สร้างจากข้อมูลที่กรอกในแอป ข้อมูลจะหายเมื่อปิดหน้าต่างหรือ Refresh — ควร Export PDF ก่อนปิด</div>
       </div>
     </div>
 
@@ -708,7 +744,7 @@
     </div>
 
     <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7">
-      SmartWean Navigator · หอผู้ป่วย กจ.2 · รพ.พหลพลพยุหเสนา<br>
+      SmartWean Navigator<span id="wardHelpFooter"></span> · รพ.พหลพลพยุหเสนา<br>
       Nurse-Driven Ventilator Weaning Protocol
     </div>
   </div>
@@ -736,12 +772,29 @@
   <div class="bar" style="z-index:61;">
     <div class="inner">
       <button class="btn btn-ghost" onclick="confirmReset()">🔄 ประเมินผลใหม่</button>
+      <button class="btn btn-primary" id="saveSheetBtn" onclick="saveToSheet()">💾 บันทึกข้อมูล</button>
       <button class="btn btn-primary" onclick="shareResult()">↗ แชร์</button>
     </div>
   </div>
 </div>
 
+<!-- ============ HISTORY / DASHBOARD PAGE ============ -->
+<div id="historyPage" style="display:none;position:fixed;inset:0;z-index:65;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
+    <button onclick="closeHistory()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">ประวัติ &amp; แดชบอร์ด</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">SmartWean Navigator</div>
+    </div>
+  </div>
+  <div id="historyPageContent" style="max-width:900px;margin:0 auto;padding:16px 14px 60px;"></div>
+</div>
+
 <script>
+/* ---------------- sheet sync config ---------------- */
+const SWN_SHEET_URL="https://script.google.com/macros/s/AKfycbxyR4tWjST97LNr6kNYLU2jmT3cdz5U9HHJqcxKQSdsvIpqfuoEBgXrf-OJdAKcB2RY/exec";
+const SWN_SHEET_SECRET="6077";
+
 /* ---------------- option builders ---------------- */
 function radio(container,name,items,cb){
   const box=document.getElementById(container);box.innerHTML="";
@@ -792,23 +845,27 @@ const clinicalItems=[
     radio("box_"+c.id,c.id,yn,calcM1);
   });
 })();
-radio("fio2","fio2",[
+const fio2Items=[
   {v:0.21,t:"0.21"},{v:0.25,t:"0.25"},{v:0.28,t:"0.28"},{v:0.30,t:"0.30"},
   {v:0.35,t:"0.35"},{v:0.40,t:"0.40"},
   {v:0.45,t:"0.45",tag:"ไม่ผ่านเกณฑ์"},{v:0.50,t:"0.50",tag:"ไม่ผ่านเกณฑ์"},{v:0.6,t:">0.50",tag:"ไม่ผ่านเกณฑ์"}
-],calcM1);
-radio("peep","peep",[
+];
+radio("fio2","fio2",fio2Items,calcM1);
+const peepItems=[
   {v:5,t:"≤ 5 cmH₂O",tag:"ผ่าน"},{v:6,t:"6 cmH₂O",tag:"ผ่าน"},{v:7,t:"7 cmH₂O",tag:"ผ่าน"},{v:8,t:"8 cmH₂O",tag:"ผ่าน"},
   {v:9,t:"9 cmH₂O",tag:"ไม่ผ่าน"},{v:10,t:"10 cmH₂O",tag:"ไม่ผ่าน"},{v:11,t:"> 10 cmH₂O",tag:"ไม่ผ่าน"}
-],calcM1);
-radio("lyte","lyte",[
+];
+radio("peep","peep",peepItems,calcM1);
+const lyteItems=[
   {v:"normal",t:"ปกติทุกค่า (Mg, Ca, P ปกติ)",tone:"good"},
   {v:"mg",t:"Magnesium ต่ำ",tone:"bad"},{v:"ca",t:"Calcium ต่ำ",tone:"bad"},
   {v:"p",t:"Phosphate ต่ำ",tone:"bad"},{v:"multi",t:"ต่ำมากกว่า 1 ค่า",tone:"bad"}
-],calcM1);
-radio("sbtmode","sbtmode",[
+];
+radio("lyte","lyte",lyteItems,calcM1);
+const sbtmodeItems=[
   {v:"tpiece",t:"T-piece"},{v:"ps",t:"Pressure Support (PS)"},{v:"none",t:"ยังไม่ทำ SBT (รอแก้ไข)"}
-]);
+];
+radio("sbtmode","sbtmode",sbtmodeItems);
 
 function calcM1(){
   const fails=[];
@@ -863,11 +920,12 @@ function calcM1(){
 }
 
 /* ---------------- MODULE 2 build ---------------- */
-radio("sbtround","sbtround",[
+const sbtroundItems=[
   {v:1,t:"รอบที่ 1 (15 นาที)"},{v:2,t:"รอบที่ 2 (30 นาที)"},{v:3,t:"รอบที่ 3 (45 นาที)"},
   {v:4,t:"รอบที่ 4 (60 นาที)"},{v:5,t:"รอบที่ 5 (90 นาที)"},
   {v:6,t:"รอบที่ 6 (120 นาที — สิ้นสุด SBT)"},{v:"x",t:"รอบพิเศษ (พบอาการผิดปกติ)"}
-],calcM2);
+];
+radio("sbtround","sbtround",sbtroundItems,calcM2);
 const rfGroups=[
   {id:"rf1",title:"1. Respiratory Muscle Fatigue / Distress",items:[
     {v:"n",t:"ไม่พบ (Normal)",normal:true},{v:"a",t:"RR > 30/min"},{v:"b",t:"TV < 200 cc"},
@@ -893,11 +951,12 @@ const rfGroups=[
     checks(g.id,g.id,g.items,calcM2);
   });
 })();
-radio("m2action","m2action",[
+const m2actionItems=[
   {v:1,t:"หยุด SBT / กลับ Setting เดิม"},{v:2,t:"แจ้งแพทย์"},{v:3,t:"ทำ ECG 12 leads"},
   {v:4,t:"ดูดเสมหะ"},{v:5,t:"เจาะ ABG/VBG"},{v:6,t:"จัดท่าศีรษะสูง 30–45°"},
   {v:7,t:"ไม่ต้องดำเนินการเพิ่ม"},{v:8,t:"อื่นๆ"}
-]);
+];
+radio("m2action","m2action",m2actionItems);
 
 function calcM2(){
   const round=getR("sbtround");
@@ -942,20 +1001,23 @@ function calcM2(){
 }
 
 /* ---------------- MODULE 3 build ---------------- */
-checks("preext","preext",[
+const preextItems=[
   {v:1,t:"NPO อย่างน้อย 4 ชั่วโมง"},{v:2,t:"ดูดเสมหะใน ETT และช่องปากเรียบร้อย"},
   {v:3,t:"พ่นยาขยายหลอดลม 15 นาทีก่อนถอดท่อ"},{v:4,t:"เตรียม O₂ mask with nebulizer พร้อมใช้"},
   {v:5,t:"Cuff Leak Test ผ่าน (Positive)"}
-]);
-radio("cuff","cuff",[
+];
+checks("preext","preext",preextItems);
+const cuffItems=[
   {v:"pos",t:"Positive (มี leak > 110 ml) — พร้อมถอดท่อ",tone:"good"},
   {v:"neg",t:"Negative (leak < 110 ml / ไม่มี) — เสี่ยง พิจารณา Steroid",tone:"bad"},
   {v:"none",t:"ไม่ได้ทำ Cuff Leak Test"}
-]);
-radio("perrsround","perrsround",[
+];
+radio("cuff","cuff",cuffItems);
+const perrsroundItems=[
   {v:5,t:"5 นาทีหลังถอดท่อ"},{v:15,t:"15 นาทีหลังถอดท่อ"},{v:30,t:"30 นาทีหลังถอดท่อ"},
   {v:60,t:"60 นาทีหลังถอดท่อ"},{v:120,t:"2 ชั่วโมงหลังถอดท่อ"},{v:"x",t:"ประเมินพิเศษ (พบอาการผิดปกติ)"}
-]);
+];
+radio("perrsround","perrsround",perrsroundItems);
 const perrsParams=[
   {id:"p1",title:"พารามิเตอร์ 1 · อัตราการหายใจ (RR)",o:[
     {s:0,t:"12–24 ครั้ง/นาที (ปกติ)"},{s:1,t:"25–30 ครั้ง/นาที (เฝ้าระวัง)"},{s:2,t:"> 30 หรือ < 10 (วิกฤต)"}]},
@@ -979,21 +1041,24 @@ const perrsParams=[
     radio(p.id,p.id,p.o.map(x=>({v:x.s,t:`<b style="font-family:Sora">${x.s}</b> &nbsp;${x.t}`})),calcM3);
   });
 })();
-radio("roxfio2","roxfio2",[
+const roxfio2Items=[
   {v:0.21,t:"0.21 (Room air)"},{v:0.24,t:"0.24 (NC 1 L/min)"},{v:0.28,t:"0.28 (NC 2 L/min)"},
   {v:0.32,t:"0.32 (NC 3 L/min)"},{v:0.36,t:"0.36 (NC 4 L/min)"},{v:0.40,t:"0.40 (Simple mask / NC 5 L)"},
   {v:0.50,t:"0.50 (Simple mask 8–10 L)"},{v:0.60,t:"0.60 (Non-rebreather)"},
   {v:0.75,t:"0.70–0.80 (HFNC / NIV)"},{v:0.90,t:"> 0.80 (HFNC high flow / BIPAP)"}
-],calcM3);
-checks("m3action","m3action",[
+];
+radio("roxfio2","roxfio2",roxfio2Items,calcM3);
+const m3actionItems=[
   {v:1,t:"เปลี่ยนเป็น Nasal Cannula"},{v:2,t:"เปลี่ยนเป็น Simple Mask"},{v:3,t:"เริ่ม HFNC"},
   {v:4,t:"เริ่ม NIV / BIPAP"},{v:5,t:"แจ้งแพทย์ด่วน"},{v:6,t:"เตรียม Crash Cart"},
   {v:7,t:"เตรียมอุปกรณ์ Intubation"},{v:8,t:"ดูดเสมหะ"},{v:9,t:"Reintubation"}
-]);
-radio("m3outcome","m3outcome",[
+];
+checks("m3action","m3action",m3actionItems);
+const m3outcomeItems=[
   {v:1,t:"สังเกตอาการต่อใน ICU"},{v:2,t:"ส่งกลับ Ward ได้"},{v:3,t:"ส่ง Ward พร้อม O₂"},
   {v:4,t:"Reintubation (ใส่ท่อใหม่)"}
-]);
+];
+radio("m3outcome","m3outcome",m3outcomeItems);
 
 function calcM3(){
   // ROX
@@ -1078,7 +1143,7 @@ function buildReport(){
       <path d="M50 32 C42 30 30 34 28 48 C26 62 30 76 40 78 C46 79 47 72 47 64 L47 40"/>
       <path d="M50 32 C58 30 70 34 72 48 C74 62 70 76 60 78 C54 79 53 72 53 64 L53 40"/></svg>
     <div><h1>SmartWean Navigator</h1>
-      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา — หอผู้ป่วย กจ.2</div></div>
+      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา${document.getElementById("ward").value.trim()?" — หอผู้ป่วย "+document.getElementById("ward").value.trim():""}</div></div>
     <div class="rp-meta">พิมพ์เมื่อ<br>${stamp}</div>
   </div>
   <div class="rp-patient">
@@ -1211,14 +1276,160 @@ function buildReport(){
   }
 
   html+=`
-  <div class="rp-sign">
-    <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${V("nurse")})</div>
-    <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
-  </div>
-  <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
-    ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>`;
+  <div class="rp-footer">
+    <div class="rp-sign">
+      <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${V("nurse")})</div>
+      <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
+    </div>
+    <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
+      ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>
+  </div>`;
 
   document.getElementById("report").innerHTML=html;
+}
+
+/* ---------------- sheet payload (history/dashboard sync) ---------------- */
+function verdictParts(resId){
+  const r=document.getElementById(resId);
+  if(r.classList.contains("idle"))return{status:"idle",text:"",desc:"",fails:""};
+  const status=["green","amber","red"].find(c=>r.classList.contains(c))||"amber";
+  const text=r.querySelector(".light")?.textContent.trim()||"";
+  const desc=r.querySelector(".desc")?.textContent.trim()||"";
+  const fails=[...r.querySelectorAll("ul li")].map(li=>li.textContent.trim()).join("; ");
+  return{status,text,desc,fails};
+}
+function buildSheetPayload(){
+  const v1=verdictParts("res1"),v2=verdictParts("res2"),v3=verdictParts("res3");
+  const tv=parseFloat(document.getElementById("tv").value),wt=parseFloat(document.getElementById("wt").value),
+        rr1=parseFloat(document.getElementById("rr1").value);
+  let rsbi="",tvkg="";
+  if(!isNaN(rr1)&&!isNaN(tv)&&tv>0)rsbi=(rr1/(tv/1000)).toFixed(0);
+  if(!isNaN(tv)&&!isNaN(wt)&&wt>0)tvkg=(tv/wt).toFixed(1);
+
+  const flags=[];
+  rfGroups.forEach(g=>{
+    document.querySelectorAll(`input[name="${g.id}"]:checked`).forEach(c=>{
+      if(c.dataset.normal!=="1")flags.push(c.parentElement.querySelector(".otxt").textContent.trim());
+    });
+  });
+
+  const sp=parseFloat(document.getElementById("roxspo2").value),roxrr=parseFloat(document.getElementById("roxrr").value),
+        roxfio2v=parseFloat(getR("roxfio2"));
+  let rox="";
+  if(!isNaN(sp)&&!isNaN(roxrr)&&roxrr>0&&!isNaN(roxfio2v))rox=((sp/roxfio2v)/roxrr).toFixed(2);
+  let perrsAnswered=0,perrsTotal=0;
+  ["p1","p2","p3","p4","p5","p6"].forEach(p=>{const val=getR(p);if(val!==null){perrsAnswered++;perrsTotal+=parseInt(val);}});
+
+  return{
+    hn:V("hn"),pname:V("pname"),adate:V("adate"),atime:V("atime"),nurse:V("nurse"),ward:V("ward"),
+    m1_status:v1.status,m1_verdict_text:v1.text,m1_verdict_desc:v1.desc,m1_fail_reasons:v1.fails,
+    m1_c1:rTxt("c1")||"",m1_c2:rTxt("c2")||"",m1_c3:rTxt("c3")||"",m1_c4:rTxt("c4")||"",
+    m1_spo2:V("spo2"),m1_pao2:V("pao2"),m1_fio2:rTxt("fio2")||"",m1_peep:rTxt("peep")||"",
+    m1_tv:V("tv"),m1_wt:V("wt"),m1_tvkg:tvkg,m1_mv:V("mv"),m1_rr:V("rr1"),
+    m1_sbp:V("sbp1"),m1_dbp:V("dbp1"),m1_hr:V("hr1"),m1_hct:V("hct"),m1_hb:V("hb"),
+    m1_lyte:rTxt("lyte")||"",m1_rsbi:rsbi,m1_sbtmode:rTxt("sbtmode")||"",
+    m2_status:v2.status,m2_verdict_text:v2.text,m2_verdict_desc:v2.desc,
+    m2_sbtround:rTxt("sbtround")||"",m2_sbttime:V("sbttime"),
+    m2_rr:V("rr2"),m2_tv:V("tv2"),m2_sbp:V("sbp2"),m2_dbp:V("dbp2"),m2_hr:V("hr2"),m2_spo2:V("spo22"),
+    m2_redflags:flags.join("; "),m2_action:rTxt("m2action")||"",
+    m3_status:v3.status,m3_verdict_text:v3.text,m3_verdict_desc:v3.desc,
+    m3_preext:cTxt("preext").join("; "),m3_cuff:rTxt("cuff")||"",m3_perrsround:rTxt("perrsround")||"",
+    m3_p1:getR("p1")||"",m3_p2:getR("p2")||"",m3_p3:getR("p3")||"",m3_p4:getR("p4")||"",m3_p5:getR("p5")||"",m3_p6:getR("p6")||"",
+    m3_perrs_total:perrsAnswered>0?perrsTotal:"",m3_roxspo2:V("roxspo2"),m3_roxrr:V("roxrr"),
+    m3_roxfio2:rTxt("roxfio2")||"",m3_rox_index:rox,
+    m3_action:cTxt("m3action").join("; "),m3_outcome:rTxt("m3outcome")||"",
+    note1:V("note1"),note2:V("note2"),note3:V("note3")
+  };
+}
+async function saveToSheet(){
+  const allIdle=[1,2,3].every(i=>document.getElementById("res"+i).classList.contains("idle"));
+  if(allIdle){alert("กรุณากรอกข้อมูลอย่างน้อย 1 โมดูลก่อนบันทึกข้อมูล");return;}
+
+  const hn=document.getElementById("hn").value.trim();
+  const btn=document.getElementById("saveSheetBtn");
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ กำลังตรวจสอบ...";
+  let existingMatch=null;
+  try{
+    if(hn){
+      const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
+      const json=await resp.json();
+      if(json.ok){
+        const matches=(json.rows||[]).filter(r=>String(r.hn||"").trim()===hn);
+        if(matches.length)existingMatch=matches[matches.length-1];
+      }
+    }
+  }catch(err){ /* lookup failed — fall through and just save as new */ }
+  btn.disabled=false;btn.textContent=originalLabel;
+
+  if(existingMatch)showSaveChoiceSheet(existingMatch);
+  else await doSaveToSheet(null);
+}
+function showSaveChoiceSheet(existingMatch){
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="saveChoiceSheet";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">พบข้อมูล HN นี้อยู่แล้ว</span>
+        <button onclick="document.getElementById('saveChoiceSheet').remove()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <p style="font-size:13px;color:var(--ink-soft);margin:0">พบรายการล่าสุดของ HN ${existingMatch.hn} (${existingMatch.pname||"—"}) วันที่ ${existingMatch.adate||"—"} — ต้องการทำอย่างไร?</p>
+      </div>
+      <div class="sheet-foot" style="flex-direction:column;gap:8px">
+        <button class="btn btn-primary" style="width:100%" onclick="document.getElementById('saveChoiceSheet').remove();doSaveToSheet('${(existingMatch.save_id||"").replace(/'/g,"")}')">🔄 อัพเดตรายการเดิม (เติม Module ที่เพิ่งทำ)</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="document.getElementById('saveChoiceSheet').remove();doSaveToSheet(null,'พบประวัติเดิม HN ${existingMatch.hn} วันที่ ${existingMatch.adate||"—"} (บันทึกนี้เป็นการรักษาคนละครั้ง)')">➕ บันทึกเป็นรายการใหม่ (คนละครั้งรักษา)</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+}
+async function doSaveToSheet(updateSaveId,repeatNote){
+  const btn=document.getElementById("saveSheetBtn");
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ กำลังบันทึก...";
+  try{
+    const data=buildSheetPayload();
+    if(repeatNote)data.repeat_visit_note=repeatNote;
+    // NOTE: Content-Type must stay "text/plain" — Apps Script Web Apps can't
+    // handle a CORS preflight, and "application/json" would trigger one.
+    // The server parses the JSON body manually via JSON.parse(e.postData.contents).
+    const payload=updateSaveId
+      ?{secret:SWN_SHEET_SECRET,action:"update",save_id:updateSaveId,data}
+      :{secret:SWN_SHEET_SECRET,data};
+    const resp=await fetch(SWN_SHEET_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    });
+    const json=await resp.json();
+    if(json.ok){showSaveFeedback(true,updateSaveId?"อัพเดตข้อมูลสำเร็จ":"บันทึกข้อมูลสำเร็จ");}
+    else{showSaveFeedback(false,"บันทึกไม่สำเร็จ: "+(json.error||"unauthorized — เช็ครหัสลับ"));}
+  }catch(err){
+    showSaveFeedback(false,"เชื่อมต่อไม่สำเร็จ — เช็ค Web App URL และการเชื่อมต่ออินเทอร์เน็ต");
+  }finally{
+    btn.disabled=false;btn.textContent=originalLabel;
+  }
+}
+function showSaveFeedback(ok,msg){
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-body" style="text-align:center;padding:26px 20px 30px">
+        <div style="font-size:40px;margin-bottom:10px">${ok?"✅":"⚠️"}</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:${ok?"var(--green)":"var(--red)"}">${msg}</div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-primary" onclick="this.closest('.sheet-backdrop').remove()">ปิด</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
 }
 function exportPDF(){
   if(document.getElementById("res1").classList.contains("idle")
@@ -1379,9 +1590,15 @@ function confirmReset(){
     });
     document.getElementById("rsbiBox").innerHTML="RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ";
     document.getElementById("roxBox").innerHTML="ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ";
+    clearModuleUpdatedLabels();
     closeResultPage();
     switchModule(1);
   }
+}
+function goHome(){
+  const anyFilled=[1,2,3].some(i=>!document.getElementById("res"+i).classList.contains("idle"));
+  if(anyFilled&&!confirm("ข้อมูลที่กรอกยังไม่ได้บันทึก ต้องการออกจากหน้านี้เพื่อกลับหน้าแรกหรือไม่?"))return;
+  location.href="./index.html";
 }
 /* ---------------- help page ---------------- */
 function openHelp(){
@@ -1397,11 +1614,523 @@ function toggleHelp(head){
   body.classList.toggle("open");
 }
 
+/* ---------------- history / dashboard page ---------------- */
+let historyRows=[];
+let historyFilters={q:"",ward:"",from:"",to:""};
+const histStatusColor={green:"var(--green)",amber:"var(--amber)",red:"var(--red)"};
+const histModLabels=["Module 1 · SBT Readiness","Module 2 · SBT Guardian","Module 3 · PERRS Score"];
+
+function openHistory(){
+  document.getElementById("historyPage").style.display="block";
+  document.getElementById("historyPage").scrollTop=0;
+  loadHistory();
+}
+function closeHistory(){
+  document.getElementById("historyPage").style.display="none";
+}
+async function loadHistory(){
+  const box=document.getElementById("historyPageContent");
+  box.innerHTML=`<div class="hist-empty">⏳ กำลังโหลดข้อมูล...</div>`;
+  try{
+    const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
+    const json=await resp.json();
+    if(!json.ok){
+      box.innerHTML=`<div class="hist-empty">⚠️ โหลดข้อมูลไม่สำเร็จ: ${json.error||"unauthorized"}<br>
+        <button class="btn btn-ghost" style="margin-top:14px;flex:none;padding:10px 20px" onclick="loadHistory()">ลองใหม่</button></div>`;
+      return;
+    }
+    historyRows=json.rows||[];
+    historyFilters={q:"",ward:"",from:"",to:""};
+    renderHistoryPage();
+  }catch(err){
+    box.innerHTML=`<div class="hist-empty">⚠️ เชื่อมต่อไม่สำเร็จ — เช็ค Web App URL และการเชื่อมต่ออินเทอร์เน็ต<br>
+      <button class="btn btn-ghost" style="margin-top:14px;flex:none;padding:10px 20px" onclick="loadHistory()">ลองใหม่</button></div>`;
+  }
+}
+function getFilteredHistoryRows(){
+  const q=historyFilters.q.trim().toLowerCase();
+  return historyRows.filter(r=>{
+    if(q&&!((r.hn||"").toLowerCase().includes(q)||(r.pname||"").toLowerCase().includes(q)))return false;
+    if(historyFilters.ward&&r.ward!==historyFilters.ward)return false;
+    if(historyFilters.from&&(r.adate||"")<historyFilters.from)return false;
+    if(historyFilters.to&&(r.adate||"")>historyFilters.to)return false;
+    return true;
+  });
+}
+function updateHistoryFilter(key,val){
+  historyFilters[key]=val;
+  renderHistoryPage();
+}
+function clearHistoryFilters(){
+  historyFilters={q:"",ward:"",from:"",to:""};
+  renderHistoryPage();
+}
+function renderDashboardStats(rows){
+  const wardCounts={};
+  rows.forEach(r=>{const w=r.ward||"(ไม่ระบุ)";wardCounts[w]=(wardCounts[w]||0)+1;});
+  const wardEntries=Object.entries(wardCounts).sort((a,b)=>b[1]-a[1]);
+  const maxWard=wardEntries.length?wardEntries[0][1]:0;
+  const wardHtml=wardEntries.map(([w,c])=>`
+    <div class="hist-bar-row"><span class="lbl">${w}</span>
+      <div class="hist-bar-track"><div class="hist-bar-fill" style="width:${maxWard?Math.round(c/maxWard*100):0}%"></div></div>
+      <span class="cnt">${c}</span></div>`).join("")||`<div style="font-size:12px;color:var(--muted)">— ไม่มีข้อมูล —</div>`;
+
+  const dates=rows.map(r=>r.adate).filter(Boolean).sort();
+  const dateRange=dates.length?`${dates[0]} – ${dates[dates.length-1]}`:"—";
+
+  const modBadges=[1,2,3].map(i=>{
+    const counts={green:0,amber:0,red:0};
+    rows.forEach(r=>{const s=r["m"+i+"_status"];if(s&&counts[s]!==undefined)counts[s]++;});
+    const total=counts.green+counts.amber+counts.red;
+    const chips=["green","amber","red"].filter(c=>counts[c]>0).map(c=>
+      `<span class="help-badge ${c}">${c==="green"?"🟢":c==="amber"?"🟡":"🔴"} ${counts[c]}</span>`).join(" ");
+    return `<div style="margin:8px 0"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">${histModLabels[i-1]} (${total} รายการ)</div>${chips||`<span style="font-size:12px;color:var(--muted)">— ไม่มีข้อมูล —</span>`}</div>`;
+  }).join("");
+
+  return `
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
+    <div class="hist-stat"><div class="n">${rows.length}</div><div class="l">รายการทั้งหมด (ตามตัวกรอง)</div></div>
+    <div class="hist-stat"><div class="n" style="font-size:14px;line-height:1.6">${dateRange}</div><div class="l">ช่วงวันที่ประเมิน</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">🏥</span><h2>แยกตามหน่วยงาน</h2></div>
+    ${wardHtml}
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">📊</span><h2>ผลการประเมินแต่ละ Module</h2></div>
+    ${modBadges}
+  </div>`;
+}
+function renderHistoryTable(rows){
+  const wards=[...new Set(historyRows.map(r=>r.ward).filter(Boolean))].sort();
+  const wardOptions=wards.map(w=>`<option value="${w}" ${historyFilters.ward===w?"selected":""}>${w}</option>`).join("");
+  const dot=s=>s==="green"?'<span class="dot g"></span>':s==="amber"?'<span class="dot a"></span>':s==="red"?'<span class="dot r"></span>':'<span class="dot" style="background:var(--line)"></span>';
+  const rowsHtml=rows.length?rows.slice().reverse().map(r=>`
+    <div class="hist-row" onclick="viewHistoryDetail('${(r.save_id||"").replace(/'/g,"")}')">
+      <div class="info">
+        <div class="hn">${r.hn||"—"} · ${r.pname||"—"}${r.repeat_visit_note?' <span class="help-badge amber" style="vertical-align:middle">🔁 ประเมินซ้ำ</span>':""}</div>
+        <div class="meta">${r.adate||"—"} ${r.atime||""} · ${r.ward||"—"}</div>
+      </div>
+      <div class="dots">${dot(r.m1_status)}${dot(r.m2_status)}${dot(r.m3_status)}</div>
+    </div>`).join(""):`<div class="hist-empty">ไม่พบข้อมูลที่ตรงกับตัวกรอง</div>`;
+
+  return `
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">🔍</span><h2>ค้นหา / กรองข้อมูล</h2></div>
+    <div class="q"><input type="text" placeholder="ค้นหา HN หรือชื่อผู้ป่วย" value="${historyFilters.q}" oninput="updateHistoryFilter('q',this.value)"></div>
+    <div class="grid2">
+      <div class="q"><select onchange="updateHistoryFilter('ward',this.value)"><option value="">ทุกหน่วยงาน</option>${wardOptions}</select></div>
+      <div class="q" style="display:flex;gap:8px">
+        <input type="date" value="${historyFilters.from}" onchange="updateHistoryFilter('from',this.value)">
+        <input type="date" value="${historyFilters.to}" onchange="updateHistoryFilter('to',this.value)">
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="flex:none;padding:9px 16px;font-size:13px" onclick="clearHistoryFilters()">ล้างตัวกรอง</button>
+  </div>
+  <div class="card" style="padding:6px 0">
+    ${rowsHtml}
+  </div>`;
+}
+function renderHistoryPage(){
+  const filtered=getFilteredHistoryRows();
+  document.getElementById("historyPageContent").innerHTML=
+    renderDashboardStats(filtered)+renderHistoryTable(filtered);
+}
+function histDetailRow(k,v){
+  if(v===undefined||v===null||v==="")v="—";
+  return `<div class="rp-row"><span class="lk">${k}</span><span class="lv">${v}</span></div>`;
+}
+function histVerdictBox(status,text,desc,fails){
+  if(!status||status==="idle")return`<div style="font-size:12.5px;color:var(--muted)">ไม่มีข้อมูล Module นี้</div>`;
+  const color=histStatusColor[status]||"var(--muted)";
+  const failsHtml=fails?`<ul class="rp-list">${fails.split("; ").map(f=>`<li>${f}</li>`).join("")}</ul>`:"";
+  return `<div class="rp-verdict ${status}" style="border-color:${color}">
+    <div class="vt" style="color:${color}">${text||""}</div>
+    ${desc?`<div class="vd">${desc}</div>`:""}
+    ${failsHtml}
+  </div>`;
+}
+function viewHistoryDetail(saveId){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  const missingMod=[1,2,3].find(i=>(r["m"+i+"_status"]||"idle")==="idle");
+  const continueBtn=missingMod
+    ?`<button class="btn btn-primary" style="flex:none;padding:10px 20px;font-size:13px;width:100%;margin-bottom:10px" onclick="continueAssessment('${(r.save_id||"").replace(/'/g,"")}')">📝 ทำ Module ${missingMod} ต่อ</button>`
+    :`<button class="btn btn-ghost" style="flex:none;padding:10px 20px;font-size:13px;width:100%;margin-bottom:10px" onclick="continueAssessment('${(r.save_id||"").replace(/'/g,"")}')">📝 โหลดเพื่อดู/แก้ไข (ประเมินครบทั้ง 3 Module แล้ว)</button>`;
+  const repeatBadge=r.repeat_visit_note?`<div class="help-tip" style="margin-bottom:14px"><b>🔁 ประเมินซ้ำ:</b> ${r.repeat_visit_note}</div>`:"";
+  const html=`
+  <button class="btn btn-ghost" style="flex:none;padding:8px 16px;font-size:13px;margin-bottom:14px" onclick="renderHistoryPage()">← กลับไปประวัติ</button>
+  ${repeatBadge}
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">📋</span><h2>ข้อมูลผู้ป่วย</h2></div>
+    <div class="rp-grid two" style="margin-top:10px">
+      ${histDetailRow("HN",r.hn)}${histDetailRow("ชื่อ-นามสกุล",r.pname)}
+      ${histDetailRow("วันที่",r.adate)}${histDetailRow("เวลา",r.atime)}
+    </div>
+    <div class="rp-row" style="margin-top:8px">${histDetailRow("ผู้ประเมิน",r.nurse)}</div>
+    <div class="rp-row">${histDetailRow("หน่วยงาน",r.ward)}</div>
+  </div>
+  <div class="card" style="margin-bottom:14px;border-left:4px solid ${histStatusColor[r.m1_status]||"var(--line)"}">
+    <div class="sec-head"><span class="ic">🟢</span><h2>Module 1 · SBT Readiness</h2></div>
+    ${histVerdictBox(r.m1_status,r.m1_verdict_text,r.m1_verdict_desc,r.m1_fail_reasons)}
+    <div class="rp-grid" style="margin-top:10px">
+      ${histDetailRow("SpO₂",r.m1_spo2)}${histDetailRow("PaO₂",r.m1_pao2)}${histDetailRow("RSBI",r.m1_rsbi)}
+      ${histDetailRow("TV/kg",r.m1_tvkg)}${histDetailRow("MV",r.m1_mv)}${histDetailRow("RR",r.m1_rr)}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;border-left:4px solid ${histStatusColor[r.m2_status]||"var(--line)"}">
+    <div class="sec-head"><span class="ic">🟡</span><h2>Module 2 · SBT Guardian</h2></div>
+    ${histVerdictBox(r.m2_status,r.m2_verdict_text,r.m2_verdict_desc,r.m2_redflags)}
+    <div class="rp-grid" style="margin-top:10px">
+      ${histDetailRow("รอบประเมิน",r.m2_sbtround)}${histDetailRow("RR",r.m2_rr)}${histDetailRow("SpO₂",r.m2_spo2)}
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;border-left:4px solid ${histStatusColor[r.m3_status]||"var(--line)"}">
+    <div class="sec-head"><span class="ic">🔴</span><h2>Module 3 · PERRS Score</h2></div>
+    ${histVerdictBox(r.m3_status,r.m3_verdict_text,r.m3_verdict_desc,"")}
+    <div class="rp-grid" style="margin-top:10px">
+      ${histDetailRow("PERRS รวม",r.m3_perrs_total)}${histDetailRow("ROX Index",r.m3_rox_index)}${histDetailRow("ผลลัพธ์สุดท้าย",r.m3_outcome)}
+    </div>
+  </div>
+  <button class="btn btn-ghost" style="flex:none;padding:10px 20px;font-size:13px;width:100%;margin-bottom:10px" onclick="showHistoryPdfChooser('${(r.save_id||"").replace(/'/g,"")}')">📄 Export PDF</button>
+  ${continueBtn}
+  <button class="btn btn-ghost" id="deleteHistBtn" style="flex:none;padding:10px 20px;font-size:13px;color:var(--red);border-color:var(--red-soft);width:100%" onclick="deleteHistoryRecord('${(r.save_id||"").replace(/'/g,"")}')">🗑️ ลบรายการนี้</button>`;
+  document.getElementById("historyPageContent").innerHTML=html;
+  document.getElementById("historyPage").scrollTop=0;
+}
+/* ---------------- rehydrate saved data back into the live form ---------------- */
+function selectRadioByText(name,items,text){
+  if(!text)return;
+  const match=items.find(it=>String(it.t)===text);
+  if(!match)return;
+  const input=document.querySelector(`input[name="${name}"][value="${CSS.escape(String(match.v))}"]`);
+  if(input){input.checked=true;input.dispatchEvent(new Event("change",{bubbles:true}));}
+}
+function selectRadioByValue(name,value){
+  if(value===undefined||value===null||value==="")return;
+  const input=document.querySelector(`input[name="${name}"][value="${CSS.escape(String(value))}"]`);
+  if(input){input.checked=true;input.dispatchEvent(new Event("change",{bubbles:true}));}
+}
+function selectChecksByText(name,items,joinedText){
+  if(!joinedText)return;
+  String(joinedText).split("; ").map(s=>s.trim()).filter(Boolean).forEach(part=>{
+    const match=items.find(it=>String(it.t)===part);
+    if(!match)return;
+    const input=document.querySelector(`input[name="${name}"][value="${CSS.escape(String(match.v))}"]`);
+    if(input&&!input.checked){input.checked=true;input.dispatchEvent(new Event("change",{bubbles:true}));}
+  });
+}
+function setNumField(id,val){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.value=(val===undefined||val===null)?"":val;
+  el.dispatchEvent(new Event("input",{bubbles:true}));
+}
+function rehydrateModule1(r){
+  if(!r.m1_status||r.m1_status==="idle")return;
+  selectRadioByText("c1",yn,r.m1_c1);selectRadioByText("c2",yn,r.m1_c2);
+  selectRadioByText("c3",yn,r.m1_c3);selectRadioByText("c4",yn,r.m1_c4);
+  setNumField("spo2",r.m1_spo2);setNumField("pao2",r.m1_pao2);
+  selectRadioByText("fio2",fio2Items,r.m1_fio2);selectRadioByText("peep",peepItems,r.m1_peep);
+  setNumField("tv",r.m1_tv);setNumField("wt",r.m1_wt);setNumField("mv",r.m1_mv);setNumField("rr1",r.m1_rr);
+  setNumField("sbp1",r.m1_sbp);setNumField("dbp1",r.m1_dbp);setNumField("hr1",r.m1_hr);
+  setNumField("hct",r.m1_hct);setNumField("hb",r.m1_hb);
+  selectRadioByText("lyte",lyteItems,r.m1_lyte);selectRadioByText("sbtmode",sbtmodeItems,r.m1_sbtmode);
+}
+function rehydrateModule2(r){
+  if(!r.m2_status||r.m2_status==="idle")return;
+  selectRadioByText("sbtround",sbtroundItems,r.m2_sbtround);
+  setNumField("sbttime",r.m2_sbttime);
+  setNumField("rr2",r.m2_rr);setNumField("tv2",r.m2_tv);setNumField("sbp2",r.m2_sbp);
+  setNumField("dbp2",r.m2_dbp);setNumField("hr2",r.m2_hr);setNumField("spo22",r.m2_spo2);
+  rfGroups.forEach(g=>selectChecksByText(g.id,g.items,r.m2_redflags));
+  selectRadioByText("m2action",m2actionItems,r.m2_action);
+}
+function rehydrateModule3(r){
+  if(!r.m3_status||r.m3_status==="idle")return;
+  selectChecksByText("preext",preextItems,r.m3_preext);
+  selectRadioByText("cuff",cuffItems,r.m3_cuff);
+  selectRadioByText("perrsround",perrsroundItems,r.m3_perrsround);
+  selectRadioByValue("p1",r.m3_p1);selectRadioByValue("p2",r.m3_p2);selectRadioByValue("p3",r.m3_p3);
+  selectRadioByValue("p4",r.m3_p4);selectRadioByValue("p5",r.m3_p5);selectRadioByValue("p6",r.m3_p6);
+  setNumField("roxspo2",r.m3_roxspo2);setNumField("roxrr",r.m3_roxrr);
+  selectRadioByText("roxfio2",roxfio2Items,r.m3_roxfio2);
+  selectChecksByText("m3action",m3actionItems,r.m3_action);
+  selectRadioByText("m3outcome",m3outcomeItems,r.m3_outcome);
+}
+function formatUpdatedAt(iso){
+  if(!iso)return"";
+  const d=new Date(iso);
+  if(isNaN(d.getTime()))return"";
+  const p=x=>String(x).padStart(2,"0");
+  return `แก้ไข ${p(d.getDate())}/${p(d.getMonth()+1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function renderModuleUpdatedLabels(r){
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById("tabUpdated"+i);
+    if(el)el.textContent=formatUpdatedAt(r["m"+i+"_updated_at"]);
+  });
+}
+function clearModuleUpdatedLabels(){
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById("tabUpdated"+i);
+    if(el)el.textContent="";
+  });
+}
+function continueAssessment(saveId){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  const anyFilled=[1,2,3].some(i=>!document.getElementById("res"+i).classList.contains("idle"));
+  if(anyFilled&&!confirm("ข้อมูลที่กรอกอยู่ในฟอร์มตอนนี้ยังไม่ได้บันทึก จะโหลดข้อมูลผู้ป่วย "+(r.pname||r.hn)+" ทับหรือไม่?"))return;
+
+  const setv=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||"";};
+  setv("hn",r.hn);setv("pname",r.pname);setv("nurse",r.nurse);setv("ward",r.ward);
+  if(document.getElementById("ward").value)saveWard();
+  const n=new Date(),p=x=>String(x).padStart(2,"0");
+  setv("adate",`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`);
+  setv("atime",`${p(n.getHours())}:${p(n.getMinutes())}`);
+
+  rehydrateModule1(r);
+  rehydrateModule2(r);
+  rehydrateModule3(r);
+  renderModuleUpdatedLabels(r);
+
+  const missingMod=[1,2,3].find(i=>(r["m"+i+"_status"]||"idle")==="idle");
+  closeHistory();
+  switchModule(missingMod||1);
+  alert(missingMod
+    ?"โหลดข้อมูลผู้ป่วย "+(r.pname||r.hn)+" แล้ว กรุณาประเมิน Module "+missingMod+" ต่อ"
+    :"โหลดข้อมูลผู้ป่วย "+(r.pname||r.hn)+" แล้ว (ประเมินครบทั้ง 3 Module) กดแท็บ Module ที่ต้องการเพื่อดู/แก้ไขได้เลย");
+}
+function openHnSearch(){
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="hnSearchSheet";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">🔍 ค้นหาผู้ป่วยเก่า</span>
+        <button onclick="document.getElementById('hnSearchSheet').remove()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="q"><label class="qlabel">HN ผู้ป่วย</label><input type="text" inputmode="numeric" id="hnSearchInput" placeholder="กรอก HN" onkeydown="if(event.key==='Enter')doHnSearch()"></div>
+        <div id="hnSearchStatus" style="font-size:12.5px;color:var(--muted);min-height:18px"></div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-ghost" onclick="document.getElementById('hnSearchSheet').remove()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="doHnSearch()">ค้นหา</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+  setTimeout(()=>document.getElementById("hnSearchInput")?.focus(),50);
+}
+async function doHnSearch(){
+  const hn=document.getElementById("hnSearchInput").value.trim();
+  const status=document.getElementById("hnSearchStatus");
+  if(!hn){status.textContent="กรุณากรอก HN";status.style.color="var(--red)";return;}
+  status.textContent="⏳ กำลังค้นหา...";status.style.color="var(--muted)";
+  try{
+    const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
+    const json=await resp.json();
+    if(!json.ok){status.textContent="ค้นหาไม่สำเร็จ: "+(json.error||"unknown error");status.style.color="var(--red)";return;}
+    historyRows=json.rows||[];
+    const matches=historyRows.filter(r=>String(r.hn||"").trim()===hn);
+    if(!matches.length){status.textContent="ไม่พบข้อมูลผู้ป่วย HN "+hn;status.style.color="var(--red)";return;}
+    const latest=matches[matches.length-1];
+    document.getElementById("hnSearchSheet")?.remove();
+    continueAssessment(latest.save_id);
+  }catch(err){
+    status.textContent="เชื่อมต่อไม่สำเร็จ — เช็คอินเทอร์เน็ต";status.style.color="var(--red)";
+  }
+}
+async function deleteHistoryRecord(saveId){
+  if(!confirm("ยืนยันลบรายการนี้? ข้อมูลจะถูกลบออกจาก Google Sheet ถาวร กู้คืนไม่ได้"))return;
+  const btn=document.getElementById("deleteHistBtn");
+  const originalLabel=btn.textContent;
+  btn.disabled=true;btn.textContent="⏳ กำลังลบ...";
+  try{
+    const resp=await fetch(SWN_SHEET_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({secret:SWN_SHEET_SECRET,action:"delete",save_id:saveId})
+    });
+    const json=await resp.json();
+    if(json.ok){
+      historyRows=historyRows.filter(r=>r.save_id!==saveId);
+      renderHistoryPage();
+    }else{
+      alert("ลบไม่สำเร็จ: "+(json.error||"unknown error"));
+      btn.disabled=false;btn.textContent=originalLabel;
+    }
+  }catch(err){
+    alert("เชื่อมต่อไม่สำเร็จ — เช็คอินเทอร์เน็ต");
+    btn.disabled=false;btn.textContent=originalLabel;
+  }
+}
+
+/* ---------------- history: export PDF ---------------- */
+const histModLabelsFull={1:"Module 1 · SBT Readiness",2:"Module 2 · SBT Guardian",3:"Module 3 · PERRS Score"};
+function showHistoryPdfChooser(saveId){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  const available=[1,2,3].filter(i=>r["m"+i+"_status"]&&r["m"+i+"_status"]!=="idle");
+  if(!available.length){alert("ยังไม่มีข้อมูล Module ใดที่ประเมินแล้วในรายการนี้");return;}
+  const backdrop=document.createElement("div");
+  backdrop.className="sheet-backdrop";
+  backdrop.id="pdfChooserSheet";
+  backdrop.innerHTML=`
+    <div class="sheet" style="max-height:none">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <span class="sheet-title">📄 เลือก Module สำหรับ Export PDF</span>
+        <button onclick="document.getElementById('pdfChooserSheet').remove()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="opts" id="pdfModCheckboxes">
+          ${available.map(i=>`<label class="opt sel"><input type="checkbox" value="${i}" checked><span class="otxt">${histModLabelsFull[i]}</span></label>`).join("")}
+        </div>
+      </div>
+      <div class="sheet-foot">
+        <button class="btn btn-ghost" onclick="document.getElementById('pdfChooserSheet').remove()">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="confirmHistoryPdfExport('${saveId.replace(/'/g,"")}')">📄 Export PDF</button>
+      </div>
+    </div>`;
+  backdrop.addEventListener("click",e=>{if(e.target===backdrop)backdrop.remove();});
+  document.body.appendChild(backdrop);
+  backdrop.querySelectorAll("#pdfModCheckboxes .opt").forEach(lab=>{
+    lab.querySelector("input").addEventListener("change",()=>{
+      lab.classList.toggle("sel",lab.querySelector("input").checked);
+    });
+  });
+}
+function confirmHistoryPdfExport(saveId){
+  const checked=[...document.querySelectorAll("#pdfModCheckboxes input:checked")].map(i=>parseInt(i.value));
+  if(!checked.length){alert("กรุณาเลือกอย่างน้อย 1 Module");return;}
+  document.getElementById("pdfChooserSheet")?.remove();
+  exportHistoryPDF(saveId,checked);
+}
+function exportHistoryPDF(saveId,modules){
+  const r=historyRows.find(x=>x.save_id===saveId);
+  if(!r)return;
+  buildReportFromHistory(r,modules);
+  setTimeout(()=>window.print(),60);
+}
+function buildReportFromHistory(r,modules){
+  const stamp=new Date().toLocaleString("th-TH",{dateStyle:"long",timeStyle:"short"});
+  const rr=(k,v)=>{if(v===undefined||v===null||v==="")v="—";return `<div class="rp-row"><span class="lk">${k}</span><span class="lv">${v}</span></div>`;};
+  const ul=s=>String(s||"").split("; ").filter(Boolean).map(x=>`<li>${x}</li>`).join("");
+  const verd=(status,text,desc,fails)=>{
+    if(!status||status==="idle")return"";
+    const cls=["green","amber","red"].includes(status)?status:"amber";
+    return `<div class="rp-verdict ${cls}"><div class="vt">${text||""}</div>${desc?`<div class="vd">${desc}</div>`:""}${fails?`<ul class="rp-list">${ul(fails)}</ul>`:""}</div>`;
+  };
+  let html=`
+  <div class="rp-head">
+    <svg class="lg" viewBox="0 0 100 100"><path d="M50 18 V46"/>
+      <path d="M50 32 C42 30 30 34 28 48 C26 62 30 76 40 78 C46 79 47 72 47 64 L47 40"/>
+      <path d="M50 32 C58 30 70 34 72 48 C74 62 70 76 60 78 C54 79 53 72 53 64 L53 40"/></svg>
+    <div><h1>SmartWean Navigator</h1>
+      <div class="org">ใบสรุปผลการประเมินการหย่าเครื่องช่วยหายใจ · รพ.พหลพลพยุหเสนา${r.ward?" — หอผู้ป่วย "+r.ward:""}</div></div>
+    <div class="rp-meta">พิมพ์เมื่อ<br>${stamp}</div>
+  </div>
+  <div class="rp-patient">
+    <div class="cell"><div class="k">HN</div><div class="v">${r.hn||"—"}</div></div>
+    <div class="cell"><div class="k">ชื่อ-นามสกุล</div><div class="v">${r.pname||"—"}</div></div>
+    <div class="cell"><div class="k">วันที่ประเมิน</div><div class="v">${r.adate||"—"}</div></div>
+    <div class="cell"><div class="k">เวลา</div><div class="v">${r.atime||"—"}</div></div>
+    <div class="cell" style="grid-column:span 4;border-bottom:none"><div class="k">ผู้ประเมิน (พยาบาล)</div><div class="v">${r.nurse||"—"}</div></div>
+  </div>`;
+
+  if(modules.includes(1)&&r.m1_status&&r.m1_status!=="idle"){
+    html+=`<div class="rp-mod"><div class="rp-mod-title t1">🟢 Module 1 · Smart Readiness Assessment</div>
+    <div class="rp-mod-body">
+      <div class="rp-grid">
+        ${rr("SpO₂ (%)",r.m1_spo2)}${rr("PaO₂ (mmHg)",r.m1_pao2)}${rr("FiO₂",r.m1_fio2)}
+        ${rr("PEEP",r.m1_peep)}${rr("TV (cc)",r.m1_tv)}${rr("น้ำหนัก (kg)",r.m1_wt)}
+        ${rr("TV/kg",r.m1_tvkg)}${rr("RSBI",r.m1_rsbi)}${rr("MV (L/min)",r.m1_mv)}
+        ${rr("RR (/min)",r.m1_rr)}${rr("SBP",r.m1_sbp)}${rr("DBP",r.m1_dbp)}
+        ${rr("HR",r.m1_hr)}${rr("Hct (%)",r.m1_hct)}${rr("Hb (g/dL)",r.m1_hb)}
+        ${rr("Electrolytes",r.m1_lyte)}${rr("Mode SBT",r.m1_sbtmode)}
+      </div>
+      ${verd(r.m1_status,r.m1_verdict_text,r.m1_verdict_desc,r.m1_fail_reasons)}
+      ${r.note1?`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${r.note1}</div>`:""}
+    </div></div>`;
+  }
+  if(modules.includes(2)&&r.m2_status&&r.m2_status!=="idle"){
+    html+=`<div class="rp-mod"><div class="rp-mod-title t2">🟡 Module 2 · SBT Guardian</div>
+    <div class="rp-mod-body">
+      <div class="rp-grid">
+        ${rr("รอบการประเมิน",r.m2_sbtround)}${rr("เวลาที่บันทึก",r.m2_sbttime)}
+        ${rr("RR",r.m2_rr)}${rr("TV",r.m2_tv)}${rr("SBP",r.m2_sbp)}${rr("DBP",r.m2_dbp)}
+        ${rr("HR",r.m2_hr)}${rr("SpO₂",r.m2_spo2)}
+      </div>
+      <div class="rp-sub">🚩 Red Flag ที่พบ</div>
+      ${r.m2_redflags?`<ul class="rp-list">${ul(r.m2_redflags)}</ul>`:`<div class="vd" style="font-size:11px;color:var(--green)">ไม่พบ Red Flag</div>`}
+      ${r.m2_action?`<div class="rp-grid" style="margin-top:8px">${rr("Action ที่ดำเนินการ",r.m2_action)}</div>`:""}
+      ${verd(r.m2_status,r.m2_verdict_text,r.m2_verdict_desc,r.m2_redflags)}
+      ${r.note2?`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${r.note2}</div>`:""}
+    </div></div>`;
+  }
+  if(modules.includes(3)&&r.m3_status&&r.m3_status!=="idle"){
+    html+=`<div class="rp-mod"><div class="rp-mod-title t3">🔴 Module 3 · PERRS Score</div>
+    <div class="rp-mod-body">
+      <div class="rp-grid two">
+        ${rr("Cuff Leak Test",r.m3_cuff)}${rr("รอบประเมิน PERRS",r.m3_perrsround)}
+      </div>
+      <div class="rp-sub">Pre-Extubation Checklist</div>
+      ${r.m3_preext?`<ul class="rp-list">${ul(r.m3_preext)}</ul>`:`<div class="vd" style="font-size:11px">—</div>`}
+      <div class="rp-sub">PERRS Parameters</div>
+      <div class="rp-grid">
+        ${rr("1. RR",r.m3_p1)}${rr("2. Work of Breathing",r.m3_p2)}${rr("3. ROX Index",r.m3_p3)}
+        ${rr("4. ความรู้สึกตัว",r.m3_p4)}${rr("5. การขับเสมหะ",r.m3_p5)}${rr("6. Hemodynamics",r.m3_p6)}
+      </div>
+      <div class="rp-sub">ROX Index (คำนวณ)</div>
+      <div class="rp-grid two">
+        ${rr("SpO₂ หลังถอดท่อ (%)",r.m3_roxspo2)}${rr("RR หลังถอดท่อ (/min)",r.m3_roxrr)}
+        ${rr("FiO₂",r.m3_roxfio2)}${rr("ROX Index",r.m3_rox_index)}
+      </div>
+      <div class="rp-calc">PERRS รวม = <b>${r.m3_perrs_total||"—"}</b> &nbsp;|&nbsp; ROX Index = <b>${r.m3_rox_index||"—"}</b></div>
+      ${verd(r.m3_status,r.m3_verdict_text,r.m3_verdict_desc,"")}
+      ${r.m3_action?`<div class="rp-sub">Action หลังประเมิน</div><ul class="rp-list">${ul(r.m3_action)}</ul>`:""}
+      ${r.m3_outcome?`<div class="rp-grid" style="margin-top:8px">${rr("ผลลัพธ์สุดท้าย",r.m3_outcome)}</div>`:""}
+      ${r.note3?`<div class="rp-note"><b>บันทึกการพยาบาล:</b> ${r.note3}</div>`:""}
+    </div></div>`;
+  }
+
+  html+=`
+  <div class="rp-footer">
+    <div class="rp-sign">
+      <div class="s"><div class="line"></div>พยาบาลผู้ประเมิน<br>(${r.nurse||"—"})</div>
+      <div class="s"><div class="line"></div>แพทย์ผู้รับผิดชอบ</div>
+    </div>
+    <div class="rp-disc">⚠️ เอกสารนี้สร้างจากระบบ SmartWean Navigator เพื่อสนับสนุนการตัดสินใจทางคลินิกเท่านั้น
+      ไม่ทดแทนการประเมินของแพทย์ · ผลคำนวณอ้างอิงเกณฑ์ที่ตั้งค่าไว้ในระบบ</div>
+  </div>`;
+
+  document.getElementById("report").innerHTML=html;
+}
+
+/* ---------------- ward / department name ---------------- */
+function renderWard(){
+  const ward=document.getElementById("ward").value.trim();
+  document.getElementById("wardHeaderSub").textContent=ward?" — หอผู้ป่วย "+ward:"";
+  document.getElementById("wardFooter").textContent=ward?" · พัฒนาสำหรับหอผู้ป่วย "+ward:"";
+  document.getElementById("wardHelpFooter").textContent=ward?" · หอผู้ป่วย "+ward:"";
+}
+function saveWard(){
+  localStorage.setItem("swn_ward",document.getElementById("ward").value.trim());
+  renderWard();
+}
+
 // default date/time = now
 (function(){
   const n=new Date(),p=x=>String(x).padStart(2,"0");
   document.getElementById("adate").value=`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`;
   document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
+  document.getElementById("ward").value=localStorage.getItem("swn_ward")||"";
+  renderWard();
 })();
 </script>
 </body>
