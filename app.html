@@ -212,6 +212,71 @@
   .hist-row .dots{display:flex;gap:4px;flex:none}
   .hist-empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:13.5px}
 
+  /* ---------- Research eligibility & dashboard page ---------- */
+  .param-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 4px;border-bottom:1px dashed var(--line)}
+  .param-row:last-child{border-bottom:none}
+  .param-label{font-size:13.5px;color:var(--ink)}
+  .param-label small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+  .param-inputs{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .param-inputs input[type=number]{width:64px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;text-align:center;color:var(--teal-deep);font-weight:600;background:var(--teal-soft)}
+  .param-dash{color:var(--muted);font-size:12px}
+  .unit{font-size:12px;color:var(--muted)}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 4px;border-bottom:1px dashed var(--line)}
+  .toggle-row:last-child{border-bottom:none}
+  .switch{position:relative;width:38px;height:22px;flex-shrink:0}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .slider{position:absolute;inset:0;background:#e8cdd9;border-radius:99px;cursor:pointer;transition:.2s}
+  .switch .slider::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .switch input:checked+.slider{background:var(--teal)}
+  .switch input:checked+.slider::before{transform:translateX(16px)}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center}
+  .kpi .num{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--teal-deep);line-height:1}
+  .kpi .lbl{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.3}
+  .group-card{border-radius:16px;padding:16px 18px;margin-bottom:14px;border:1px solid var(--line)}
+  .group-card.success{background:linear-gradient(135deg,var(--green-soft),#fff)}
+  .group-card.fail{background:linear-gradient(135deg,var(--red-soft),#fff)}
+  .group-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .group-title{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700}
+  .group-title .dot{width:11px;height:11px;border-radius:50%}
+  .group-card.success .dot{background:var(--green)}
+  .group-card.fail .dot{background:var(--red)}
+  .group-pct{font-family:'Sora',sans-serif;font-size:20px;font-weight:700}
+  .group-card.success .group-pct{color:var(--green)}
+  .group-card.fail .group-pct{color:var(--red)}
+  .group-n{font-size:11.5px;color:var(--muted)}
+  .bar-track{height:8px;background:#fff;border-radius:99px;overflow:hidden;margin-bottom:14px;border:1px solid var(--line)}
+  .bar-fill{height:100%;border-radius:99px}
+  .group-card.success .bar-fill{background:var(--green)}
+  .group-card.fail .bar-fill{background:var(--red)}
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .stat-box{background:rgba(255,255,255,.7);border-radius:10px;padding:9px 11px}
+  .stat-box .v{font-size:14.5px;font-weight:700;color:var(--ink)}
+  .stat-box .k{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .comorbid-list{margin-top:12px}
+  .comorbid-row{display:flex;align-items:center;gap:10px;font-size:12px;padding:4px 0}
+  .comorbid-name{width:72px;flex-shrink:0;color:var(--ink-soft)}
+  .comorbid-track{flex:1;height:7px;background:rgba(0,0,0,.06);border-radius:99px;overflow:hidden}
+  .comorbid-fill{height:100%;border-radius:99px}
+  .group-card.success .comorbid-fill{background:var(--green)}
+  .group-card.fail .comorbid-fill{background:var(--red)}
+  .comorbid-val{width:32px;text-align:right;font-weight:700;color:var(--ink);flex-shrink:0}
+  .elig-result{margin-top:14px;border-radius:12px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;font-size:13.5px;font-weight:700}
+  .elig-result.pass{background:var(--green-soft);color:var(--green)}
+  .elig-result.fail{background:var(--red-soft);color:var(--red)}
+  .elig-result .rdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+  .elig-result.pass .rdot{background:var(--green)}
+  .elig-result.fail .rdot{background:var(--red)}
+  .elig-result .reason{font-weight:400;font-size:12px;display:block;margin-top:3px;color:var(--ink-soft)}
+  .rtable-wrap{overflow-x:auto}
+  .rtable{width:100%;border-collapse:collapse;font-size:12.5px}
+  .rtable th{text-align:left;padding:8px 9px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.02em;border-bottom:2px solid var(--line);white-space:nowrap}
+  .rtable td{padding:8px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .rtable tr:last-child td{border-bottom:none}
+  .rpill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;display:inline-block}
+  .rpill.pass{background:var(--green-soft);color:var(--green)}
+  .rpill.fail{background:var(--red-soft);color:var(--red)}
+
   /* ---------- Help page ---------- */
   .help-page{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
   .help-header{background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px}
@@ -315,6 +380,7 @@
     <div class="warn" style="flex:1;margin-top:0">⚠️ ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น ไม่ทดแทนการประเมินของแพทย์</div>
     <div style="display:flex;flex-direction:column;gap:6px;flex:none">
       <button class="help-btn" onclick="openHistory()">📁 ประวัติ</button>
+      <button class="help-btn" onclick="openResearchPage()">🧪 เกณฑ์วิจัย</button>
       <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
       <button class="help-btn" onclick="goHome()">🏠 หน้าแรก</button>
     </div>
@@ -339,6 +405,20 @@
       <div class="q"><label class="qlabel">ผู้ประเมิน (พยาบาล) <span class="req">*</span></label><input type="text" id="nurse" placeholder="ชื่อพยาบาล"></div>
       <div class="q"><label class="qlabel">หน่วยงาน / หอผู้ป่วย</label><input type="text" id="ward" placeholder="เช่น กจ.2" oninput="saveWard()"></div>
     </div>
+
+    <div class="eyebrow" style="margin-top:16px">🧪 ข้อมูลสำหรับเกณฑ์คัดเข้ากลุ่มตัวอย่าง (วิจัย — ไม่บังคับ)</div>
+    <div class="hint" style="margin-top:-4px;margin-bottom:12px">ใช้ประเมินว่าเคสนี้เข้าเกณฑ์เก็บข้อมูลวิจัยหรือไม่ กรอกเพิ่มถ้าต้องการให้ระบบคำนวณให้อัตโนมัติ</div>
+    <div class="grid2">
+      <div class="q"><label class="qlabel">อายุ (ปี)</label><input type="text" inputmode="numeric" id="eligAge" oninput="calcEligibility()" placeholder="เช่น 62"></div>
+      <div class="q"><label class="qlabel">ส่วนสูง (cm)</label><input type="text" inputmode="decimal" id="eligHt" oninput="calcEligibility()" placeholder="เช่น 160"></div>
+      <div class="q"><label class="qlabel">GCS</label><input type="text" inputmode="numeric" id="eligGcs" oninput="calcEligibility()" placeholder="เช่น 14"></div>
+      <div class="q"><label class="qlabel">ระยะเวลาใส่ท่อก่อนประเมิน (ชม.)</label><input type="text" inputmode="decimal" id="eligVentHr" oninput="calcEligibility()" placeholder="เช่น 96"></div>
+      <div class="q"><label class="qlabel">จำนวนครั้งที่ทำ SBT (รวมครั้งนี้)</label><input type="text" inputmode="numeric" id="eligSbtCount" oninput="calcEligibility()" placeholder="เช่น 1"></div>
+      <div class="q"><label class="qlabel">BMI (คำนวณอัตโนมัติ)</label><input type="text" id="eligBmiShow" disabled placeholder="—"></div>
+    </div>
+    <div class="q"><label class="qlabel">โรคประจำตัว (เลือกได้หลายข้อ)</label><div class="opts" id="eligComorbid"></div></div>
+    <div class="q"><label class="qlabel">ภาวะที่เป็นเกณฑ์คัดออก (เลือกได้หลายข้อ)</label><div class="opts" id="eligExclusion"></div></div>
+    <div id="eligResultBox"></div>
   </div>
 
   <!-- Module tabs -->
@@ -782,12 +862,25 @@
 <div id="historyPage" style="display:none;position:fixed;inset:0;z-index:65;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
     <button onclick="closeHistory()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
-    <div>
+    <div style="flex:1">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">ประวัติ &amp; แดชบอร์ด</div>
       <div style="font-size:11.5px;opacity:.85;margin-top:1px;">SmartWean Navigator</div>
     </div>
+    <button onclick="closeHistory();openResearchPage()" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;padding:8px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;flex:none;white-space:nowrap;">🧪 เกณฑ์วิจัย</button>
   </div>
   <div id="historyPageContent" style="max-width:900px;margin:0 auto;padding:16px 14px 60px;"></div>
+</div>
+
+<!-- ============ RESEARCH ELIGIBILITY & SUCCESS DASHBOARD PAGE ============ -->
+<div id="researchPage" style="display:none;position:fixed;inset:0;z-index:66;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
+    <button onclick="closeResearchPage()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">เกณฑ์วิจัย &amp; Dashboard สรุปผลสำเร็จ</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">SmartWean Navigator</div>
+    </div>
+  </div>
+  <div id="researchPageContent" style="max-width:900px;margin:0 auto;padding:16px 14px 60px;"></div>
 </div>
 
 <script>
@@ -867,7 +960,63 @@ const sbtmodeItems=[
 ];
 radio("sbtmode","sbtmode",sbtmodeItems);
 
+/* ---------------- study eligibility criteria ---------------- */
+const comorbidItems=[
+  {v:"COPD",t:"COPD"},{v:"DM",t:"เบาหวาน (DM)"},{v:"CKD",t:"โรคไตเรื้อรัง (CKD)"},{v:"HT",t:"ความดันโลหิตสูง (HT)"}
+];
+checks("eligComorbid","eligComorbid",comorbidItems,calcEligibility);
+const exclusionItems=[
+  {v:"trach",t:"เจาะคอ (Tracheostomy)"},{v:"dnr",t:"DNR / Palliative care"},
+  {v:"neuromuscular",t:"โรคระบบประสาทและกล้ามเนื้อ"},{v:"pregnant",t:"ตั้งครรภ์"}
+];
+checks("eligExclusion","eligExclusion",exclusionItems,calcEligibility);
+
+const defaultEligibilitySettings={
+  ageMin:18,ageMax:80,minVentHr:48,minSbt:1,bmiMax:35,gcsMin:10,followHr:48,
+  exclTrach:true,exclDnr:true,exclNeuromuscular:false,exclPregnant:true
+};
+let eligibilitySettings=Object.assign({},defaultEligibilitySettings);
+(function(){
+  try{
+    const saved=localStorage.getItem("swn_elig_settings");
+    if(saved)eligibilitySettings=Object.assign({},defaultEligibilitySettings,JSON.parse(saved));
+  }catch(err){}
+})();
+function evalEligibility(row,settings){
+  const s=settings||eligibilitySettings;
+  const reasons=[];
+  const{age,bmi,gcs,ventHr,sbtCount}=row;
+  if(age===null||age<s.ageMin||age>s.ageMax)reasons.push(`อายุนอกช่วง ${s.ageMin}-${s.ageMax} ปี`);
+  if(ventHr===null||ventHr<s.minVentHr)reasons.push(`ใส่ท่อไม่ถึง ${s.minVentHr} ชม.`);
+  if(sbtCount===null||sbtCount<s.minSbt)reasons.push(`ทำ SBT ไม่ถึง ${s.minSbt} ครั้ง`);
+  if(bmi!==null&&bmi>s.bmiMax)reasons.push(`BMI เกิน ${s.bmiMax}`);
+  if(gcs===null||gcs<s.gcsMin)reasons.push(`GCS ต่ำกว่า ${s.gcsMin}`);
+  const excl=row.exclusion||[];
+  if(s.exclTrach&&excl.includes("trach"))reasons.push("มีการเจาะคอมาก่อน");
+  if(s.exclDnr&&excl.includes("dnr"))reasons.push("มีคำสั่ง DNR/Palliative");
+  if(s.exclNeuromuscular&&excl.includes("neuromuscular"))reasons.push("มีโรคระบบประสาทและกล้ามเนื้อ");
+  if(s.exclPregnant&&excl.includes("pregnant"))reasons.push("ตั้งครรภ์");
+  return{eligible:reasons.length===0,reasons};
+}
+function calcEligibility(){
+  const age=num("eligAge"),ht=num("eligHt"),wt=num("wt"),gcs=num("eligGcs"),
+        ventHr=num("eligVentHr"),sbtCount=num("eligSbtCount");
+  let bmi=null;
+  if(ht&&ht>0&&wt)bmi=wt/Math.pow(ht/100,2);
+  const bmiBox=document.getElementById("eligBmiShow");
+  if(bmiBox)bmiBox.value=bmi!==null?bmi.toFixed(1):"";
+  const exclusion=[...document.querySelectorAll('input[name="eligExclusion"]:checked')].map(e=>e.value);
+  const box=document.getElementById("eligResultBox");
+  if(!box)return;
+  if(age===null&&ventHr===null&&sbtCount===null&&gcs===null){box.innerHTML="";return;}
+  const{eligible,reasons}=evalEligibility({age,bmi,gcs,ventHr,sbtCount,exclusion},eligibilitySettings);
+  box.innerHTML=eligible
+    ?`<div class="elig-result pass"><span class="rdot"></span><span>ผ่านเกณฑ์คัดเข้ากลุ่มตัวอย่าง<span class="reason">อายุ ${age??"—"} ปี · ใส่ท่อ ${ventHr??"—"} ชม. · BMI ${bmi!==null?bmi.toFixed(1):"—"} · GCS ${gcs??"—"} · ไม่มีข้อคัดออก</span></span></div>`
+    :`<div class="elig-result fail"><span class="rdot"></span><span>ไม่ผ่านเกณฑ์คัดเข้ากลุ่มตัวอย่าง<span class="reason">${reasons.join(" · ")}</span></span></div>`;
+}
+
 function calcM1(){
+  calcEligibility();
   const fails=[];
   // clinical
   const cl=[["c1","Underlying cause ยังไม่ดีขึ้น"],["c2","มี ACS/CHF/Arrhythmia คุกคามชีวิต"],
@@ -1338,7 +1487,26 @@ function buildSheetPayload(){
     m3_perrs_total:perrsAnswered>0?perrsTotal:"",m3_roxspo2:V("roxspo2"),m3_roxrr:V("roxrr"),
     m3_roxfio2:rTxt("roxfio2")||"",m3_rox_index:rox,
     m3_action:cTxt("m3action").join("; "),m3_outcome:rTxt("m3outcome")||"",
-    note1:V("note1"),note2:V("note2"),note3:V("note3")
+    note1:V("note1"),note2:V("note2"),note3:V("note3"),
+    ...buildEligibilityPayload()
+  };
+}
+function buildEligibilityPayload(){
+  const age=num("eligAge"),ht=num("eligHt"),wt=num("wt"),gcs=num("eligGcs"),
+        ventHr=num("eligVentHr"),sbtCount=num("eligSbtCount");
+  let bmi=null;
+  if(ht&&ht>0&&wt)bmi=wt/Math.pow(ht/100,2);
+  const exclusion=[...document.querySelectorAll('input[name="eligExclusion"]:checked')].map(e=>e.value);
+  const hasAnyEligInput=age!==null||ht!==null||gcs!==null||ventHr!==null||sbtCount!==null;
+  const{eligible,reasons}=hasAnyEligInput
+    ?evalEligibility({age,bmi,gcs,ventHr,sbtCount,exclusion},eligibilitySettings)
+    :{eligible:null,reasons:[]};
+  return{
+    elig_age:V("eligAge"),elig_ht:V("eligHt"),elig_bmi:bmi!==null?bmi.toFixed(1):"—",
+    elig_gcs:V("eligGcs"),elig_vent_hr:V("eligVentHr"),elig_sbt_count:V("eligSbtCount"),
+    elig_comorbid:cTxt("eligComorbid").join("; "),elig_exclusion:cTxt("eligExclusion").join("; "),
+    elig_eligible:hasAnyEligInput?(eligible?"Yes":"No"):"",
+    elig_reasons:reasons.join("; ")
   };
 }
 async function saveToSheet(){
@@ -1590,6 +1758,7 @@ function confirmReset(){
     });
     document.getElementById("rsbiBox").innerHTML="RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ";
     document.getElementById("roxBox").innerHTML="ROX Index = (SpO₂ ÷ FiO₂) ÷ RR — กรอกค่าเพื่อคำนวณ";
+    document.getElementById("eligResultBox").innerHTML="";
     clearModuleUpdatedLabels();
     closeResultPage();
     switchModule(1);
@@ -1837,6 +2006,13 @@ function rehydrateModule1(r){
   setNumField("hct",r.m1_hct);setNumField("hb",r.m1_hb);
   selectRadioByText("lyte",lyteItems,r.m1_lyte);selectRadioByText("sbtmode",sbtmodeItems,r.m1_sbtmode);
 }
+function rehydrateEligibility(r){
+  setNumField("eligAge",r.elig_age);setNumField("eligHt",r.elig_ht);setNumField("eligGcs",r.elig_gcs);
+  setNumField("eligVentHr",r.elig_vent_hr);setNumField("eligSbtCount",r.elig_sbt_count);
+  selectChecksByText("eligComorbid",comorbidItems,r.elig_comorbid);
+  selectChecksByText("eligExclusion",exclusionItems,r.elig_exclusion);
+  calcEligibility();
+}
 function rehydrateModule2(r){
   if(!r.m2_status||r.m2_status==="idle")return;
   selectRadioByText("sbtround",sbtroundItems,r.m2_sbtround);
@@ -1893,6 +2069,7 @@ function continueAssessment(saveId){
   rehydrateModule1(r);
   rehydrateModule2(r);
   rehydrateModule3(r);
+  rehydrateEligibility(r);
   renderModuleUpdatedLabels(r);
 
   const missingMod=[1,2,3].find(i=>(r["m"+i+"_status"]||"idle")==="idle");
@@ -2124,6 +2301,189 @@ function saveWard(){
   renderWard();
 }
 
+/* ---------------- research page: eligibility criteria + success dashboard ---------------- */
+const OUTCOME_REINTUBATION="Reintubation (ใส่ท่อใหม่)";
+function numOrNull(v){
+  if(v===undefined||v===null||v===""||v==="—")return null;
+  const n=parseFloat(v);return isNaN(n)?null:n;
+}
+function closeResearchPage(){document.getElementById("researchPage").style.display="none";}
+async function openResearchPage(){
+  document.getElementById("researchPage").style.display="block";
+  document.getElementById("researchPage").scrollTop=0;
+  const box=document.getElementById("researchPageContent");
+  box.innerHTML=`<div class="hist-empty">⏳ กำลังโหลดข้อมูล...</div>`;
+  await loadEligibilitySettingsFromSheet();
+  box.innerHTML=renderEligibilityCriteriaForm()+`<div id="researchDashboardBox"></div>`;
+  try{
+    const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET));
+    const json=await resp.json();
+    if(json.ok){historyRows=json.rows||[];renderResearchPageDashboardOnly();}
+    else document.getElementById("researchDashboardBox").innerHTML=`<div class="hist-empty">⚠️ โหลดข้อมูลไม่สำเร็จ: ${json.error||"unauthorized"}<br>
+      <button class="btn btn-ghost" style="margin-top:14px;flex:none;padding:10px 20px" onclick="openResearchPage()">ลองใหม่</button></div>`;
+  }catch(err){
+    document.getElementById("researchDashboardBox").innerHTML=`<div class="hist-empty">⚠️ เชื่อมต่อไม่สำเร็จ — เช็ค Web App URL และการเชื่อมต่ออินเทอร์เน็ต<br>
+      <button class="btn btn-ghost" style="margin-top:14px;flex:none;padding:10px 20px" onclick="openResearchPage()">ลองใหม่</button></div>`;
+  }
+}
+function renderResearchPageDashboardOnly(){
+  const box=document.getElementById("researchDashboardBox");
+  if(box)box.innerHTML=renderResearchDashboard();
+}
+async function loadEligibilitySettingsFromSheet(){
+  try{
+    const resp=await fetch(SWN_SHEET_URL+"?secret="+encodeURIComponent(SWN_SHEET_SECRET)+"&action=settings");
+    const json=await resp.json();
+    if(json.ok&&json.settings&&Object.keys(json.settings).length){
+      eligibilitySettings=Object.assign({},defaultEligibilitySettings,json.settings);
+      localStorage.setItem("swn_elig_settings",JSON.stringify(eligibilitySettings));
+    }
+  }catch(err){ /* keep locally-cached / default settings */ }
+}
+function exclusionToggleRow(id,label,checked){
+  return `<div class="toggle-row"><div class="param-label">${label}</div>
+    <label class="switch"><input type="checkbox" id="${id}" ${checked?"checked":""}><span class="slider"></span></label></div>`;
+}
+function renderEligibilityCriteriaForm(){
+  const s=eligibilitySettings;
+  return `
+  <div class="card">
+    <div class="sec-head"><span class="ic">🧪</span><h2>เกณฑ์คัดเข้ากลุ่มตัวอย่าง (Study Eligibility)</h2></div>
+    <div class="sec-desc">คนละชุดกับเกณฑ์ Screening ทางคลินิกใน Module 1 — ใช้พิจารณาว่าเคสนี้เข้าเกณฑ์เก็บข้อมูลวิจัยหรือไม่ ปรับค่าตามโปรโตคอลของหน่วยงาน แล้วกด "บันทึกเกณฑ์" เพื่อใช้ร่วมกันทั้งทีม (บันทึกลง Sheet)</div>
+    <div class="grid2">
+      <div>
+        <div class="param-row"><div class="param-label">อายุ (ปี)<small>ช่วงอายุที่รับเข้าศึกษา</small></div>
+          <div class="param-inputs"><input type="number" id="setAgeMin" value="${s.ageMin}"><span class="param-dash">–</span><input type="number" id="setAgeMax" value="${s.ageMax}"></div></div>
+        <div class="param-row"><div class="param-label">ระยะเวลาใส่ท่อขั้นต่ำ<small>ก่อนเริ่มนับเข้าศึกษา</small></div>
+          <div class="param-inputs"><input type="number" id="setMinVentHr" value="${s.minVentHr}"><span class="unit">ชม.</span></div></div>
+        <div class="param-row"><div class="param-label">จำนวนครั้งที่ทำ SBT ขั้นต่ำ<small>เพื่อนับเป็นเคสในกลุ่มศึกษา</small></div>
+          <div class="param-inputs"><input type="number" id="setMinSbt" value="${s.minSbt}"><span class="unit">ครั้ง</span></div></div>
+      </div>
+      <div>
+        <div class="param-row"><div class="param-label">BMI สูงสุด<small>เกินค่านี้ไม่นับเข้า</small></div>
+          <div class="param-inputs"><input type="number" id="setBmiMax" value="${s.bmiMax}"><span class="unit">kg/m²</span></div></div>
+        <div class="param-row"><div class="param-label">GCS ขั้นต่ำ<small>ระดับความรู้สึกตัวที่ยอมรับได้</small></div>
+          <div class="param-inputs"><input type="number" id="setGcsMin" value="${s.gcsMin}"><span class="unit">คะแนน</span></div></div>
+        <div class="param-row"><div class="param-label">ระยะเวลาติดตามหลังถอดท่อ<small>สำหรับตัดสิน success/fail</small></div>
+          <div class="param-inputs"><input type="number" id="setFollowHr" value="${s.followHr}"><span class="unit">ชม.</span></div></div>
+      </div>
+    </div>
+    <div class="eyebrow" style="margin-top:8px">เกณฑ์คัดออก (Exclusion)</div>
+    ${exclusionToggleRow("setExclTrach","เจาะคอ (Tracheostomy) มาก่อนรับเข้าศึกษา",s.exclTrach)}
+    ${exclusionToggleRow("setExclDnr","มีคำสั่ง DNR / Palliative care",s.exclDnr)}
+    ${exclusionToggleRow("setExclNeuromuscular","โรคระบบประสาทและกล้ามเนื้อ (Neuromuscular disease)",s.exclNeuromuscular)}
+    ${exclusionToggleRow("setExclPregnant","ตั้งครรภ์",s.exclPregnant)}
+    <button class="btn btn-primary" style="margin-top:14px;width:100%" onclick="saveEligibilityCriteria()">💾 บันทึกเกณฑ์</button>
+    <div id="critSaveStatus" style="font-size:12px;color:var(--muted);margin-top:8px;min-height:16px"></div>
+  </div>`;
+}
+function readEligibilityCriteriaForm(){
+  const gi=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v;};
+  const gc=id=>document.getElementById(id).checked;
+  return{
+    ageMin:gi("setAgeMin"),ageMax:gi("setAgeMax"),minVentHr:gi("setMinVentHr"),minSbt:gi("setMinSbt"),
+    bmiMax:gi("setBmiMax"),gcsMin:gi("setGcsMin"),followHr:gi("setFollowHr"),
+    exclTrach:gc("setExclTrach"),exclDnr:gc("setExclDnr"),
+    exclNeuromuscular:gc("setExclNeuromuscular"),exclPregnant:gc("setExclPregnant")
+  };
+}
+async function saveEligibilityCriteria(){
+  const status=document.getElementById("critSaveStatus");
+  const newSettings=readEligibilityCriteriaForm();
+  eligibilitySettings=newSettings;
+  localStorage.setItem("swn_elig_settings",JSON.stringify(newSettings));
+  calcEligibility();
+  renderResearchPageDashboardOnly();
+  status.textContent="⏳ กำลังบันทึกเกณฑ์ลง Sheet...";
+  try{
+    const resp=await fetch(SWN_SHEET_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({secret:SWN_SHEET_SECRET,action:"saveSettings",settings:newSettings})
+    });
+    const json=await resp.json();
+    status.textContent=json.ok?"✅ บันทึกเกณฑ์เรียบร้อย (ใช้ร่วมกันทั้งทีม)":"⚠️ บันทึกลง Sheet ไม่สำเร็จ (ใช้งานในเครื่องนี้ได้ตามปกติ): "+(json.error||"");
+  }catch(err){
+    status.textContent="⚠️ เชื่อมต่อ Sheet ไม่สำเร็จ — เกณฑ์ถูกบันทึกไว้ในเครื่องนี้แล้ว";
+  }
+}
+function computeEligibleConcludedRows(){
+  return historyRows.map(r=>{
+    const age=numOrNull(r.elig_age),bmi=numOrNull(r.elig_bmi),gcs=numOrNull(r.elig_gcs),
+          ventHr=numOrNull(r.elig_vent_hr),sbtCount=numOrNull(r.elig_sbt_count);
+    const exclusion=exclusionItems.filter(it=>String(r.elig_exclusion||"").includes(it.t)).map(it=>it.v);
+    const comorbid=comorbidItems.filter(it=>String(r.elig_comorbid||"").includes(it.t)).map(it=>it.v);
+    const hasEligInput=age!==null||ventHr!==null||sbtCount!==null||gcs!==null;
+    const evalRes=hasEligInput?evalEligibility({age,bmi,gcs,ventHr,sbtCount,exclusion},eligibilitySettings):{eligible:false,reasons:[]};
+    return{r,age,bmi,gcs,ventHr,sbtCount,comorbid,eligible:evalRes.eligible,outcome:r.m3_outcome||""};
+  }).filter(x=>x.eligible&&x.outcome);
+}
+function renderResearchDashboard(){
+  const rows=computeEligibleConcludedRows();
+  const success=rows.filter(x=>x.outcome!==OUTCOME_REINTUBATION);
+  const fail=rows.filter(x=>x.outcome===OUTCOME_REINTUBATION);
+  const total=rows.length;
+  const pct=(n,d)=>d?((n/d)*100).toFixed(1):"0.0";
+  const avg=(arr,key)=>{const vals=arr.map(x=>x[key]).filter(v=>v!==null);return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length):null;};
+  const fmt=v=>v===null?"—":v.toFixed(1);
+
+  function groupStatBox(arr){
+    const ages=arr.map(x=>x.age).filter(v=>v!==null);
+    return `
+    <div class="stat-grid">
+      <div class="stat-box"><div class="v">${fmt(avg(arr,"age"))} ปี</div><div class="k">อายุเฉลี่ย</div></div>
+      <div class="stat-box"><div class="v">${fmt(avg(arr,"ventHr"))} ชม.</div><div class="k">ใส่ท่อก่อนประเมิน เฉลี่ย</div></div>
+      <div class="stat-box"><div class="v">${fmt(avg(arr,"sbtCount"))} ครั้ง</div><div class="k">จำนวนครั้ง SBT เฉลี่ย</div></div>
+      <div class="stat-box"><div class="v">${ages.length?Math.min(...ages)+"–"+Math.max(...ages):"—"} ปี</div><div class="k">ช่วงอายุ</div></div>
+    </div>`;
+  }
+  function comorbidRows(arr){
+    return comorbidItems.map(c=>{
+      const n=arr.filter(x=>x.comorbid.includes(c.v)).length;
+      const p=arr.length?Math.round(n/arr.length*100):0;
+      return `<div class="comorbid-row"><div class="comorbid-name">${c.t}</div><div class="comorbid-track"><div class="comorbid-fill" style="width:${p}%"></div></div><div class="comorbid-val">${p}%</div></div>`;
+    }).join("");
+  }
+  const tableRows=rows.slice().reverse().slice(0,30).map(x=>`
+    <tr><td>${x.r.hn||"—"}</td><td>${x.age??"—"}</td><td>${x.ventHr??"—"}</td><td>${x.sbtCount??"—"}</td>
+    <td>${x.comorbid.length?x.comorbid.join(", "):"—"}</td>
+    <td>${x.outcome===OUTCOME_REINTUBATION?'<span class="rpill fail">ไม่สำเร็จ</span>':'<span class="rpill pass">สำเร็จ</span>'}</td></tr>`).join("");
+
+  return `
+  <div class="kpi-row">
+    <div class="kpi"><div class="num">${total}</div><div class="lbl">เคสเข้าเกณฑ์ &amp; มีผลสรุป</div></div>
+    <div class="kpi"><div class="num" style="color:var(--green)">${success.length}</div><div class="lbl">สำเร็จ (${pct(success.length,total)}%)</div></div>
+    <div class="kpi"><div class="num" style="color:var(--red)">${fail.length}</div><div class="lbl">ไม่สำเร็จ (${pct(fail.length,total)}%)</div></div>
+    <div class="kpi"><div class="num">${fmt(avg(rows,"ventHr"))}</div><div class="lbl">ชม.ใส่ท่อก่อนประเมิน เฉลี่ยรวม</div></div>
+  </div>
+  <div class="grid2">
+    <div class="group-card success">
+      <div class="group-head">
+        <div class="group-title"><span class="dot"></span>กลุ่มสำเร็จ</div>
+        <div style="text-align:right"><div class="group-pct">${pct(success.length,total)}%</div><div class="group-n">n = ${success.length} / ${total}</div></div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct(success.length,total)}%"></div></div>
+      ${groupStatBox(success)}
+      <div class="comorbid-list">${comorbidRows(success)}</div>
+    </div>
+    <div class="group-card fail">
+      <div class="group-head">
+        <div class="group-title"><span class="dot"></span>กลุ่มไม่สำเร็จ (Reintubation)</div>
+        <div style="text-align:right"><div class="group-pct">${pct(fail.length,total)}%</div><div class="group-n">n = ${fail.length} / ${total}</div></div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct(fail.length,total)}%"></div></div>
+      ${groupStatBox(fail)}
+      <div class="comorbid-list">${comorbidRows(fail)}</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="sec-head"><span class="ic">📋</span><h2>รายเคสที่เข้าเกณฑ์ (ล่าสุด ${Math.min(30,rows.length)} จาก ${total})</h2></div>
+    <div class="rtable-wrap"><table class="rtable"><thead><tr><th>HN</th><th>อายุ</th><th>ชม.ใส่ท่อ</th><th>ครั้ง SBT</th><th>โรคประจำตัว</th><th>ผลลัพธ์</th></tr></thead>
+    <tbody>${tableRows||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">— ไม่มีเคสที่เข้าเกณฑ์และมีผลสรุปครบ —</td></tr>'}</tbody></table></div>
+  </div>
+  <p class="hint" style="margin-top:10px">📌 คำนวณจากเคสที่เข้าเกณฑ์คัดเข้ากลุ่มตัวอย่าง (ตามพารามิเตอร์ด้านบน) และมีการบันทึกผลลัพธ์ใน Module 3 แล้วเท่านั้น · สำเร็จ = ไม่ถูก Reintubation ภายในช่วงติดตาม, ไม่สำเร็จ = Reintubation</p>`;
+}
+
 // default date/time = now
 (function(){
   const n=new Date(),p=x=>String(x).padStart(2,"0");
@@ -2131,6 +2491,7 @@ function saveWard(){
   document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
   document.getElementById("ward").value=localStorage.getItem("swn_ward")||"";
   renderWard();
+  if(location.hash==="#research")openResearchPage();
 })();
 </script>
 </body>
