@@ -288,6 +288,45 @@
     border-top:1px solid var(--line);padding-top:10px}
 
   .rp-calc{background:#f6e8ef;border-left:3px solid #d65d86;padding:7px 10px;border-radius:5px;font-size:11.5px;margin:8px 0;line-height:1.6}
+
+  /* ---- criteria card ---- */
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .criteria-result{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600}
+  .criteria-result.pass{background:#e8f5e9;color:#2e7d32;border:1.5px solid #a5d6a7}
+  .criteria-result.fail{background:#fce4ec;color:#b71c1c;border:1.5px solid #f48fb1}
+  .criteria-result.pending{background:#f3f3f3;color:var(--muted);border:1.5px solid var(--line)}
+
+  /* ---- settings page ---- */
+  #settingsPage{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .settings-section{margin-bottom:20px}
+  .settings-section h3{font-size:13px;font-weight:700;color:var(--teal-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+  .settings-row:last-child{border-bottom:none}
+  .settings-lbl{font-size:13px;color:var(--ink);flex:1}
+  .settings-inp{width:72px;padding:5px 8px;border:1.5px solid var(--line);border-radius:6px;font-size:13px;text-align:center;background:var(--bg)}
+  .settings-unit{font-size:11px;color:var(--muted);margin-left:4px;min-width:32px}
+
+  /* ---- research dashboard ---- */
+  #researchPage{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .rsch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .rsch-tile{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:14px 12px;text-align:center}
+  .rsch-tile .n{font-size:26px;font-weight:800;color:var(--teal-deep);line-height:1}
+  .rsch-tile .n.success{color:var(--green)}
+  .rsch-tile .n.fail{color:var(--red)}
+  .rsch-tile .l{font-size:11px;color:var(--muted);margin-top:4px}
+  .rsch-tile .pct{font-size:13px;font-weight:600;color:var(--muted);margin-top:2px}
+  .rsch-bar-row{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12.5px}
+  .rsch-bar-row .lbl{min-width:130px;color:var(--ink)}
+  .rsch-bar-track{flex:1;background:var(--line);border-radius:4px;height:8px;overflow:hidden}
+  .rsch-bar-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .3s}
+  .rsch-bar-fill.success{background:var(--green)}
+  .rsch-bar-fill.fail{background:var(--red)}
+  .rsch-bar-row .cnt{min-width:36px;text-align:right;color:var(--muted)}
+  .rsch-table{width:100%;border-collapse:collapse;font-size:12px}
+  .rsch-table th{padding:7px 8px;text-align:left;font-weight:700;color:var(--teal-deep);border-bottom:2px solid var(--line);background:#f9f3f6}
+  .rsch-table td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .rsch-table tr:last-child td{border-bottom:none}
+
   @media print{
     body{background:#fff}
     header,.wrap,.bar,.tabs,#helpPage,#resultPage,#historyPage,.sheet-backdrop{display:none!important}
@@ -316,6 +355,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;flex:none">
       <button class="help-btn" onclick="openHistory()">📁 ประวัติ</button>
       <button class="help-btn" onclick="openHelp()">❓ วิธีใช้งาน</button>
+      <button class="help-btn" onclick="openSettings()">⚙️ ตั้งค่า</button>
       <button class="help-btn" onclick="goHome()">🏠 หน้าแรก</button>
     </div>
   </div>
@@ -338,7 +378,23 @@
       <div class="q"><label class="qlabel">เวลาที่ประเมิน <span class="req">*</span></label><input type="time" id="atime"></div>
       <div class="q"><label class="qlabel">ผู้ประเมิน (พยาบาล) <span class="req">*</span></label><input type="text" id="nurse" placeholder="ชื่อพยาบาล"></div>
       <div class="q"><label class="qlabel">หน่วยงาน / หอผู้ป่วย</label><input type="text" id="ward" placeholder="เช่น กจ.2" oninput="saveWard()"></div>
+      <div class="q"><label class="qlabel">อายุ (ปี)</label><input type="number" id="pt_age" placeholder="เช่น 65" min="0" max="120"></div>
+      <div class="q"><label class="qlabel">จำนวนวันใส่ท่อ (วัน)</label><input type="number" id="vent_days" placeholder="เช่น 5" min="0"></div>
     </div>
+    <div class="q"><label class="qlabel">วินิจฉัยหลัก</label><input type="text" id="pt_dx" placeholder="เช่น Pneumonia, Sepsis, ARDS"></div>
+    <div class="q"><label class="qlabel">ครั้งที่ SBT</label><div class="opts" id="sbt_attempt_opts"></div></div>
+    <div class="q"><label class="qlabel">โรคประจำตัว (เลือกได้หลายข้อ)</label><div class="opts" id="comorbidities"></div></div>
+  </div>
+
+  <!-- Inclusion / Exclusion Criteria -->
+  <div class="card" id="criteriaCard" style="margin-top:12px">
+    <div class="sec-head"><span class="ic">🔬</span><h2>เกณฑ์การคัดเข้า-ออกกลุ่มตัวอย่าง</h2></div>
+    <div class="sec-desc">ตรวจสอบก่อนเริ่มประเมิน SBT ในฐานะกลุ่มตัวอย่างวิจัย</div>
+    <div class="eyebrow" style="margin-top:12px">Inclusion Criteria — ต้องผ่านทุกข้อ</div>
+    <div class="opts" id="inclusion_criteria"></div>
+    <div class="eyebrow" style="margin-top:16px">Exclusion Criteria — ห้ามมีแม้ข้อเดียว</div>
+    <div class="opts" id="exclusion_criteria"></div>
+    <div id="criteriaResult" class="criteria-result pending">☑️ กรุณาตรวจสอบเกณฑ์ด้านบนก่อน</div>
   </div>
 
   <!-- Module tabs -->
@@ -788,12 +844,128 @@
     </div>
   </div>
   <div id="historyPageContent" style="max-width:900px;margin:0 auto;padding:16px 14px 60px;"></div>
+  <!-- Research button inside history page -->
+  <div style="position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 16px;">
+    <button class="btn btn-ghost" style="width:100%;padding:11px;font-size:13px" onclick="openResearch()">📊 Research Dashboard</button>
+  </div>
+</div>
+
+<!-- ============ SETTINGS PAGE ============ -->
+<div id="settingsPage">
+  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
+    <button onclick="closeSettings()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">⚙️ ตั้งค่า Thresholds</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">ปรับเกณฑ์การประเมินทางคลินิก</div>
+    </div>
+  </div>
+  <div style="max-width:760px;margin:0 auto;padding:16px 14px 80px;">
+    <div class="card">
+      <div class="settings-section">
+        <h3>Module 1 · SBT Readiness Thresholds</h3>
+        <div class="settings-row"><span class="settings-lbl">SpO₂ ต้อง &gt;</span><input class="settings-inp" id="s_spo2_min" type="number" min="50" max="99"><span class="settings-unit">%</span></div>
+        <div class="settings-row"><span class="settings-lbl">PaO₂ ต้อง &gt;</span><input class="settings-inp" id="s_pao2_min" type="number" min="20" max="200"><span class="settings-unit">mmHg</span></div>
+        <div class="settings-row"><span class="settings-lbl">TV/kg ต้อง &gt;</span><input class="settings-inp" id="s_tvkg_min" type="number" min="1" max="20" step="0.5"><span class="settings-unit">cc/kg</span></div>
+        <div class="settings-row"><span class="settings-lbl">RSBI ต้อง &lt;</span><input class="settings-inp" id="s_rsbi_max" type="number" min="50" max="200"><span class="settings-unit">ครั้ง/นาที/ลิตร</span></div>
+        <div class="settings-row"><span class="settings-lbl">MV ต้องอยู่ในช่วง</span><input class="settings-inp" id="s_mv_min" type="number" min="1" max="20">–<input class="settings-inp" id="s_mv_max" type="number" min="1" max="30"><span class="settings-unit">LPM</span></div>
+        <div class="settings-row"><span class="settings-lbl">RR ต้อง &lt;</span><input class="settings-inp" id="s_rr_max" type="number" min="10" max="60"><span class="settings-unit">/min</span></div>
+        <div class="settings-row"><span class="settings-lbl">SBP ต้องอยู่ในช่วง</span><input class="settings-inp" id="s_sbp_min" type="number" min="50" max="150">–<input class="settings-inp" id="s_sbp_max" type="number" min="100" max="250"><span class="settings-unit">mmHg</span></div>
+        <div class="settings-row"><span class="settings-lbl">DBP ต้อง &gt;</span><input class="settings-inp" id="s_dbp_min" type="number" min="20" max="100"><span class="settings-unit">mmHg</span></div>
+        <div class="settings-row"><span class="settings-lbl">HR ต้องอยู่ในช่วง</span><input class="settings-inp" id="s_hr_min" type="number" min="20" max="100">–<input class="settings-inp" id="s_hr_max" type="number" min="80" max="200"><span class="settings-unit">/min</span></div>
+        <div class="settings-row"><span class="settings-lbl">Hct ต้อง ≥</span><input class="settings-inp" id="s_hct_min" type="number" min="10" max="60"><span class="settings-unit">%</span></div>
+        <div class="settings-row"><span class="settings-lbl">Hb ต้อง &gt;</span><input class="settings-inp" id="s_hb_min" type="number" min="4" max="20" step="0.5"><span class="settings-unit">g/dL</span></div>
+      </div>
+      <div class="settings-section">
+        <h3>Module 2 · Stop-SBT Thresholds</h3>
+        <div class="settings-row"><span class="settings-lbl">RR เกิน</span><input class="settings-inp" id="s_m2_rr_max" type="number" min="10" max="60"><span class="settings-unit">/min</span></div>
+        <div class="settings-row"><span class="settings-lbl">TV ต่ำกว่า</span><input class="settings-inp" id="s_m2_tv_min" type="number" min="50" max="500"><span class="settings-unit">cc</span></div>
+        <div class="settings-row"><span class="settings-lbl">SpO₂ ต่ำกว่า</span><input class="settings-inp" id="s_m2_spo2_min" type="number" min="50" max="99"><span class="settings-unit">%</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" style="flex:1;padding:12px" onclick="resetSettings()">🔄 ค่าเริ่มต้น</button>
+      <button class="btn btn-primary" style="flex:1;padding:12px" onclick="applySettings()">💾 บันทึกการตั้งค่า</button>
+    </div>
+    <div id="settingsSaveMsg" style="text-align:center;font-size:12.5px;color:var(--green);margin-top:10px;min-height:18px"></div>
+  </div>
+</div>
+
+<!-- ============ RESEARCH DASHBOARD PAGE ============ -->
+<div id="researchPage">
+  <div style="background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;">
+    <button onclick="closeResearch()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;">←</button>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:17px;">📊 Research Dashboard</div>
+      <div style="font-size:11.5px;opacity:.85;margin-top:1px;">สถิติผลการหย่าเครื่องช่วยหายใจ</div>
+    </div>
+  </div>
+  <div id="researchPageContent" style="max-width:900px;margin:0 auto;padding:16px 14px 60px;"></div>
 </div>
 
 <script>
 /* ---------------- sheet sync config ---------------- */
 const SWN_SHEET_URL="https://script.google.com/macros/s/AKfycbxyR4tWjST97LNr6kNYLU2jmT3cdz5U9HHJqcxKQSdsvIpqfuoEBgXrf-OJdAKcB2RY/exec";
 const SWN_SHEET_SECRET="6077";
+
+/* ---------------- settings (clinical thresholds) ---------------- */
+const DEFAULT_SETTINGS={
+  spo2_min:90,pao2_min:60,tvkg_min:5,rsbi_max:105,
+  mv_min:5,mv_max:12,rr_max:30,sbp_min:90,sbp_max:180,
+  dbp_min:60,hr_min:50,hr_max:120,hct_min:30,hb_min:7,
+  m2_rr_max:30,m2_tv_min:200,m2_spo2_min:90
+};
+let SWN_SETTINGS={...DEFAULT_SETTINGS};
+function loadSettings(){
+  try{SWN_SETTINGS={...DEFAULT_SETTINGS,...JSON.parse(localStorage.getItem("swn_settings")||"{}")};}catch(e){}
+}
+function openSettings(){
+  loadSettings();
+  const S=SWN_SETTINGS;
+  const setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  setVal("s_spo2_min",S.spo2_min);setVal("s_pao2_min",S.pao2_min);setVal("s_tvkg_min",S.tvkg_min);
+  setVal("s_rsbi_max",S.rsbi_max);setVal("s_mv_min",S.mv_min);setVal("s_mv_max",S.mv_max);
+  setVal("s_rr_max",S.rr_max);setVal("s_sbp_min",S.sbp_min);setVal("s_sbp_max",S.sbp_max);
+  setVal("s_dbp_min",S.dbp_min);setVal("s_hr_min",S.hr_min);setVal("s_hr_max",S.hr_max);
+  setVal("s_hct_min",S.hct_min);setVal("s_hb_min",S.hb_min);
+  setVal("s_m2_rr_max",S.m2_rr_max);setVal("s_m2_tv_min",S.m2_tv_min);setVal("s_m2_spo2_min",S.m2_spo2_min);
+  document.getElementById("settingsSaveMsg").textContent="";
+  document.getElementById("settingsPage").style.display="block";
+  document.getElementById("settingsPage").scrollTop=0;
+}
+function closeSettings(){document.getElementById("settingsPage").style.display="none";}
+function applySettings(){
+  const gv=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;};
+  const s={
+    spo2_min:gv("s_spo2_min")??DEFAULT_SETTINGS.spo2_min,
+    pao2_min:gv("s_pao2_min")??DEFAULT_SETTINGS.pao2_min,
+    tvkg_min:gv("s_tvkg_min")??DEFAULT_SETTINGS.tvkg_min,
+    rsbi_max:gv("s_rsbi_max")??DEFAULT_SETTINGS.rsbi_max,
+    mv_min:gv("s_mv_min")??DEFAULT_SETTINGS.mv_min,
+    mv_max:gv("s_mv_max")??DEFAULT_SETTINGS.mv_max,
+    rr_max:gv("s_rr_max")??DEFAULT_SETTINGS.rr_max,
+    sbp_min:gv("s_sbp_min")??DEFAULT_SETTINGS.sbp_min,
+    sbp_max:gv("s_sbp_max")??DEFAULT_SETTINGS.sbp_max,
+    dbp_min:gv("s_dbp_min")??DEFAULT_SETTINGS.dbp_min,
+    hr_min:gv("s_hr_min")??DEFAULT_SETTINGS.hr_min,
+    hr_max:gv("s_hr_max")??DEFAULT_SETTINGS.hr_max,
+    hct_min:gv("s_hct_min")??DEFAULT_SETTINGS.hct_min,
+    hb_min:gv("s_hb_min")??DEFAULT_SETTINGS.hb_min,
+    m2_rr_max:gv("s_m2_rr_max")??DEFAULT_SETTINGS.m2_rr_max,
+    m2_tv_min:gv("s_m2_tv_min")??DEFAULT_SETTINGS.m2_tv_min,
+    m2_spo2_min:gv("s_m2_spo2_min")??DEFAULT_SETTINGS.m2_spo2_min
+  };
+  SWN_SETTINGS=s;
+  localStorage.setItem("swn_settings",JSON.stringify(s));
+  document.getElementById("settingsSaveMsg").textContent="✅ บันทึกแล้ว — ค่าใหม่จะมีผลเมื่อคำนวณครั้งถัดไป";
+  calcM1();calcM2();
+}
+function resetSettings(){
+  if(!confirm("รีเซ็ตค่าทุกอย่างกลับเป็นค่ามาตรฐาน?"))return;
+  SWN_SETTINGS={...DEFAULT_SETTINGS};
+  localStorage.removeItem("swn_settings");
+  openSettings();
+  document.getElementById("settingsSaveMsg").textContent="✅ รีเซ็ตเป็นค่ามาตรฐานแล้ว";
+}
 
 /* ---------------- option builders ---------------- */
 function radio(container,name,items,cb){
@@ -827,6 +999,50 @@ function checks(container,name,items,cb){
 const getR=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.value:null;};
 const getRTone=n=>{const e=document.querySelector(`input[name="${n}"]:checked`);return e?e.dataset.tone:null;};
 const num=id=>{const v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;};
+
+/* ---------------- patient info extras (sbt_attempt, comorbidities) ---------------- */
+radio("sbt_attempt_opts","sbt_attempt",[
+  {v:"1",t:"ครั้งที่ 1"},{v:"2",t:"ครั้งที่ 2"},{v:"3",t:"ครั้งที่ 3"},{v:"4+",t:"≥ 4 ครั้ง"}
+]);
+const comorbItems=[
+  {v:"dm",t:"DM (เบาหวาน)"},{v:"ht",t:"HT (ความดันสูง)"},{v:"heart",t:"Heart disease (HF/CAD/Arrhythmia)"},
+  {v:"copd",t:"COPD"},{v:"ckd",t:"CKD (ไตเรื้อรัง)"},{v:"pneumonia",t:"Pneumonia / Sepsis"},
+  {v:"stroke",t:"Stroke / CVA"},{v:"cancer",t:"Cancer"},{v:"trauma",t:"Trauma"}
+];
+checks("comorbidities","comorbidity",comorbItems);
+
+/* ---------------- inclusion / exclusion criteria ---------------- */
+const inclItems=[
+  {v:"i1",t:"อายุ ≥ 18 ปี"},{v:"i2",t:"ใส่ท่อช่วยหายใจ (ETT) ≥ 24 ชั่วโมง"},
+  {v:"i3",t:"ใช้เครื่องช่วยหายใจผ่าน ETT (ไม่ใช่ Tracheostomy)"},
+  {v:"i4",t:"อยู่ใน ICU / หอผู้ป่วยหนัก"},
+  {v:"i5",t:"ผู้ป่วย / ผู้แทนโดยชอบธรรมให้ความยินยอม"}
+];
+const exclItems=[
+  {v:"e1",t:"มี Tracheostomy"},{v:"e2",t:"มีคำสั่ง DNR / DNI"},
+  {v:"e3",t:"โรคระยะสุดท้าย / Comfort care"},
+  {v:"e4",t:"Unplanned extubation"},{v:"e5",t:"กำลังได้รับ ECMO"}
+];
+checks("inclusion_criteria","incl",inclItems,calcCriteria);
+checks("exclusion_criteria","excl",exclItems,calcCriteria);
+function calcCriteria(){
+  const inc=[...document.querySelectorAll("input[name='incl']")];
+  const exc=[...document.querySelectorAll("input[name='excl']")];
+  const el=document.getElementById("criteriaResult");
+  if(!inc.length){return;}
+  const allInc=inc.every(cb=>cb.checked);
+  const anyExc=exc.some(cb=>cb.checked);
+  const checked=inc.some(cb=>cb.checked)||exc.some(cb=>cb.checked);
+  if(!checked){el.className="criteria-result pending";el.textContent="☑️ กรุณาตรวจสอบเกณฑ์ด้านบนก่อน";return;}
+  if(allInc&&!anyExc){
+    el.className="criteria-result pass";
+    el.textContent="✅ ผ่านเกณฑ์คัดเข้ากลุ่มตัวอย่าง (Inclusion ครบทุกข้อ + ไม่มี Exclusion)";
+  }else{
+    const reason=!allInc?"Inclusion criteria ไม่ครบ":"มี Exclusion criteria — คัดออกจากกลุ่มตัวอย่าง";
+    el.className="criteria-result fail";
+    el.textContent="❌ ไม่ผ่านเกณฑ์ — "+reason;
+  }
+}
 
 /* ---------------- MODULE 1 build ---------------- */
 const yn=[{v:"Yes",t:"ผ่าน (Yes)",tone:"good"},{v:"No",t:"ไม่ผ่าน (No)",tone:"bad"}];
@@ -878,27 +1094,28 @@ function calcM1(){
   const spo2=num("spo2"),pao2=num("pao2"),tv=num("tv"),wt=num("wt"),mv=num("mv"),
         rr=num("rr1"),sbp=num("sbp1"),dbp=num("dbp1"),hr=num("hr1"),hct=num("hct"),hb=num("hb"),
         fio2=parseFloat(getR("fio2")),peep=parseFloat(getR("peep")),lyte=getR("lyte");
-  if(spo2!==null&&spo2<=90)fails.push("SpO₂ ≤ 90% ("+spo2+")");
-  if(pao2!==null&&pao2>0&&pao2<=60)fails.push("PaO₂ ≤ 60 ("+pao2+")");
+  const S=SWN_SETTINGS;
+  if(spo2!==null&&spo2<=S.spo2_min)fails.push("SpO₂ ≤ "+S.spo2_min+"% ("+spo2+")");
+  if(pao2!==null&&pao2>0&&pao2<=S.pao2_min)fails.push("PaO₂ ≤ "+S.pao2_min+" ("+pao2+")");
   if(!isNaN(fio2)&&fio2>0.40)fails.push("FiO₂ > 0.40");
   if(!isNaN(peep)&&peep>8)fails.push("PEEP > 8 cmH₂O");
   // RSBI + TV/kg
   let rsbi=null,tvkg=null;
-  if(tv!==null&&wt!==null&&wt>0){tvkg=tv/wt;if(tvkg<=5)fails.push("TV/kg ≤ 5 ("+tvkg.toFixed(1)+")");}
+  if(tv!==null&&wt!==null&&wt>0){tvkg=tv/wt;if(tvkg<=S.tvkg_min)fails.push("TV/kg ≤ "+S.tvkg_min+" ("+tvkg.toFixed(1)+")");}
   if(rr!==null&&tv!==null&&tv>0){rsbi=rr/(tv/1000);}
   const rb=document.getElementById("rsbiBox");
   if(rsbi!==null){
-    const ok=rsbi<105;
-    rb.innerHTML=`RSBI = <b>${rsbi.toFixed(0)}</b> ครั้ง/นาที/ลิตร · ${ok?'<span class="pill-pass">&lt; 105 ผ่านเกณฑ์</span>':'<span class="pill-fail">≥ 105 เสี่ยงหย่าไม่สำเร็จ</span>'}${tvkg!==null?` &nbsp;|&nbsp; TV/kg = <b>${tvkg.toFixed(1)}</b>`:""}`;
-    if(!ok)fails.push("RSBI ≥ 105 ("+rsbi.toFixed(0)+")");
+    const ok=rsbi<S.rsbi_max;
+    rb.innerHTML=`RSBI = <b>${rsbi.toFixed(0)}</b> ครั้ง/นาที/ลิตร · ${ok?`<span class="pill-pass">&lt; ${S.rsbi_max} ผ่านเกณฑ์</span>`:`<span class="pill-fail">≥ ${S.rsbi_max} เสี่ยงหย่าไม่สำเร็จ</span>`}${tvkg!==null?` &nbsp;|&nbsp; TV/kg = <b>${tvkg.toFixed(1)}</b>`:""}`;
+    if(!ok)fails.push("RSBI ≥ "+S.rsbi_max+" ("+rsbi.toFixed(0)+")");
   }else{rb.innerHTML="RSBI = RR ÷ (TV/1000) — กรอก RR และ TV เพื่อคำนวณ";}
-  if(mv!==null&&(mv<5||mv>12))fails.push("MV นอกช่วง 5–12 ("+mv+")");
-  if(rr!==null&&rr>=30)fails.push("RR ≥ 30 ("+rr+")");
-  if(sbp!==null&&(sbp<90||sbp>180))fails.push("SBP นอกช่วง 90–180 ("+sbp+")");
-  if(dbp!==null&&dbp<=60)fails.push("DBP ≤ 60 ("+dbp+")");
-  if(hr!==null&&(hr<50||hr>120))fails.push("HR นอกช่วง 50–120 ("+hr+")");
-  if(hct!==null&&hct<30)fails.push("Hct < 30% ("+hct+")");
-  if(hb!==null&&hb<=7)fails.push("Hb ≤ 7 ("+hb+")");
+  if(mv!==null&&(mv<S.mv_min||mv>S.mv_max))fails.push("MV นอกช่วง "+S.mv_min+"–"+S.mv_max+" ("+mv+")");
+  if(rr!==null&&rr>=S.rr_max)fails.push("RR ≥ "+S.rr_max+" ("+rr+")");
+  if(sbp!==null&&(sbp<S.sbp_min||sbp>S.sbp_max))fails.push("SBP นอกช่วง "+S.sbp_min+"–"+S.sbp_max+" ("+sbp+")");
+  if(dbp!==null&&dbp<=S.dbp_min)fails.push("DBP ≤ "+S.dbp_min+" ("+dbp+")");
+  if(hr!==null&&(hr<S.hr_min||hr>S.hr_max))fails.push("HR นอกช่วง "+S.hr_min+"–"+S.hr_max+" ("+hr+")");
+  if(hct!==null&&hct<S.hct_min)fails.push("Hct < "+S.hct_min+"% ("+hct+")");
+  if(hb!==null&&hb<=S.hb_min)fails.push("Hb ≤ "+S.hb_min+" ("+hb+")");
   if(lyte&&lyte!=="normal")fails.push("Electrolytes ผิดปกติ");
 
   const anyInput=clinicalAnswered>0||spo2!==null||!isNaN(fio2)||tv!==null;
@@ -962,12 +1179,13 @@ function calcM2(){
   const round=getR("sbtround");
   const vitalFails=[];
   const rr=num("rr2"),tv=num("tv2"),sbp=num("sbp2"),dbp=num("dbp2"),hr=num("hr2"),spo2=num("spo22");
-  if(rr!==null&&(rr>30||rr<10))vitalFails.push("RR ผิดเกณฑ์ ("+rr+")");
-  if(tv!==null&&tv<200)vitalFails.push("TV < 200 ("+tv+")");
-  if(sbp!==null&&(sbp<90||sbp>180))vitalFails.push("SBP ผิดเกณฑ์ ("+sbp+")");
-  if(dbp!==null&&dbp<60)vitalFails.push("DBP < 60 ("+dbp+")");
-  if(hr!==null&&hr>120)vitalFails.push("HR > 120 ("+hr+")");
-  if(spo2!==null&&spo2<90)vitalFails.push("SpO₂ < 90 ("+spo2+")");
+  const S2=SWN_SETTINGS;
+  if(rr!==null&&(rr>S2.m2_rr_max||rr<10))vitalFails.push("RR ผิดเกณฑ์ ("+rr+")");
+  if(tv!==null&&tv<S2.m2_tv_min)vitalFails.push("TV < "+S2.m2_tv_min+" ("+tv+")");
+  if(sbp!==null&&(sbp<S2.sbp_min||sbp>S2.sbp_max))vitalFails.push("SBP ผิดเกณฑ์ ("+sbp+")");
+  if(dbp!==null&&dbp<S2.dbp_min)vitalFails.push("DBP < "+S2.dbp_min+" ("+dbp+")");
+  if(hr!==null&&hr>S2.hr_max)vitalFails.push("HR > "+S2.hr_max+" ("+hr+")");
+  if(spo2!==null&&spo2<S2.m2_spo2_min)vitalFails.push("SpO₂ < "+S2.m2_spo2_min+" ("+spo2+")");
   // red flags
   const flags=[];
   rfGroups.forEach(g=>{
@@ -1320,8 +1538,14 @@ function buildSheetPayload(){
   let perrsAnswered=0,perrsTotal=0;
   ["p1","p2","p3","p4","p5","p6"].forEach(p=>{const val=getR(p);if(val!==null){perrsAnswered++;perrsTotal+=parseInt(val);}});
 
+  const comorbVals=[...document.querySelectorAll("input[name='comorbidity']:checked")].map(cb=>cb.parentElement.querySelector(".otxt").textContent.trim()).join(", ")||"—";
+  const inclOk=[...document.querySelectorAll("input[name='incl']")].every(cb=>cb.checked)?"ผ่าน":"ไม่ผ่าน";
+  const exclOk=[...document.querySelectorAll("input[name='excl']")].some(cb=>cb.checked)?"มีเกณฑ์ยกเว้น":"ผ่าน";
   return{
     hn:V("hn"),pname:V("pname"),adate:V("adate"),atime:V("atime"),nurse:V("nurse"),ward:V("ward"),
+    pt_age:V("pt_age"),vent_days:V("vent_days"),pt_dx:V("pt_dx"),
+    sbt_attempt:getR("sbt_attempt")||"—",comorbidities:comorbVals,
+    inclusion_ok:inclOk,exclusion_ok:exclOk,
     m1_status:v1.status,m1_verdict_text:v1.text,m1_verdict_desc:v1.desc,m1_fail_reasons:v1.fails,
     m1_c1:rTxt("c1")||"",m1_c2:rTxt("c2")||"",m1_c3:rTxt("c3")||"",m1_c4:rTxt("c4")||"",
     m1_spo2:V("spo2"),m1_pao2:V("pao2"),m1_fio2:rTxt("fio2")||"",m1_peep:rTxt("peep")||"",
@@ -1581,6 +1805,8 @@ function confirmReset(){
       el.checked=false;
       el.closest(".opt")?.classList.remove("sel","good","warnbad");
     });
+    const cr=document.getElementById("criteriaResult");
+    if(cr){cr.className="criteria-result pending";cr.textContent="☑️ กรุณาตรวจสอบเกณฑ์ด้านบนก่อน";}
     [1,2,3].forEach(i=>{
       const res=document.getElementById("res"+i);
       const idle=i===1?"ผลการประเมิน Module 1":i===2?"ผลการประเมิน SBT รอบนี้":"PERRS Risk Assessment";
@@ -1885,6 +2111,7 @@ function continueAssessment(saveId){
 
   const setv=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val||"";};
   setv("hn",r.hn);setv("pname",r.pname);setv("nurse",r.nurse);setv("ward",r.ward);
+  setv("pt_age",r.pt_age||"");setv("vent_days",r.vent_days||"");setv("pt_dx",r.pt_dx||"");
   if(document.getElementById("ward").value)saveWard();
   const n=new Date(),p=x=>String(x).padStart(2,"0");
   setv("adate",`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`);
@@ -2112,6 +2339,140 @@ function buildReportFromHistory(r,modules){
   document.getElementById("report").innerHTML=html;
 }
 
+/* ---------------- research dashboard ---------------- */
+function openResearch(){
+  document.getElementById("researchPage").style.display="block";
+  document.getElementById("researchPage").scrollTop=0;
+  buildResearchDashboard(historyRows);
+}
+function closeResearch(){document.getElementById("researchPage").style.display="none";}
+function buildResearchDashboard(rows){
+  const el=document.getElementById("researchPageContent");
+  if(!rows||!rows.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px 20px;color:var(--muted)">ยังไม่มีข้อมูล — กด ประวัติ เพื่อโหลดข้อมูลก่อน</div>`;
+    return;
+  }
+  const successVals=["ส่งกลับ Ward ได้","ส่ง Ward พร้อม O₂"];
+  const failVals=["Reintubation"];
+  const withOutcome=rows.filter(r=>r.m3_outcome&&(successVals.includes(r.m3_outcome)||failVals.includes(r.m3_outcome)));
+  const success=withOutcome.filter(r=>successVals.includes(r.m3_outcome));
+  const fail=withOutcome.filter(r=>failVals.includes(r.m3_outcome));
+  const pct=(n,d)=>d?Math.round(n/d*100):0;
+
+  // demographics helpers
+  const meanSd=arr=>{
+    const nums=arr.map(v=>parseFloat(v)).filter(v=>!isNaN(v));
+    if(!nums.length)return{mean:null,sd:null,n:0};
+    const m=nums.reduce((a,b)=>a+b,0)/nums.length;
+    const sd=Math.sqrt(nums.reduce((a,b)=>a+(b-m)**2,0)/nums.length);
+    return{mean:m,sd,n:nums.length,min:Math.min(...nums),max:Math.max(...nums)};
+  };
+  const ages=rows.map(r=>r.pt_age).filter(Boolean);
+  const vdays=rows.map(r=>r.vent_days).filter(Boolean);
+  const ageStat=meanSd(ages);
+  const vdStat=meanSd(vdays);
+
+  // SBT attempt distribution
+  const sbtCounts={"1":0,"2":0,"3":0,"4+":0};
+  rows.forEach(r=>{const v=(r.sbt_attempt||"").trim();if(sbtCounts[v]!==undefined)sbtCounts[v]++;});
+
+  // comorbidities
+  const comorbNames={dm:"DM",ht:"HT",heart:"Heart disease",copd:"COPD",ckd:"CKD",
+    pneumonia:"Pneumonia/Sepsis",stroke:"Stroke/CVA",cancer:"Cancer",trauma:"Trauma"};
+  const comorbCounts={};
+  const comorbSuccess={};const comorbFail={};
+  Object.keys(comorbNames).forEach(k=>{comorbCounts[k]=0;comorbSuccess[k]=0;comorbFail[k]=0;});
+  rows.forEach(r=>{
+    const cs=String(r.comorbidities||"");
+    const isSuccess=successVals.includes(r.m3_outcome);
+    const isFail=failVals.includes(r.m3_outcome);
+    Object.entries(comorbNames).forEach(([k,name])=>{
+      if(cs.toLowerCase().includes(k)){
+        comorbCounts[k]++;
+        if(isSuccess)comorbSuccess[k]++;
+        if(isFail)comorbFail[k]++;
+      }
+    });
+  });
+  const n=rows.length;
+  const fmt=(stat)=>stat.n?`${stat.mean.toFixed(1)} ± ${stat.sd.toFixed(1)} (${stat.min}–${stat.max})`:"—";
+
+  // age groups
+  const ageGroups=[["18–40",18,40],["41–60",41,60],["61–75",61,75],[">75",76,999]];
+  const agGroupHtml=ageGroups.map(([lbl,lo,hi])=>{
+    const c=ages.filter(a=>{const v=parseFloat(a);return v>=lo&&v<=hi;}).length;
+    return`<div class="rsch-bar-row"><span class="lbl">${lbl} ปี</span><div class="rsch-bar-track"><div class="rsch-bar-fill" style="width:${ages.length?pct(c,ages.length):0}%"></div></div><span class="cnt">${c}</span></div>`;
+  }).join("");
+
+  // vent_days groups
+  const vdGroups=[["1–3 วัน",1,3],["4–7 วัน",4,7],["8–14 วัน",8,14],[">14 วัน",15,9999]];
+  const vdGroupHtml=vdGroups.map(([lbl,lo,hi])=>{
+    const c=vdays.filter(d=>{const v=parseFloat(d);return v>=lo&&v<=hi;}).length;
+    return`<div class="rsch-bar-row"><span class="lbl">${lbl}</span><div class="rsch-bar-track"><div class="rsch-bar-fill" style="width:${vdays.length?pct(c,vdays.length):0}%"></div></div><span class="cnt">${c}</span></div>`;
+  }).join("");
+
+  // comorbidity bar
+  const maxComorbN=Math.max(...Object.values(comorbCounts),1);
+  const comorbBarHtml=Object.entries(comorbNames).map(([k,name])=>{
+    const c=comorbCounts[k];
+    return`<div class="rsch-bar-row"><span class="lbl" style="min-width:145px">${name}</span><div class="rsch-bar-track"><div class="rsch-bar-fill" style="width:${pct(c,maxComorbN)}%"></div></div><span class="cnt">${c} (${pct(c,n)}%)</span></div>`;
+  }).join("");
+
+  // outcome by comorbidity table
+  const comorbTableRows=Object.entries(comorbNames).map(([k,name])=>{
+    const c=comorbCounts[k];
+    if(!c)return"";
+    const s=comorbSuccess[k],f=comorbFail[k],other=c-s-f;
+    return`<tr><td>${name}</td><td>${c} (${pct(c,n)}%)</td><td style="color:var(--green)">${s} (${c?pct(s,c):0}%)</td><td style="color:var(--red)">${f} (${c?pct(f,c):0}%)</td></tr>`;
+  }).join("");
+
+  // sbt attempt distribution
+  const sbtTotal=Object.values(sbtCounts).reduce((a,b)=>a+b,0)||1;
+  const sbtHtml=Object.entries(sbtCounts).map(([k,c])=>`
+    <div class="rsch-bar-row"><span class="lbl">ครั้งที่ ${k}</span><div class="rsch-bar-track"><div class="rsch-bar-fill" style="width:${pct(c,sbtTotal)}%"></div></div><span class="cnt">${c} (${pct(c,n)}%)</span></div>`).join("");
+
+  el.innerHTML=`
+  <!-- overview tiles -->
+  <div class="rsch-grid">
+    <div class="rsch-tile"><div class="n">${n}</div><div class="l">รายการทั้งหมด</div></div>
+    <div class="rsch-tile"><div class="n">${withOutcome.length}</div><div class="l">มีผลลัพธ์ (M3 ครบ)</div></div>
+    <div class="rsch-tile"><div class="n success">${success.length}</div><div class="pct">${pct(success.length,withOutcome.length)}%</div><div class="l">✅ หย่าเครื่องสำเร็จ</div></div>
+    <div class="rsch-tile"><div class="n fail">${fail.length}</div><div class="pct">${pct(fail.length,withOutcome.length)}%</div><div class="l">❌ Reintubation</div></div>
+  </div>
+
+  <!-- demographics -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">👤</span><h2>Demographics</h2></div>
+    <div style="font-size:12.5px;margin-bottom:8px">อายุเฉลี่ย: <b>${fmt(ageStat)}</b> ปี (n=${ageStat.n})</div>
+    ${agGroupHtml}
+    <div style="font-size:12.5px;margin:12px 0 8px">วันใส่ท่อเฉลี่ย: <b>${fmt(vdStat)}</b> วัน (n=${vdStat.n})</div>
+    ${vdGroupHtml}
+  </div>
+
+  <!-- sbt attempt -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">🔄</span><h2>จำนวนครั้ง SBT</h2></div>
+    ${sbtHtml}
+  </div>
+
+  <!-- comorbidities bar -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">🏥</span><h2>โรคประจำตัว</h2></div>
+    ${comorbBarHtml}
+  </div>
+
+  <!-- outcome by comorbidity -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="sec-head"><span class="ic">📊</span><h2>ผลลัพธ์แยกตามโรคประจำตัว</h2></div>
+    <div style="overflow-x:auto">
+    <table class="rsch-table">
+      <thead><tr><th>โรคประจำตัว</th><th>จำนวน (% ของทั้งหมด)</th><th>สำเร็จ (%)</th><th>Reintubation (%)</th></tr></thead>
+      <tbody>${comorbTableRows||`<tr><td colspan="4" style="text-align:center;color:var(--muted)">ยังไม่มีข้อมูลโรคประจำตัว</td></tr>`}</tbody>
+    </table>
+    </div>
+  </div>`;
+}
+
 /* ---------------- ward / department name ---------------- */
 function renderWard(){
   const ward=document.getElementById("ward").value.trim();
@@ -2124,8 +2485,9 @@ function saveWard(){
   renderWard();
 }
 
-// default date/time = now
+// default date/time = now, load settings
 (function(){
+  loadSettings();
   const n=new Date(),p=x=>String(x).padStart(2,"0");
   document.getElementById("adate").value=`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())}`;
   document.getElementById("atime").value=`${p(n.getHours())}:${p(n.getMinutes())}`;
