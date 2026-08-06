@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🏥 Patient Monitoring System</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- React -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8',
+            300: '#f9a8d4', 400: '#f472b6', 500: '#ec4899',
+            600: '#db2777', 700: '#be185d', 800: '#9d174d', 900: '#831843'
+          },
+          secondary: {
+            50: '#faf5ff', 100: '#f3e8ff', 200: '#e9d5ff',
+            300: '#d8b4fe', 400: '#c084fc', 500: '#a855f7',
+            600: '#9333ea', 700: '#7e22ce', 800: '#6b21a8', 900: '#581c87'
+          }
+        },
+        fontFamily: { sans: ['Prompt', 'Sarabun', 'system-ui', 'sans-serif'] }
+      }
+    }
+  }
+</script>
+
+<style>
+  body { font-family: 'Prompt', 'Sarabun', sans-serif; margin: 0; }
+  .leaflet-container { height: 100%; width: 100%; border-radius: 0.75rem; z-index: 0; }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .pulse-ring::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: 50%; background: currentColor;
+    animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+
+  @keyframes slide-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .toast-in { animation: slide-in 0.3s ease-out; }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fade-in 0.4s ease-out; }
+
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: #fdf2f8; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 3px; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
+</head>
+<body class="bg-gradient-to-br from-primary-50 to-secondary-50">
+<div id="root"></div>
+
+<script type="text/babel" data-type="module">
+const { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } = React;
+
+// ============ i18n ============
+const translations = {
+  th: {
+    'app.title': 'ระบบติดตามผู้ป่วยหลังผ่าตัด',
+    'nav.dashboard': 'แดชบอร์ด',
+    'nav.patients': 'รายชื่อผู้ป่วย',
+    'nav.alerts': 'การแจ้งเตือน',
+    'nav.settings': 'ตั้งค่า',
+    'nav.logout': 'ออกจากระบบ',
+    'login.title': 'เข้าสู่ระบบ',
+    'login.email': 'อีเมล',
+    'login.password': 'รหัสผ่าน',
+    'login.submit': 'เข้าสู่ระบบ',
+    'login.demo': 'บัญชีทดสอบ',
+    'dashboard.title': 'แดชบอร์ดติดตามผู้ป่วย',
+    'dashboard.subtitle': 'ติดตามแบบ Real-time ตลอด 24 ชั่วโมง',
+    'dashboard.total': 'ผู้ป่วยทั้งหมด',
+    'dashboard.stable': 'ปกติ',
+    'dashboard.warning': 'เฝ้าระวัง',
+    'dashboard.critical': 'วิกฤต',
+    'patient.name': 'ชื่อผู้ป่วย',
+    'patient.age': 'อายุ',
+    'patient.surgery': 'ประเภทการผ่าตัด',
+    'patient.room': 'ห้อง',
+    'patient.status': 'สถานะ',
+    'patient.heartRate': 'อัตราการเต้นหัวใจ',
+    'patient.bp': 'ความดันโลหิต',
+    'patient.spo2': 'ออกซิเจนในเลือด',
+    'patient.temp': 'อุณหภูมิ',
+    'alert.geofence': 'ออกจากพื้นที่',
+    'alert.vital': 'สัญญาณชีพผิดปกติ',
+    'alert.inactive': 'ไม่อัปเดตตำแหน่ง',
+    'alert.active': 'การแจ้งเตือนที่ใช้งาน',
+    'alert.no': 'ไม่มีการแจ้งเตือน',
+    'status.stable': 'ปกติ',
+    'status.warning': 'เฝ้าระวัง',
+    'status.critical': 'วิกฤต',
+    'status.discharged': 'จำหน่ายแล้ว',
+    'common.save': 'บันทึก',
+    'common.cancel': 'ยกเลิก',
+    'common.close': 'ปิด',
+    'common.back': 'ย้อนกลับ',
+    'common.search': 'ค้นหา...',
+    'common.loading': 'กำลังโหลด...',
+    'common.ack': 'รับทราบ',
+    'chart.vital': 'แนวโน้มสัญญาณชีพ',
+    'chart.all': 'ทั้งหมด',
+    'chart.hr': 'หัวใจ',
+    'chart.bp': 'ความดัน',
+    'chart.spo2': 'ออกซิเจน',
+    'chart.temp': 'อุณหภูมิ',
+    'map.location': 'ตำแหน่งปัจจุบัน',
+    'map.geofence': 'ขอบเขตพื้นที่',
+    'map.hospital_view': 'ตำแหน่งในรพ.',
+    'map.distribution': 'การกระจายที่บ้าน',
+    'med.title': 'ยาที่สั่งจ่าย',
+    'med.none': 'ไม่มียา',
+    'apt.title': 'นัดหมาย',
+    'apt.none': 'ไม่มีนัดหมาย',
+    'settings.lang': 'ภาษา',
+    'settings.notif': 'ช่องทางการแจ้งเตือน',
+    'settings.account': 'บัญชีผู้ใช้',
+    'toast.sms': 'ส่ง SMS แล้ว',
+    'toast.line': 'ส่ง LINE แล้ว',
+    'toast.push': 'แจ้งเตือน Push',
+    'home.address': 'ที่อยู่บ้าน',
+    'home.district': 'เขต',
+    'hosp.recommend': 'สถานพยาบาลใกล้บ้าน',
+    'hosp.distance': 'ระยะทาง',
+    'hosp.navigate': 'นำทาง',
+    'hosp.call': 'โทร',
+    'hosp.urgent': '⚠️ สถานะผิดปกติ — แนะนำไปพบแพทย์โดยด่วน',
+    'hosp.type.tertiary': 'ศูนย์การแพทย์',
+    'hosp.type.general': 'รพ.ทั่วไป',
+    'hosp.type.community': 'รพ.ชุมชน',
+  },
+  en: {
+    'app.title': 'Post-Op Patient Monitoring',
+    'nav.dashboard': 'Dashboard',
+    'nav.patients': 'Patients',
+    'nav.alerts': 'Alerts',
+    'nav.settings': 'Settings',
+    'nav.logout': 'Logout',
+    'login.title': 'Sign In',
+    'login.email': 'Email',
+    'login.password': 'Password',
+    'login.submit': 'Sign In',
+    'login.demo': 'Demo Account',
+    'dashboard.title': 'Patient Monitoring Dashboard',
+    'dashboard.subtitle': 'Real-time monitoring 24/7',
+    'dashboard.total': 'Total Patients',
+    'dashboard.stable': 'Stable',
+    'dashboard.warning': 'Warning',
+    'dashboard.critical': 'Critical',
+    'patient.name': 'Patient Name',
+    'patient.age': 'Age',
+    'patient.surgery': 'Surgery Type',
+    'patient.room': 'Room',
+    'patient.status': 'Status',
+    'patient.heartRate': 'Heart Rate',
+    'patient.bp': 'Blood Pressure',
+    'patient.spo2': 'SpO2',
+    'patient.temp': 'Temperature',
+    'alert.geofence': 'Left Geofence',
+    'alert.vital': 'Abnormal Vitals',
+    'alert.inactive': 'No Location Update',
+    'alert.active': 'Active Alerts',
+    'alert.no': 'No active alerts',
+    'status.stable': 'Stable',
+    'status.warning': 'Warning',
+    'status.critical': 'Critical',
+    'status.discharged': 'Discharged',
+    'common.save': 'Save',
+    'common.cancel': 'Cancel',
+    'common.close': 'Close',
+    'common.back': 'Back',
+    'common.search': 'Search...',
+    'common.loading': 'Loading...',
+    'common.ack': 'Ack',
+    'chart.vital': 'Vital Signs Trend',
+    'chart.all': 'All',
+    'chart.hr': 'Heart Rate',
+    'chart.bp': 'Blood Pressure',
+    'chart.spo2': 'SpO2',
+    'chart.temp': 'Temperature',
+    'map.location': 'Current Location',
+    'map.geofence': 'Geofence Area',
+    'map.hospital_view': 'In-Hospital View',
+    'map.distribution': 'Home Distribution',
+    'med.title': 'Medications',
+    'med.none': 'No medications',
+    'apt.title': 'Appointments',
+    'apt.none': 'No appointments',
+    'settings.lang': 'Language',
+    'settings.notif': 'Notification Channels',
+    'settings.account': 'Account',
+    'toast.sms': 'SMS sent',
+    'toast.line': 'LINE sent',
+    'toast.push': 'Push notification',
+    'home.address': 'Home Address',
+    'home.district': 'District',
+    'hosp.recommend': 'Nearby Hospitals',
+    'hosp.distance': 'Distance',
+    'hosp.navigate': 'Navigate',
+    'hosp.call': 'Call',
+    'hosp.urgent': '⚠️ Abnormal status — Seek medical attention urgently',
+    'hosp.type.tertiary': 'Medical Center',
+    'hosp.type.general': 'General Hospital',
+    'hosp.type.community': 'Community Hospital',
+  }
+};
+
+// ============ Bangkok Districts (for home addresses) ============
+const bangkokDistricts = [
+  { name: 'ลาดพร้าว', lat: 13.8145, lng: 100.5681 },
+  { name: 'บึงกุ่ม', lat: 13.7941, lng: 100.6287 },
+  { name: 'มีนบุรี', lat: 13.8160, lng: 100.7173 },
+  { name: 'ลาดกระบัง', lat: 13.7276, lng: 100.7719 },
+  { name: 'สาทร', lat: 13.7211, lng: 100.5282 },
+  { name: 'บางรัก', lat: 13.7274, lng: 100.5197 },
+  { name: 'ห้วยขวาง', lat: 13.7751, lng: 100.5818 },
+  { name: 'วังทองหลาง', lat: 13.7689, lng: 100.6057 },
+  { name: 'บางกะปิ', lat: 13.7659, lng: 100.6489 },
+  { name: 'คลองสาน', lat: 13.7271, lng: 100.4995 },
+  { name: 'ธนบุรี', lat: 13.7284, lng: 100.4772 },
+  { name: 'ดอนเมือง', lat: 13.9135, lng: 100.5857 },
+  { name: 'บางเขน', lat: 13.8584, lng: 100.5842 },
+  { name: 'สะพานสูง', lat: 13.7559, lng: 100.6671 },
+  { name: 'พระโขนง', lat: 13.7098, lng: 100.6010 },
+  { name: 'บางนา', lat: 13.6694, lng: 100.6081 },
+  { name: 'ปทุมวัน', lat: 13.7457, lng: 100.5312 },
+  { name: 'ราษฎร์บูรณะ', lat: 13.6782, lng: 100.4985 },
+  { name: 'ตลิ่งชัน', lat: 13.7841, lng: 100.4437 },
+  { name: 'ประเวศ', lat: 13.7221, lng: 100.6571 }
+];
+
+// ============ Hospital Dataset ============
+const HOSPITALS = [
+  { id:'H01', name:'รพ.รามาธิบดี', lat:13.7676, lng:100.5283, type:'tertiary', specialty:'ทุกสาขา', phone:'02-201-1000' },
+  { id:'H02', name:'รพ.ศิริราช', lat:13.7577, lng:100.4876, type:'tertiary', specialty:'ทุกสาขา', phone:'02-419-7000' },
+  { id:'H03', name:'รพ.จุฬาลงกรณ์', lat:13.7358, lng:100.5352, type:'tertiary', specialty:'ทุกสาขา', phone:'02-256-4000' },
+  { id:'H04', name:'รพ.เลิดสิน', lat:13.7261, lng:100.5240, type:'general', specialty:'อายุรกรรม', phone:'02-353-9800' },
+  { id:'H05', name:'รพ.นพรัตน์ฯ', lat:13.8511, lng:100.5728, type:'general', specialty:'ทั่วไป', phone:'02-548-7000' },
+  { id:'H06', name:'รพ.ภูมิพลอดุลยเดช', lat:13.9073, lng:100.5882, type:'general', specialty:'ออร์โธปิดิกส์', phone:'02-534-7000' },
+  { id:'H07', name:'รพ.กลาง', lat:13.7527, lng:100.5082, type:'general', specialty:'ทั่วไป', phone:'02-220-8000' },
+  { id:'H08', name:'รพ.ราษฎร์บูรณะ', lat:13.6819, lng:100.5017, type:'general', specialty:'ทั่วไป', phone:'02-427-0066' },
+  { id:'H09', name:'รพ.หลวงพ่อทวีศักดิ์', lat:13.6641, lng:100.5988, type:'community', specialty:'ทั่วไป', phone:'02-398-6101' },
+  { id:'H10', name:'รพ.มีนบุรี', lat:13.8102, lng:100.7081, type:'community', specialty:'ทั่วไป', phone:'02-540-3451' },
+  { id:'H11', name:'รพ.บึงกุ่ม', lat:13.7954, lng:100.6201, type:'community', specialty:'ทั่วไป', phone:'02-374-5160' },
+  { id:'H12', name:'รพ.ลาดกระบัง', lat:13.7306, lng:100.7754, type:'community', specialty:'ทั่วไป', phone:'02-326-0274' },
+  { id:'H13', name:'รพ.ตากสิน', lat:13.7251, lng:100.4968, type:'general', specialty:'ศัลยกรรม', phone:'02-437-0123' },
+  { id:'H14', name:'รพ.บางนา', lat:13.6701, lng:100.6050, type:'community', specialty:'ทั่วไป', phone:'02-361-1166' },
+  { id:'H15', name:'รพ.เจริญกรุงประชารักษ์', lat:13.7125, lng:100.5001, type:'general', specialty:'ทั่วไป', phone:'02-289-7777' },
+  { id:'H16', name:'ศูนย์บริการสาธารณสุข 7 บึงกุ่ม', lat:13.7930, lng:100.6290, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-374-1316' },
+  { id:'H17', name:'ศูนย์บริการสาธารณสุข 37 ลาดพร้าว', lat:13.8140, lng:100.5670, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-514-6165' },
+  { id:'H18', name:'รพ.สุขุมวิท', lat:13.7559, lng:100.6630, type:'general', specialty:'ทั่วไป', phone:'02-391-0011' },
+  { id:'H19', name:'ศูนย์บริการสาธารณสุข 27 พระโขนง', lat:13.7100, lng:100.5990, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-392-3085' },
+  { id:'H20', name:'ศูนย์บริการสาธารณสุข 39 ราษฎร์บูรณะ', lat:13.6780, lng:100.4990, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-427-1032' },
+  { id:'H21', name:'ศูนย์บริการสาธารณสุข 68 ตลิ่งชัน', lat:13.7840, lng:100.4450, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-887-0737' },
+  { id:'H22', name:'ศูนย์บริการสาธารณสุข 8 บางกะปิ', lat:13.7660, lng:100.6480, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-374-5280' },
+  { id:'H23', name:'ศูนย์บริการสาธารณสุข 58 ประเวศ', lat:13.7220, lng:100.6560, type:'community', specialty:'เวชกรรมทั่วไป', phone:'02-328-2082' },
+];
+
+// ============ Haversine Distance (km) ============
+const haversineDistance = (lat1, lng1, lat2, lng2) => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+};
+
+// ============ Mock Data ============
+const thaiNames = ['สมชาย', 'สมหญิง', 'วิชัย', 'พรทิพย์', 'สุรศักดิ์', 'นภา', 'ธนา', 'กนกพร', 'พิชัย', 'มาลี', 'อนุชา', 'อรุณี', 'ประสิทธิ์', 'สุดา', 'วิทยา', 'ปิยะ', 'วรรณา', 'สมศักดิ์', 'จินดา', 'ประเสริฐ', 'สุภาพร', 'ชัยวัฒน์', 'พิมพ์ใจ', 'ศุภชัย', 'รัตนา'];
+const surNames = ['ใจดี', 'รักสุข', 'สมบูรณ์', 'เจริญผล', 'สุขสันต์', 'มงคล', 'ศรีสุข', 'วงศ์สุข', 'แก้วใส', 'ทองดี'];
+const surgeries = ['ผ่าตัดไส้ติ่ง', 'ผ่าตัดกระดูกสันหลัง', 'ผ่าตัดหัวใจ', 'ผ่าตัดสมอง', 'ผ่าตัดคลอด', 'ผ่าตัดเข่า', 'ผ่าตัดสะโพก', 'ผ่าตัดถุงน้ำดี'];
+const medications = [
+  { name: 'Paracetamol', dosage: '500mg', schedule: 'ทุก 6 ชม.' },
+  { name: 'Amoxicillin', dosage: '500mg', schedule: 'ทุก 8 ชม.' },
+  { name: 'Ibuprofen', dosage: '400mg', schedule: 'ทุก 8 ชม.' },
+  { name: 'Omeprazole', dosage: '20mg', schedule: 'เช้า-เย็น' },
+  { name: 'Metformin', dosage: '500mg', schedule: 'หลังอาหาร' }
+];
+const streetTypes = ['ใหญ่', 'กลาง', 'พระราม', 'รัชดา'];
+
+const generatePatients = () => {
+  const centerLat = 13.7563, centerLng = 100.5018;
+  return Array.from({ length: 25 }, (_, i) => {
+    const name = `ผู้ป่วย${thaiNames[i % thaiNames.length]} ${surNames[i % surNames.length]}`;
+    const statusRoll = Math.random();
+    const status = statusRoll > 0.85 ? 'critical' : statusRoll > 0.7 ? 'warning' : 'stable';
+    const baseHR = 70 + Math.random() * 15;
+    const baseSpo2 = 95 + Math.random() * 4;
+    const baseTemp = 36.5 + Math.random() * 0.8;
+    const baseSys = 115 + Math.random() * 15;
+
+    const vitals = Array.from({ length: 48 }, (_, h) => {
+      const variation = Math.sin(h / 6) * 5;
+      return {
+        heartRate: Math.round(baseHR + variation + (Math.random() - 0.5) * 10),
+        systolicBP: Math.round(baseSys + variation + (Math.random() - 0.5) * 8),
+        diastolicBP: Math.round(70 + (Math.random() - 0.5) * 6),
+        spo2: Math.round(baseSpo2 + (Math.random() - 0.5) * 2),
+        temperature: +(baseTemp + (Math.random() - 0.5) * 0.4).toFixed(1),
+        recordedAt: new Date(Date.now() - (48 - h) * 30 * 60 * 1000)
+      };
+    });
+
+    // Home address in Bangkok district
+    const district = bangkokDistricts[i % bangkokDistricts.length];
+    const homeLat = district.lat + (Math.random() - 0.5) * 0.02;
+    const homeLng = district.lng + (Math.random() - 0.5) * 0.02;
+
+    return {
+      id: `P${String(i + 1).padStart(3, '0')}`,
+      name,
+      age: 25 + Math.floor(Math.random() * 55),
+      gender: i % 2 === 0 ? 'female' : 'male',
+      surgeryType: surgeries[i % surgeries.length],
+      surgeryDate: new Date(Date.now() - Math.random() * 7 * 86400000),
+      room: `${Math.ceil((i + 1) / 5)}`,
+      bed: `${(i % 5) + 1}`,
+      phone: `+668${String(10000000 + i * 111).slice(-8)}`,
+      location: {
+        lat: centerLat + (Math.random() - 0.5) * 0.008,
+        lng: centerLng + (Math.random() - 0.5) * 0.008,
+        updatedAt: new Date()
+      },
+      homeAddress: {
+        lat: homeLat,
+        lng: homeLng,
+        street: `ซอย ${Math.floor(Math.random() * 50 + 1)} ถนนสาย${streetTypes[i % 4]}`,
+        district: district.name,
+        province: 'กรุงเทพมหานคร'
+      },
+      geofence: {
+        center: { lat: centerLat, lng: centerLng },
+        radius: 500
+      },
+      vitals,
+      status,
+      medications: [medications[i % medications.length], medications[(i + 2) % medications.length]].slice(0, Math.random() > 0.3 ? 2 : 1),
+      appointments: Math.random() > 0.4 ? [{
+        title: 'ติดตามอาการหลังผ่าตัด',
+        datetime: new Date(Date.now() + (1 + Math.random() * 6) * 86400000),
+        notes: 'ห้องตรวจศัลยกรรม'
+      }] : []
+    };
+  });
+};
+
+// ============ Icons (SVG) ============
+const Icon = ({ path, className = "w-5 h-5", fill = "none", stroke = "currentColor" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fill} stroke={stroke}
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    {path}
+  </svg>
+);
+const Icons = {
+  Heart: (p) => <Icon {...p} path={<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />} />,
+  Users: (p) => <Icon {...p} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>} />,
+  Bell: (p) => <Icon {...p} path={<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></>} />,
+  Settings: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" /></>} />,
+  LogOut: (p) => <Icon {...p} path={<><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></>} />,
+  Menu: (p) => <Icon {...p} path={<><line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" /></>} />,
+  X: (p) => <Icon {...p} path={<><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>} />,
+  Globe: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></>} />,
+  Search: (p) => <Icon {...p} path={<><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></>} />,
+  Mail: (p) => <Icon {...p} path={<><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>} />,
+  Lock: (p) => <Icon {...p} path={<><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>} />,
+  ArrowLeft: (p) => <Icon {...p} path={<><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>} />,
+  Activity: (p) => <Icon {...p} path={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />} />,
+  AlertTriangle: (p) => <Icon {...p} path={<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></>} />,
+  MapPin: (p) => <Icon {...p} path={<><path d="M20 10c0 7-8 12-8 12s-8-5-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></>} />,
+  Clock: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>} />,
+  Thermometer: (p) => <Icon {...p} path={<><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" /></>} />,
+  Wind: (p) => <Icon {...p} path={<><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" /><path d="M9.6 4.6A2 2 0 1 1 11 8H2" /><path d="M12.6 19.4A2 2 0 1 0 14 16H2" /></>} />,
+  Check: (p) => <Icon {...p} path={<polyline points="20 6 9 17 4 12" />} />,
+  Phone: (p) => <Icon {...p} path={<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />} />,
+  Shield: (p) => <Icon {...p} path={<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />} />,
+  LayoutDashboard: (p) => <Icon {...p} path={<><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></>} />,
+  Home: (p) => <Icon {...p} path={<><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></>} />,
+  Navigation: (p) => <Icon {...p} path={<><polygon points="3 11 22 2 13 21 11 13 3 11" /></>} />,
+};
+
+// ============ App Context ============
+const AppContext = createContext();
+
+const AppProvider = ({ children }) => {
+  const [lang, setLang] = useState(localStorage.getItem('lang') || 'th');
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [patients, setPatients] = useState(() => generatePatients());
+  const [alerts, setAlerts] = useState([]);
+  const [toasts, setToasts] = useState([]);
+  const [page, setPage] = useState('dashboard');
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const t = useCallback((key) => translations[lang][key] || key, [lang]);
+
+  const changeLang = (newLang) => {
+    setLang(newLang);
+    localStorage.setItem('lang', newLang);
+  };
+
+  const login = (email, password) => {
+    if ((email === 'admin@hospital.com' && password === 'admin123') ||
+        (email === 'nurse@hospital.com' && password === 'nurse123')) {
+      const u = {
+        id: 'U001',
+        name: email.includes('admin') ? 'Admin โรงพยาบาล' : 'พยาบาลสมหญิง',
+        email,
+        role: email.includes('admin') ? 'admin' : 'nurse'
+      };
+      setUser(u);
+      localStorage.setItem('user', JSON.stringify(u));
+      return u;
+    }
+    throw new Error(lang === 'th' ? 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' : 'Invalid credentials');
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    setPage('dashboard');
+  };
+
+  const addToast = (message, type = 'info') => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  };
+
+  const addAlert = (alert) => {
+    const newAlert = { ...alert, id: 'A' + Date.now(), createdAt: new Date(), acknowledged: false };
+    setAlerts(prev => [newAlert, ...prev].slice(0, 50));
+    addToast(alert.message, alert.severity);
+  };
+
+  const acknowledgeAlert = (id) => {
+    setAlerts(prev => prev.map(a => a.id === id ? { ...a, acknowledged: true } : a));
+  };
+
+  // Real-time simulation
+  useEffect(() => {
+    if (!user) return;
+
+    const vitalsInterval = setInterval(() => {
+      setPatients(prev => prev.map(p => {
+        if (p.status === 'discharged') return p;
+        const last = p.vitals[p.vitals.length - 1];
+        const newVital = {
+          heartRate: Math.max(40, Math.min(140, last.heartRate + (Math.random() - 0.5) * 6)),
+          systolicBP: Math.max(80, Math.min(180, last.systolicBP + (Math.random() - 0.5) * 5)),
+          diastolicBP: Math.max(50, Math.min(110, last.diastolicBP + (Math.random() - 0.5) * 3)),
+          spo2: Math.max(85, Math.min(100, last.spo2 + (Math.random() - 0.5) * 1)),
+          temperature: +Math.max(35, Math.min(40, last.temperature + (Math.random() - 0.5) * 0.2)).toFixed(1),
+          recordedAt: new Date()
+        };
+
+        let newStatus = 'stable';
+        if (newVital.heartRate > 120 || newVital.heartRate < 50 || newVital.spo2 < 92) {
+          newStatus = newVital.heartRate > 140 || newVital.spo2 < 88 ? 'critical' : 'warning';
+        }
+
+        if (Math.random() < 0.003) {
+          const types = ['vital_sign', 'geofence', 'inactive'];
+          const type = types[Math.floor(Math.random() * types.length)];
+          const messages = {
+            th: {
+              vital_sign: `สัญญาณชีพผิดปกติ: ${p.name} (HR: ${Math.round(newVital.heartRate)}, SpO2: ${Math.round(newVital.spo2)})`,
+              geofence: `ผู้ป่วย ${p.name} ออกจากพื้นที่ที่กำหนด`,
+              inactive: `ไม่ได้รับตำแหน่งจาก ${p.name} นานกว่า 15 นาที`
+            },
+            en: {
+              vital_sign: `Abnormal vitals: ${p.name} (HR: ${Math.round(newVital.heartRate)}, SpO2: ${Math.round(newVital.spo2)})`,
+              geofence: `Patient ${p.name} left the designated area`,
+              inactive: `No location update from ${p.name} for 15+ minutes`
+            }
+          };
+          addAlert({
+            patientId: p.id,
+            patientName: p.name,
+            type,
+            severity: type === 'geofence' ? 'critical' : newStatus === 'critical' ? 'critical' : 'warning',
+            message: messages[lang][type]
+          });
+        }
+
+        const newLoc = {
+          lat: p.location.lat + (Math.random() - 0.5) * 0.0003,
+          lng: p.location.lng + (Math.random() - 0.5) * 0.0003,
+          updatedAt: new Date()
+        };
+
+        return {
+          ...p,
+          vitals: [...p.vitals.slice(-95), newVital],
+          location: newLoc,
+          status: newStatus
+        };
+      }));
+    }, 5000);
+
+    return () => clearInterval(vitalsInterval);
+  }, [user, lang]);
+
+  const value = {
+    lang, t, changeLang,
+    user, login, logout,
+    patients, setPatients,
+    alerts, addAlert, acknowledgeAlert,
+    toasts, addToast,
+    page, setPage,
+    selectedPatientId, setSelectedPatientId,
+    sidebarOpen, setSidebarOpen
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+const useApp = () => useContext(AppContext);
+
+// ============ Toast ============
+const Toast = () => {
+  const { toasts } = useApp();
+  return (
+    <div className="fixed top-4 right-4 z-[9999] space-y-2 max-w-sm">
+      {toasts.map(toast => (
+        <div key={toast.id} className={`toast-in px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium ${
+          toast.type === 'critical' ? 'bg-red-500' :
+          toast.type === 'warning' ? 'bg-amber-500' :
+          'bg-gradient-to-r from-primary-500 to-secondary-500'
+        }`}>
+          {toast.message}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ============ Login ============
+const Login = () => {
+  const { login, t, lang } = useApp();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    setTimeout(() => {
+      try {
+        login(email, password);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+  };
+
+  const fillDemo = () => {
+    setEmail('nurse@hospital.com');
+    setPassword('nurse123');
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-400 via-secondary-400 to-primary-500 p-4">
+      <div className="w-full max-w-md fade-in">
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center mb-3 shadow-lg">
+              <Icons.Heart className="w-8 h-8 text-white" fill="white" />
+            </div>
+            <h1 className="text-2xl font-bold gradient-text text-center">{t('app.title')}</h1>
+            <p className="text-sm text-gray-500 mt-1">{t('login.title')}</p>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('login.email')}</label>
+              <div className="relative">
+                <Icons.Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                  className="w-full pl-10 pr-3 py-2.5 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-transparent outline-none transition"
+                  placeholder="nurse@hospital.com" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('login.password')}</label>
+              <div className="relative">
+                <Icons.Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
+                  className="w-full pl-10 pr-3 py-2.5 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-transparent outline-none transition"
+                  placeholder="••••••••" />
+              </div>
+            </div>
+            {error && <div className="text-sm text-red-600 bg-red-50 p-2 rounded-lg border border-red-200">{error}</div>}
+            <button type="submit" disabled={loading}
+              className="w-full py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-semibold rounded-lg hover:shadow-lg transition disabled:opacity-50">
+              {loading ? '...' : t('login.submit')}
+            </button>
+          </form>
+          <div className="mt-6 pt-4 border-t border-primary-100">
+            <p className="text-xs text-center text-gray-500 mb-2">{t('login.demo')}</p>
+            <button onClick={fillDemo} className="w-full py-2 text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg font-medium transition">
+              nurse@hospital.com / nurse123
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ Sidebar ============
+const Sidebar = () => {
+  const { t, user, logout, page, setPage, sidebarOpen, setSidebarOpen } = useApp();
+
+  const links = [
+    { id: 'dashboard', icon: Icons.LayoutDashboard, label: 'nav.dashboard' },
+    { id: 'patients', icon: Icons.Users, label: 'nav.patients' },
+    { id: 'alerts', icon: Icons.Bell, label: 'nav.alerts' },
+    { id: 'settings', icon: Icons.Settings, label: 'nav.settings' }
+  ];
+
+  const navigate = (p) => { setPage(p); setSidebarOpen(false); };
+
+  return (
+    <>
+      {sidebarOpen && <div className="fixed inset-0 z-30 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />}
+      <aside className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-primary-100 transition-transform transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 flex flex-col shadow-lg md:shadow-none`}>
+        <div className="flex items-center justify-between p-4 border-b border-primary-100 bg-gradient-to-r from-primary-500 to-secondary-500">
+          <div className="flex items-center gap-2 text-white">
+            <Icons.Heart className="w-6 h-6" fill="white" />
+            <h1 className="font-bold text-sm leading-tight">{t('app.title')}</h1>
+          </div>
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-white">
+            <Icons.X className="w-5 h-5" />
+          </button>
+        </div>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-thin">
+          {links.map(({ id, icon: IconC, label }) => (
+            <button key={id} onClick={() => navigate(id)}
+              className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg transition ${
+                page === id
+                  ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-primary-50'
+              }`}>
+              <IconC className="w-5 h-5" />
+              <span className="font-medium text-sm">{t(label)}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="p-3 border-t border-primary-100">
+          <div className="px-3 py-2 mb-2">
+            <p className="font-semibold text-gray-800 text-sm">{user?.name}</p>
+            <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+          </div>
+          <button onClick={logout} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition">
+            <Icons.LogOut className="w-5 h-5" />
+            <span className="font-medium text-sm">{t('nav.logout')}</span>
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+};
+
+// ============ Header ============
+const Header = () => {
+  const { t, lang, changeLang, setSidebarOpen, alerts } = useApp();
+  const unacked = alerts.filter(a => !a.acknowledged).length;
+
+  return (
+    <header className="bg-white border-b border-primary-100 px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-20">
+      <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 rounded-lg hover:bg-primary-50">
+        <Icons.Menu className="w-6 h-6 text-primary-700" />
+      </button>
+      <div className="hidden md:block">
+        <h2 className="text-lg font-semibold gradient-text">Patient Monitoring</h2>
+      </div>
+      <div className="flex items-center gap-2">
+        <button className="relative p-2 rounded-lg hover:bg-primary-50">
+          <Icons.Bell className="w-5 h-5 text-gray-600" />
+          {unacked > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
+        </button>
+        <button onClick={() => changeLang(lang === 'th' ? 'en' : 'th')}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 hover:from-primary-100 hover:to-secondary-100 text-primary-700 font-medium text-sm transition">
+          <Icons.Globe className="w-4 h-4" />
+          {lang === 'th' ? 'TH' : 'EN'}
+        </button>
+      </div>
+    </header>
+  );
+};
+
+// ============ Map ============
+const MapView = ({ patients, center, zoom = 13, height = '100%', showHomeMarkers = false, showHospitalMarkers = false, hospitals = [] }) => {
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markersRef = useRef({});
+  const circlesRef = useRef({});
+  const homeMarkersRef = useRef({});
+  const hospMarkersRef = useRef({});
+
+  const statusColors = { stable: '#10b981', warning: '#f59e0b', critical: '#ef4444' };
+
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+    const c = center || [13.7563, 100.5018];
+    mapInstanceRef.current = L.map(mapRef.current).setView(c, zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(mapInstanceRef.current);
+
+    setTimeout(() => mapInstanceRef.current.invalidateSize(), 100);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // In-hospital patient markers (pulsing dots) — only when NOT in home mode
+  useEffect(() => {
+    if (!mapInstanceRef.current || showHomeMarkers) return;
+    const map = mapInstanceRef.current;
+
+    // Remove home/hospital markers if switching modes
+    Object.values(homeMarkersRef.current).forEach(m => m.remove());
+    homeMarkersRef.current = {};
+    Object.values(hospMarkersRef.current).forEach(m => m.remove());
+    hospMarkersRef.current = {};
+
+    patients.forEach(p => {
+      if (!p.location) return;
+      const color = statusColors[p.status] || '#ec4899';
+
+      if (p.geofence?.center && !circlesRef.current[p.id]) {
+        const circle = L.circle([p.geofence.center.lat, p.geofence.center.lng], {
+          radius: p.geofence.radius,
+          color: '#ec4899',
+          fillColor: '#ec4899',
+          fillOpacity: 0.05,
+          weight: 1,
+          dashArray: '5, 5'
+        }).addTo(map);
+        circlesRef.current[p.id] = circle;
+      }
+
+      const icon = L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="position:relative;width:24px;height:24px;">
+          <div class="pulse-ring" style="color:${color};width:24px;height:24px;"></div>
+          <div style="position:absolute;inset:0;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>
+        </div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      if (markersRef.current[p.id]) {
+        markersRef.current[p.id].setLatLng([p.location.lat, p.location.lng]);
+        markersRef.current[p.id].setIcon(icon);
+      } else {
+        const marker = L.marker([p.location.lat, p.location.lng], { icon })
+          .bindPopup(`<div style="font-family:Prompt,sans-serif;"><strong>${p.name}</strong><br/>Room: ${p.room}-${p.bed}<br/>Status: <span style="color:${color};font-weight:600;">${p.status}</span></div>`)
+          .addTo(map);
+        markersRef.current[p.id] = marker;
+      }
+    });
+  }, [patients, showHomeMarkers]);
+
+  // Home markers mode
+  useEffect(() => {
+    if (!mapInstanceRef.current || !showHomeMarkers) return;
+    const map = mapInstanceRef.current;
+
+    // Remove in-hospital markers
+    Object.values(markersRef.current).forEach(m => m.remove());
+    markersRef.current = {};
+    Object.values(circlesRef.current).forEach(m => m.remove());
+    circlesRef.current = {};
+
+    // Draw home markers
+    patients.forEach(p => {
+      if (!p.homeAddress) return;
+      const color = statusColors[p.status] || '#10b981';
+      const homeIcon = L.divIcon({
+        className: '',
+        html: `<div style="position:relative;text-align:center;">
+          <div style="font-size:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35));line-height:1;">${p.status === 'critical' ? '🔴' : p.status === 'warning' ? '🟡' : '🏠'}</div>
+        </div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
+      });
+
+      if (homeMarkersRef.current[p.id]) {
+        // already placed, skip
+      } else {
+        const marker = L.marker([p.homeAddress.lat, p.homeAddress.lng], { icon: homeIcon })
+          .bindPopup(`<div style="font-family:Prompt,sans-serif;min-width:160px;">
+            <strong>${p.name}</strong><br/>
+            <span style="color:#6b7280;font-size:12px;">เขต${p.homeAddress.district}</span><br/>
+            <span style="color:${color};font-weight:600;font-size:12px;">${p.status === 'critical' ? '🔴 วิกฤต' : p.status === 'warning' ? '🟡 เฝ้าระวัง' : '🟢 ปกติ'}</span>
+          </div>`)
+          .addTo(map);
+        homeMarkersRef.current[p.id] = marker;
+      }
+    });
+
+    // Draw hospital markers
+    if (showHospitalMarkers) {
+      const hospsToShow = hospitals.length > 0 ? hospitals : HOSPITALS;
+      hospsToShow.forEach(h => {
+        if (hospMarkersRef.current[h.id]) return;
+        const hospIcon = L.divIcon({
+          className: '',
+          html: `<div style="background:#0ea5e9;border:2.5px solid white;border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.3);">🏥</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 28]
+        });
+        const marker = L.marker([h.lat, h.lng], { icon: hospIcon })
+          .bindPopup(`<div style="font-family:Prompt,sans-serif;min-width:160px;">
+            <strong>${h.name}</strong><br/>
+            <span style="color:#6b7280;font-size:12px;">${h.specialty}</span><br/>
+            <span style="color:#0ea5e9;font-size:12px;">📞 ${h.phone}</span>
+          </div>`)
+          .addTo(map);
+        hospMarkersRef.current[h.id] = marker;
+      });
+    }
+  }, [patients, showHomeMarkers, showHospitalMarkers, hospitals]);
+
+  useEffect(() => {
+    if (mapInstanceRef.current && center) {
+      mapInstanceRef.current.setView(center, zoom);
+    }
+  }, [center, zoom]);
+
+  return <div ref={mapRef} style={{ height, width: '100%' }} />;
+};
+
+// ============ Vital Chart ============
+const VitalChart = ({ vitals, metric = 'all' }) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!canvasRef.current || vitals.length === 0) return;
+
+    const labels = vitals.map(v => {
+      const d = new Date(v.recordedAt);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    });
+
+    const datasets = [];
+    if (metric === 'all' || metric === 'hr') {
+      datasets.push({
+        label: 'HR (bpm)', data: vitals.map(v => v.heartRate),
+        borderColor: '#ec4899', backgroundColor: 'rgba(236, 72, 153, 0.1)',
+        tension: 0.4, borderWidth: 2, pointRadius: 0
+      });
+    }
+    if (metric === 'all' || metric === 'spo2') {
+      datasets.push({
+        label: 'SpO2 (%)', data: vitals.map(v => v.spo2),
+        borderColor: '#a855f7', backgroundColor: 'rgba(168, 85, 247, 0.1)',
+        tension: 0.4, borderWidth: 2, pointRadius: 0
+      });
+    }
+    if (metric === 'all' || metric === 'bp') {
+      datasets.push({
+        label: 'Sys BP', data: vitals.map(v => v.systolicBP),
+        borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        tension: 0.4, borderWidth: 2, pointRadius: 0
+      });
+      datasets.push({
+        label: 'Dia BP', data: vitals.map(v => v.diastolicBP),
+        borderColor: '#f97316', backgroundColor: 'rgba(249, 115, 22, 0.1)',
+        tension: 0.4, borderWidth: 2, pointRadius: 0
+      });
+    }
+    if (metric === 'temp') {
+      datasets.push({
+        label: 'Temp (°C)', data: vitals.map(v => v.temperature),
+        borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.4, borderWidth: 2, pointRadius: 0
+      });
+    }
+
+    if (chartRef.current) chartRef.current.destroy();
+    chartRef.current = new Chart(canvasRef.current, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { font: { family: 'Prompt', size: 11 }, usePointStyle: true, padding: 15 } }
+        },
+        scales: {
+          x: { grid: { color: '#fce7f3' }, ticks: { font: { size: 10 }, maxTicksLimit: 8 } },
+          y: { grid: { color: '#fce7f3' }, ticks: { font: { size: 10 } } }
+        },
+        interaction: { mode: 'index', intersect: false }
+      }
+    });
+
+    return () => { if (chartRef.current) chartRef.current.destroy(); };
+  }, [vitals, metric]);
+
+  return <canvas ref={canvasRef} />;
+};
+
+// ============ Patient Card ============
+const PatientCard = ({ patient, onClick }) => {
+  const { t } = useApp();
+  const latest = patient.vitals[patient.vitals.length - 1] || {};
+  const statusColors = {
+    stable: 'bg-green-100 text-green-700 border-green-300',
+    warning: 'bg-amber-100 text-amber-700 border-amber-300',
+    critical: 'bg-red-100 text-red-700 border-red-300'
+  };
+
+  return (
+    <div onClick={onClick} className="cursor-pointer bg-white rounded-xl border border-primary-100 hover:shadow-lg hover:border-primary-300 hover:-translate-y-1 transition-all overflow-hidden">
+      <div className={`px-4 py-2 text-xs font-semibold ${statusColors[patient.status]} border-b flex items-center justify-between`}>
+        <span>{t(`status.${patient.status}`)}</span>
+        {patient.status === 'critical' && <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}
+      </div>
+      <div className="p-4">
+        <h3 className="font-bold text-gray-800 text-sm">{patient.name}</h3>
+        <p className="text-xs text-gray-500 mt-1">
+          {patient.age}y • {patient.surgeryType}
+        </p>
+        <p className="text-xs text-gray-400">Room {patient.room}-{patient.bed}</p>
+        {patient.homeAddress && (
+          <p className="text-xs text-blue-400 mt-0.5 flex items-center gap-1">
+            <span>🏠</span> เขต{patient.homeAddress.district}
+          </p>
+        )}
+        <div className="grid grid-cols-2 gap-2 mt-3">
+          <div className="flex items-center gap-1.5 text-xs">
+            <Icons.Heart className="w-3.5 h-3.5 text-red-500" />
+            <span>{Math.round(latest.heartRate || 0)} bpm</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <Icons.Activity className="w-3.5 h-3.5 text-primary-500" />
+            <span>{latest.systolicBP || '--'}/{latest.diastolicBP || '--'}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <Icons.Wind className="w-3.5 h-3.5 text-secondary-500" />
+            <span>{Math.round(latest.spo2 || 0)}%</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <Icons.Thermometer className="w-3.5 h-3.5 text-orange-500" />
+            <span>{latest.temperature || '--'}°C</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ Alert Panel ============
+const AlertPanel = ({ compact = false }) => {
+  const { alerts, acknowledgeAlert, t, lang } = useApp();
+  const active = alerts.filter(a => !a.acknowledged).slice(0, compact ? 8 : 50);
+
+  const severityStyles = {
+    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    warning: 'bg-amber-50 border-amber-200 text-amber-800',
+    critical: 'bg-red-50 border-red-200 text-red-800'
+  };
+  const icons = { geofence: Icons.MapPin, vital_sign: Icons.Activity, inactive: Icons.Clock };
+
+  if (active.length === 0) {
+    return (
+      <div className="bg-white rounded-xl p-6 border border-primary-100 text-center text-gray-500">
+        <Icons.Check className="w-12 h-12 mx-auto mb-2 text-green-500" />
+        <p className="text-sm">{t('alert.no')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-primary-100 overflow-hidden">
+      <div className="px-4 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-semibold text-sm flex items-center justify-between">
+        <span>{t('alert.active')} ({active.length})</span>
+        <Icons.Bell className="w-4 h-4" />
+      </div>
+      <div className={`divide-y divide-primary-50 ${compact ? 'max-h-96' : 'max-h-[600px]'} overflow-y-auto scrollbar-thin`}>
+        {active.map(a => {
+          const IconC = icons[a.type] || Icons.AlertTriangle;
+          return (
+            <div key={a.id} className={`p-3 border-l-4 ${severityStyles[a.severity]}`}>
+              <div className="flex items-start gap-3">
+                <IconC className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">{a.patientName}</p>
+                  <p className="text-xs mt-0.5">{a.message}</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {new Date(a.createdAt).toLocaleString(lang === 'th' ? 'th-TH' : 'en-US')}
+                  </p>
+                </div>
+                <button onClick={() => acknowledgeAlert(a.id)}
+                  className="p-1.5 rounded-lg bg-white hover:bg-gray-100 text-xs font-medium text-gray-700 border border-gray-200">
+                  {t('common.ack')}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ============ Hospital Recommendation ============
+const HospitalRecommendation = ({ patient, t, lang }) => {
+  if (!patient.homeAddress) return null;
+  const { lat, lng } = patient.homeAddress;
+
+  const nearestHospitals = useMemo(() => {
+    return [...HOSPITALS]
+      .map(h => ({ ...h, distance: haversineDistance(lat, lng, h.lat, h.lng) }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 3);
+  }, [lat, lng]);
+
+  const urgent = patient.status === 'warning' || patient.status === 'critical';
+  const typeLabel = (type) => t(`hosp.type.${type}`);
+  const typeBadgeColor = (type) =>
+    type === 'tertiary' ? 'bg-purple-100 text-purple-700' :
+    type === 'general' ? 'bg-blue-100 text-blue-700' :
+    'bg-green-100 text-green-700';
+
+  return (
+    <div className={`bg-white rounded-xl border shadow-sm overflow-hidden ${urgent ? 'border-red-300' : 'border-primary-100'}`}>
+      <div className={`px-4 py-3 flex items-center gap-2 ${urgent ? 'bg-gradient-to-r from-red-500 to-rose-500' : 'bg-gradient-to-r from-sky-500 to-cyan-500'} text-white`}>
+        <span className="text-lg">🏥</span>
+        <span className="font-semibold text-sm">{t('hosp.recommend')}</span>
+        <span className="text-xs opacity-80 ml-auto">จากบ้าน เขต{patient.homeAddress.district}</span>
+      </div>
+
+      {urgent && (
+        <div className={`mx-4 mt-3 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 ${patient.status === 'critical' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+          {t('hosp.urgent')}
+        </div>
+      )}
+
+      <div className="p-4 space-y-3">
+        {nearestHospitals.map((h, idx) => (
+          <div key={h.id} className={`rounded-xl border p-3 flex flex-col gap-2 ${idx === 0 ? 'border-sky-200 bg-sky-50' : 'border-gray-100 bg-gray-50'}`}>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {idx === 0 && <span className="text-xs bg-sky-500 text-white px-1.5 py-0.5 rounded font-semibold">ใกล้ที่สุด</span>}
+                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${typeBadgeColor(h.type)}`}>{typeLabel(h.type)}</span>
+                </div>
+                <p className="font-bold text-gray-800 text-sm mt-1">{h.name}</p>
+                <p className="text-xs text-gray-500">{h.specialty}</p>
+              </div>
+              <div className="text-right flex-none">
+                <p className="text-lg font-bold text-sky-600">{h.distance.toFixed(1)}</p>
+                <p className="text-xs text-gray-400">กม.</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <a href={`tel:${h.phone}`}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-100 transition">
+                <Icons.Phone className="w-3.5 h-3.5" /> {h.phone}
+              </a>
+              <a href={`https://maps.google.com/?q=${h.lat},${h.lng}`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 text-white text-xs font-semibold hover:bg-sky-600 transition">
+                <Icons.Navigation className="w-3.5 h-3.5" /> {t('hosp.navigate')}
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ============ Dashboard ============
+const Dashboard = () => {
+  const { patients, t, setPage, setSelectedPatientId } = useApp();
+  const [mapMode, setMapMode] = useState('hospital');
+
+  const stats = useMemo(() => ({
+    total: patients.length,
+    stable: patients.filter(p => p.status === 'stable').length,
+    warning: patients.filter(p => p.status === 'warning').length,
+    critical: patients.filter(p => p.status === 'critical').length
+  }), [patients]);
+
+  const statCards = [
+    { label: t('dashboard.total'), value: stats.total, icon: Icons.Users, color: 'from-primary-500 to-secondary-500' },
+    { label: t('dashboard.stable'), value: stats.stable, icon: Icons.Heart, color: 'from-green-400 to-emerald-500' },
+    { label: t('dashboard.warning'), value: stats.warning, icon: Icons.AlertTriangle, color: 'from-amber-400 to-orange-500' },
+    { label: t('dashboard.critical'), value: stats.critical, icon: Icons.Activity, color: 'from-red-400 to-rose-500' }
+  ];
+
+  const openPatient = (id) => { setSelectedPatientId(id); setPage('patient-detail'); };
+
+  return (
+    <div className="space-y-6 fade-in">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold gradient-text">{t('dashboard.title')}</h1>
+        <p className="text-sm text-gray-500 mt-1">{t('dashboard.subtitle')}</p>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {statCards.map(({ label, value, icon: IconC, color }) => (
+          <div key={label} className={`bg-gradient-to-br ${color} rounded-xl p-4 text-white shadow-lg hover:shadow-xl transition`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs opacity-90">{label}</p>
+                <p className="text-2xl md:text-3xl font-bold mt-1">{value}</p>
+              </div>
+              <IconC className="w-8 h-8 md:w-10 md:h-10 opacity-80" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-primary-100 overflow-hidden shadow-sm">
+          {/* Map mode toggle */}
+          <div className="px-4 py-2 border-b border-primary-100 flex items-center justify-between bg-gradient-to-r from-primary-50 to-secondary-50">
+            <span className="text-sm font-semibold text-gray-700">🗺️ แผนที่</span>
+            <div className="flex rounded-lg overflow-hidden border border-primary-200">
+              <button
+                onClick={() => setMapMode('hospital')}
+                className={`px-3 py-1.5 text-xs font-medium transition ${mapMode === 'hospital' ? 'bg-primary-500 text-white' : 'bg-white text-gray-600 hover:bg-primary-50'}`}>
+                {t('map.hospital_view')}
+              </button>
+              <button
+                onClick={() => setMapMode('home')}
+                className={`px-3 py-1.5 text-xs font-medium transition ${mapMode === 'home' ? 'bg-sky-500 text-white' : 'bg-white text-gray-600 hover:bg-sky-50'}`}>
+                🏠 {t('map.distribution')}
+              </button>
+            </div>
+          </div>
+          {/* Map legend for home mode */}
+          {mapMode === 'home' && (
+            <div className="px-4 py-2 bg-sky-50 border-b border-sky-100 flex flex-wrap gap-3 text-xs text-gray-600">
+              <span>🏠 ปกติ</span>
+              <span>🟡 เฝ้าระวัง</span>
+              <span>🔴 วิกฤต</span>
+              <span>🏥 สถานพยาบาล</span>
+            </div>
+          )}
+          <div style={{ height: 440 }}>
+            <MapView
+              patients={patients}
+              showHomeMarkers={mapMode === 'home'}
+              showHospitalMarkers={mapMode === 'home'}
+            />
+          </div>
+        </div>
+        <AlertPanel compact />
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold text-gray-800 mb-3">{t('nav.patients')}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+          {patients.slice(0, 12).map(p => <PatientCard key={p.id} patient={p} onClick={() => openPatient(p.id)} />)}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ Patient List ============
+const PatientList = () => {
+  const { patients, t, setSelectedPatientId, setPage } = useApp();
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+
+  const filtered = patients.filter(p => {
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.surgeryType.toLowerCase().includes(search.toLowerCase()) ||
+      p.id.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === 'all' || p.status === filter;
+    return matchSearch && matchFilter;
+  });
+
+  const openPatient = (id) => { setSelectedPatientId(id); setPage('patient-detail'); };
+
+  return (
+    <div className="space-y-4 fade-in">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <h1 className="text-2xl font-bold gradient-text">{t('nav.patients')}</h1>
+        <div className="flex gap-2 flex-wrap">
+          <div className="relative">
+            <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder={t('common.search')}
+              className="pl-9 pr-3 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-400 outline-none w-full md:w-64 text-sm" />
+          </div>
+          <select value={filter} onChange={e => setFilter(e.target.value)}
+            className="px-3 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-400 outline-none text-sm bg-white">
+            <option value="all">All Status</option>
+            <option value="stable">{t('status.stable')}</option>
+            <option value="warning">{t('status.warning')}</option>
+            <option value="critical">{t('status.critical')}</option>
+          </select>
+        </div>
+      </div>
+      <p className="text-sm text-gray-500">{filtered.length} patients</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+        {filtered.map(p => <PatientCard key={p.id} patient={p} onClick={() => openPatient(p.id)} />)}
+      </div>
+    </div>
+  );
+};
+
+// ============ Patient Detail ============
+const PatientDetail = () => {
+  const { patients, selectedPatientId, setPage, t, lang } = useApp();
+  const [metric, setMetric] = useState('all');
+  const patient = patients.find(p => p.id === selectedPatientId);
+
+  if (!patient) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Patient not found</p>
+        <button onClick={() => setPage('patients')} className="mt-4 px-4 py-2 bg-primary-500 text-white rounded-lg">
+          {t('common.back')}
+        </button>
+      </div>
+    );
+  }
+
+  const latest = patient.vitals[patient.vitals.length - 1] || {};
+
+  // Nearest 3 hospitals for the home map
+  const nearestHospitals = patient.homeAddress
+    ? [...HOSPITALS]
+        .map(h => ({ ...h, distance: haversineDistance(patient.homeAddress.lat, patient.homeAddress.lng, h.lat, h.lng) }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 3)
+    : [];
+
+  return (
+    <div className="space-y-6 fade-in">
+      <button onClick={() => setPage('patients')} className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm">
+        <Icons.ArrowLeft className="w-4 h-4" /> {t('common.back')}
+      </button>
+
+      <div className="bg-white rounded-xl border border-primary-100 p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold gradient-text">{patient.name}</h1>
+            <p className="text-gray-600 mt-1 text-sm">
+              {patient.age}y • {patient.gender === 'male' ? (lang === 'th' ? 'ชาย' : 'Male') : (lang === 'th' ? 'หญิง' : 'Female')} • {patient.surgeryType}
+            </p>
+            <p className="text-sm text-gray-500 mt-1 flex items-center gap-3 flex-wrap">
+              <span className="flex items-center gap-1"><Icons.MapPin className="w-4 h-4" /> Room {patient.room}-{patient.bed}</span>
+              <span className="flex items-center gap-1"><Icons.Phone className="w-4 h-4" /> {patient.phone}</span>
+              <span className="flex items-center gap-1"><Icons.Clock className="w-4 h-4" /> ID: {patient.id}</span>
+            </p>
+            {patient.homeAddress && (
+              <p className="text-sm text-sky-600 mt-1 flex items-center gap-1">
+                <Icons.Home className="w-4 h-4" />
+                {patient.homeAddress.street} เขต{patient.homeAddress.district} {patient.homeAddress.province}
+              </p>
+            )}
+          </div>
+          <div className={`px-4 py-2 rounded-lg font-semibold text-sm ${
+            patient.status === 'stable' ? 'bg-green-100 text-green-700' :
+            patient.status === 'warning' ? 'bg-amber-100 text-amber-700' :
+            'bg-red-100 text-red-700 animate-pulse'
+          }`}>
+            {t(`status.${patient.status}`)}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {[
+          { label: t('patient.heartRate'), value: Math.round(latest.heartRate || 0), unit: 'bpm', icon: Icons.Heart, color: 'text-red-500', bg: 'bg-red-50' },
+          { label: t('patient.bp'), value: `${latest.systolicBP || '--'}/${latest.diastolicBP || '--'}`, unit: 'mmHg', icon: Icons.Activity, color: 'text-primary-500', bg: 'bg-primary-50' },
+          { label: t('patient.spo2'), value: Math.round(latest.spo2 || 0), unit: '%', icon: Icons.Wind, color: 'text-secondary-500', bg: 'bg-secondary-50' },
+          { label: t('patient.temp'), value: latest.temperature || '--', unit: '°C', icon: Icons.Thermometer, color: 'text-orange-500', bg: 'bg-orange-50' }
+        ].map(({ label, value, unit, icon: IconC, color, bg }) => (
+          <div key={label} className={`${bg} rounded-xl border border-primary-100 p-4`}>
+            <div className="flex items-center gap-2 mb-2">
+              <IconC className={`w-5 h-5 ${color}`} />
+              <span className="text-xs text-gray-600 font-medium">{label}</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-800">{value}</p>
+            <p className="text-xs text-gray-500">{unit}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl border border-primary-100 p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h2 className="font-semibold text-gray-800">{t('chart.vital')}</h2>
+          <select value={metric} onChange={e => setMetric(e.target.value)}
+            className="px-3 py-1.5 border border-primary-200 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-primary-400">
+            <option value="all">{t('chart.all')}</option>
+            <option value="hr">{t('chart.hr')}</option>
+            <option value="bp">{t('chart.bp')}</option>
+            <option value="spo2">{t('chart.spo2')}</option>
+            <option value="temp">{t('chart.temp')}</option>
+          </select>
+        </div>
+        <div style={{ height: 300 }}>
+          <VitalChart vitals={patient.vitals} metric={metric} />
+        </div>
+      </div>
+
+      {/* In-hospital map */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white rounded-xl border border-primary-100 overflow-hidden shadow-sm" style={{ height: 400 }}>
+          <div className="px-4 py-2 bg-gradient-to-r from-primary-50 to-secondary-50 border-b border-primary-100 flex items-center gap-2">
+            <Icons.MapPin className="w-4 h-4 text-primary-600" />
+            <span className="font-semibold text-sm">{t('map.location')}</span>
+          </div>
+          <MapView patients={[patient]} center={[patient.location.lat, patient.location.lng]} zoom={16} />
+        </div>
+
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl border border-primary-100 p-4 shadow-sm">
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <Icons.Shield className="w-4 h-4 text-primary-600" /> {t('med.title')}
+            </h3>
+            <div className="space-y-2">
+              {patient.medications.map((m, i) => (
+                <div key={i} className="flex items-center justify-between p-2.5 bg-primary-50 rounded-lg text-sm">
+                  <div>
+                    <span className="font-medium text-gray-800">{m.name}</span>
+                    <span className="text-gray-500 ml-2">{m.dosage}</span>
+                  </div>
+                  <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">{m.schedule}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-primary-100 p-4 shadow-sm">
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <Icons.Clock className="w-4 h-4 text-secondary-600" /> {t('apt.title')}
+            </h3>
+            <div className="space-y-2">
+              {patient.appointments.map((a, i) => (
+                <div key={i} className="p-2.5 bg-secondary-50 rounded-lg text-sm">
+                  <p className="font-medium text-gray-800">{a.title}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(a.datetime).toLocaleString(lang === 'th' ? 'th-TH' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                  </p>
+                  {a.notes && <p className="text-xs text-gray-400 mt-1">{a.notes}</p>}
+                </div>
+              ))}
+              {patient.appointments.length === 0 && <p className="text-sm text-gray-400">{t('apt.none')}</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Home address map + Hospital recommendation */}
+      {patient.homeAddress && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Home map */}
+          <div className="bg-white rounded-xl border border-sky-200 overflow-hidden shadow-sm" style={{ height: 420 }}>
+            <div className="px-4 py-2 bg-gradient-to-r from-sky-50 to-cyan-50 border-b border-sky-100 flex items-center gap-2">
+              <Icons.Home className="w-4 h-4 text-sky-600" />
+              <span className="font-semibold text-sm text-sky-700">{t('home.address')} — เขต{patient.homeAddress.district}</span>
+            </div>
+            <div className="px-4 py-2 bg-sky-50 border-b border-sky-100 flex flex-wrap gap-3 text-xs text-gray-500">
+              <span>🏠 บ้านผู้ป่วย</span>
+              <span>🏥 สถานพยาบาลใกล้เคียง (top 3)</span>
+            </div>
+            <div style={{ height: 345 }}>
+              <MapView
+                patients={[patient]}
+                center={[patient.homeAddress.lat, patient.homeAddress.lng]}
+                zoom={13}
+                showHomeMarkers={true}
+                showHospitalMarkers={true}
+                hospitals={nearestHospitals}
+              />
+            </div>
+          </div>
+
+          {/* Hospital recommendation */}
+          <HospitalRecommendation patient={patient} t={t} lang={lang} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ Alerts Page ============
+const AlertsPage = () => {
+  const { t } = useApp();
+  return (
+    <div className="space-y-4 fade-in">
+      <h1 className="text-2xl font-bold gradient-text">{t('nav.alerts')}</h1>
+      <AlertPanel />
+    </div>
+  );
+};
+
+// ============ Settings ============
+const Settings = () => {
+  const { t, lang, changeLang, user, addToast } = useApp();
+  const [notify, setNotify] = useState({ sms: true, line: true, push: true });
+
+  const testNotify = (channel) => {
+    const msgs = { sms: t('toast.sms'), line: t('toast.line'), push: t('toast.push') };
+    addToast(`✅ ${msgs[channel]} - Test`, 'info');
+  };
+
+  return (
+    <div className="max-w-2xl space-y-4 fade-in">
+      <h1 className="text-2xl font-bold gradient-text">{t('nav.settings')}</h1>
+
+      <div className="bg-white rounded-xl border border-primary-100 p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <Icons.Globe className="w-5 h-5 text-primary-600" />
+          <h2 className="font-semibold text-gray-800">{t('settings.lang')}</h2>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => changeLang('th')}
+            className={`px-4 py-2 rounded-lg font-medium transition ${lang === 'th' ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+            🇹🇭 ไทย
+          </button>
+          <button onClick={() => changeLang('en')}
+            className={`px-4 py-2 rounded-lg font-medium transition ${lang === 'en' ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+            🇬🇧 English
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-primary-100 p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <Icons.Bell className="w-5 h-5 text-primary-600" />
+          <h2 className="font-semibold text-gray-800">{t('settings.notif')}</h2>
+        </div>
+        <div className="space-y-3">
+          {[
+            { key: 'sms', label: 'SMS (Twilio)', icon: '📱' },
+            { key: 'line', label: 'LINE Notify', icon: '💬' },
+            { key: 'push', label: 'Push Notification', icon: '🔔' }
+          ].map(({ key, label, icon }) => (
+            <div key={key} className="flex items-center justify-between p-3 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-lg">
+              <span className="font-medium text-sm flex items-center gap-2">
+                <span>{icon}</span> {label}
+              </span>
+              <div className="flex items-center gap-2">
+                <button onClick={() => testNotify(key)}
+                  className="text-xs px-2 py-1 bg-white border border-primary-200 rounded hover:bg-primary-50 text-primary-700">
+                  Test
+                </button>
+                <input type="checkbox" checked={notify[key]}
+                  onChange={e => setNotify({ ...notify, [key]: e.target.checked })}
+                  className="w-5 h-5 accent-primary-500" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-primary-100 p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <Icons.Shield className="w-5 h-5 text-primary-600" />
+          <h2 className="font-semibold text-gray-800">{t('settings.account')}</h2>
+        </div>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between py-2 border-b border-gray-100">
+            <span className="text-gray-500">Name</span>
+            <span className="font-medium text-gray-800">{user?.name}</span>
+          </div>
+          <div className="flex justify-between py-2 border-b border-gray-100">
+            <span className="text-gray-500">Email</span>
+            <span className="font-medium text-gray-800">{user?.email}</span>
+          </div>
+          <div className="flex justify-between py-2">
+            <span className="text-gray-500">Role</span>
+            <span className="font-medium capitalize text-gray-800">{user?.role}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Hospital list reference */}
+      <div className="bg-white rounded-xl border border-sky-200 p-5 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xl">🏥</span>
+          <h2 className="font-semibold text-gray-800">สถานพยาบาลในระบบ ({HOSPITALS.length} แห่ง)</h2>
+        </div>
+        <div className="space-y-2 max-h-64 overflow-y-auto scrollbar-thin">
+          {HOSPITALS.map(h => (
+            <div key={h.id} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50">
+              <div>
+                <span className="font-medium text-gray-800">{h.name}</span>
+                <span className="text-xs text-gray-400 ml-2">{h.specialty}</span>
+              </div>
+              <a href={`tel:${h.phone}`} className="text-xs text-sky-600 hover:underline">{h.phone}</a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============ Main App ============
+const App = () => {
+  const { user, page } = useApp();
+
+  if (!user) return <Login />;
+
+  const renderPage = () => {
+    switch (page) {
+      case 'dashboard': return <Dashboard />;
+      case 'patients': return <PatientList />;
+      case 'patient-detail': return <PatientDetail />;
+      case 'alerts': return <AlertsPage />;
+      case 'settings': return <Settings />;
+      default: return <Dashboard />;
+    }
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <Header />
+        <main className="flex-1 overflow-y-auto scrollbar-thin p-4 md:p-6">
+          {renderPage()}
+        </main>
+      </div>
+      <Toast />
+    </div>
+  );
+};
+
+// ============ Mount ============
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <AppProvider>
+    <App />
+  </AppProvider>
+);
+</script>
+</body>
+</html>
