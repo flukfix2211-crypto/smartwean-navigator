@@ -1007,7 +1007,8 @@ radio("sbt_attempt_opts","sbt_attempt",[
 const comorbItems=[
   {v:"dm",t:"DM (เบาหวาน)"},{v:"ht",t:"HT (ความดันสูง)"},{v:"heart",t:"Heart disease (HF/CAD/Arrhythmia)"},
   {v:"copd",t:"COPD"},{v:"ckd",t:"CKD (ไตเรื้อรัง)"},{v:"pneumonia",t:"Pneumonia / Sepsis"},
-  {v:"stroke",t:"Stroke / CVA"},{v:"cancer",t:"Cancer"},{v:"trauma",t:"Trauma"}
+  {v:"stroke",t:"Stroke / CVA"},{v:"cancer",t:"Cancer"},{v:"trauma",t:"Trauma"},
+  {v:"surgery",t:"การผ่าตัด (ประวัติผ่าตัดก่อนหน้า)"}
 ];
 checks("comorbidities","comorbidity",comorbItems);
 
@@ -2378,7 +2379,7 @@ function buildResearchDashboard(rows){
 
   // comorbidities
   const comorbNames={dm:"DM",ht:"HT",heart:"Heart disease",copd:"COPD",ckd:"CKD",
-    pneumonia:"Pneumonia/Sepsis",stroke:"Stroke/CVA",cancer:"Cancer",trauma:"Trauma"};
+    pneumonia:"Pneumonia/Sepsis",stroke:"Stroke/CVA",cancer:"Cancer",trauma:"Trauma",surgery:"การผ่าตัด"};
   const comorbCounts={};
   const comorbSuccess={};const comorbFail={};
   Object.keys(comorbNames).forEach(k=>{comorbCounts[k]=0;comorbSuccess[k]=0;comorbFail[k]=0;});
